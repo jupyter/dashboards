@@ -8,7 +8,7 @@ help:
 	@echo '           clean - clean built files'
 	@echo '            demo - start notebook server with stable dashboard / widget extensions'
 	@echo '             dev - start notebook server in a container with source mounted'
-	@echo 'dev-with-widgets - like dev, but with stable widgets installed'
+	@echo 'dev-with-widgets - like dev, but with stable declarativewidgets installed'
 	@echo '         install - install latest sdist into a container'
 	@echo '           sdist - build a source distribution into dist/'
 	@echo '            test - run unit tests within a container'
@@ -26,7 +26,7 @@ clean:
 	@-rm -rf *.egg-info
 	@-rm -rf etc/notebooks/test_app
 	@-rm -rf node_modules
-	@rm -rf urth_dash_js/notebook/bower_components
+	@-rm -rf urth_dash_js/notebook/bower_components
 	@-find . -name __pycache__ -exec rm -fr {} \;
 
 demo: NB_HOME?=/home/jovyan/.ipython
@@ -35,12 +35,12 @@ demo: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
 demo: configs
 	@docker run -it --rm \
 		-p 9500:8888 \
-		-v `pwd`/../dashboard-nbexts:/dashboard-nbexts \
-		-v `pwd`/../widgets:/widgets \
+		-v `pwd`:/dashboards \
+		-v `pwd`/../declarativewidgets:/declarativewidgets \
 		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
-		$(REPO) bash -c 'pip install $$(ls -1 /dashboard-nbexts/dist/*.tar.gz | tail -n 1) && \
-			pip install $$(ls -1 /widgets/dist/*.tar.gz | tail -n 1) && \
+		$(REPO) bash -c 'pip install $$(ls -1 /dashboards/dist/*.tar.gz | tail -n 1) && \
+			pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1) && \
 			$(CMD)'
 
 dev: NB_HOME?=/home/jovyan/.ipython
@@ -77,13 +77,13 @@ dev-with-widgets: configs
 		-e USE_HTTP=1 \
 		-e PASSWORD='' \
 		-e AUTORELOAD=$(AUTORELOAD) \
-		-v `pwd`/../widgets:/widgets \
+		-v `pwd`/../declarativewidgets:/declarativewidgets \
 		-v `pwd`/urth_dash_js:$(NB_HOME)/nbextensions/urth_dash_js \
 		-v `pwd`/urth/dashboard:/opt/conda/lib/python3.4/site-packages/urth/dashboard \
 		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/profile_default/nbconfig/notebook.json \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
-		$(REPO) bash -c 'pip install $$(ls -1 /widgets/dist/*.tar.gz | tail -n 1) && \
+		$(REPO) bash -c 'pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1) && \
 			$(CMD)'
 
 install: REPO?=jupyter/pyspark-notebook:3.2
