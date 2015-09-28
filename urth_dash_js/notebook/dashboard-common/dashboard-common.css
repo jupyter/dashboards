@@ -1,0 +1,23 @@
+/**
+ * Copyright (c) Jupyter Development Team.
+ * Distributed under the terms of the Modified BSD License.
+ */
+
+.container div.output_wrapper {
+    z-index: auto; /* override `z-index:1` set by Notebook */
+}
+
+.container div.output_subarea {
+    max-width: none; /* override Notebook CSS so it takes up full width */
+    overflow: visible; /* ensure contents overflow, needed for widgets such as dropdown menus */
+}
+
+/* disable display of paragraph anchor text*/
+.container h1:hover .anchor-link,
+.container h2:hover .anchor-link,
+.container h3:hover .anchor-link,
+.container h4:hover .anchor-link,
+.container h5:hover .anchor-link,
+.container h6:hover .anchor-link {
+    display: none;
+}

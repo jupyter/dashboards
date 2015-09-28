@@ -1,0 +1,281 @@
+/**
+ * Copyright (c) Jupyter Development Team.
+ * Distributed under the terms of the Modified BSD License.
+ */
+
+/* hide extraneous cell parts when in dashboard view  */
+.urth-dashboard .celltoolbar,
+.urth-dashboard .container:not(.show-code) .cell > .input,
+.urth-dashboard .container:not(.show-code) .prompt {
+    display: none !important; /* Necessary to override inline style set by notebook */
+}
+
+/* Gridstack container */
+.grid-stack#notebook-container {
+    padding-left: 0;
+    padding-right: 0;
+    transition: all 0.75s;
+    transition-delay: 0.25s;
+    transition-property: background-color, box-shadow;
+}
+body:not(.view-only) .grid-stack#notebook-container:hover {
+    background-color: transparent;
+    box-shadow: none;
+}
+.grid-stack#notebook-container .grid-stack-placeholder {
+    transition-duration: 0.25s;
+}
+.grid-stack#notebook-container .grid-stack-placeholder > .placeholder-content {
+    border: 2px dashed #5bc0de;
+    background-color: transparent;
+
+    /*
+        computed by gridstack-custom:
+
+        left:  (margin/2)px;
+        right: (margin/2)px;
+     */
+}
+
+/* Gridstack cells */
+.grid-stack .cell {
+    background: transparent;
+    border: none;
+
+    /*
+        computed by gridstack-custom:
+
+        padding: 0 (margin/2)px;
+     */
+}
+.grid-stack .dashboard-item-background {
+    position: absolute;
+    background-color: white;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    transition: box-shadow 0.75s 0.25s;
+
+    /*
+        computed by gridstack-custom:
+
+        left: (margin/2)px;
+        right: (margin/2)px;
+     */
+}
+.grid-stack:hover .dashboard-item-background,
+.urth-dashboard #dashboard-hidden-container .cell {
+    box-shadow: 0 1px 5px 1px rgba(87,87,87,0.2);
+}
+.urth-dashboard .ui-draggable-dragging.cell,
+.urth-dashboard .ui-resizable-resizing.cell {
+    opacity: 0.75;
+}
+.grid-stack .cell > :not(.dashboard-item-background):not(.ui-resizable-handle) {
+    /*
+        computed by gridstack-custom:
+
+        margin-left: (margin/2)px;
+        margin-right: (margin/2)px;
+     */
+}
+.urth-dashboard #notebook-container .cell:not(.grid-stack-item) {
+    display: none;
+}
+
+/* Grid cell controls */
+.urth-dashboard .cell .grid-control-container {
+    visibility: hidden;
+    position: absolute;
+    color: #b2b2b2;
+    top: 0;
+
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-top: none;
+
+    /* widgets overlap, so pull forward */
+    z-index: 100;
+}
+.urth-dashboard .cell:hover .grid-control-container {
+    visibility: visible;
+}
+.urth-dashboard .cell .grid-control-container.grid-control-nw {
+    border-left: none;
+
+    /*
+        computed by gridstack-custom:
+
+        left: (margin/2)px;
+     */
+}
+.urth-dashboard #dashboard-hidden-container .cell .grid-control-container.grid-control-nw {
+    left: 0;
+}
+.urth-dashboard .cell .grid-control-container.grid-control-ne {
+    border-right: none;
+
+    /*
+        computed by gridstack-custom:
+
+        right: (margin/2)px;
+     */
+}
+.urth-dashboard #dashboard-hidden-container .cell .grid-control-container.grid-control-ne {
+    right: 0;
+}
+.urth-dashboard .cell .grid-control {
+    padding: 5px;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+}
+
+/* Grid cell controls: drag */
+.urth-dashboard .cell:hover .drag-handle:hover {
+    border-color: #306c9e;
+    cursor: move; /* for old IE */
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+body.dragging,
+body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hover {
+    cursor: -webkit-grabbing !important;
+    cursor: grabbing !important;
+}
+
+/* Grid cell controls: edit cell */
+.urth-dashboard .cell:hover .edit-btn:hover {
+    color: #306c9e;
+    cursor: pointer;
+}
+
+/* Grid cell controls: hide cell */
+.urth-dashboard .cell:hover .close-btn:hover {
+    color: red;
+    cursor: pointer;
+}
+
+/* Hidden Cells */
+.urth-dashboard #dashboard-hidden-container {
+    padding: 15px;
+    margin-top: 5em;
+}
+
+.urth-dashboard #dashboard-hidden-container .cell {
+    min-height: 100px;
+    background-color: #fff;
+    position: relative;
+    border: none;
+}
+
+.urth-dashboard #dashboard-hidden-container .cell:not(:first-child) {
+    margin-top: 15px;
+}
+
+.urth-dashboard #dashboard-hidden-container .cell .grid-control.drag-handle,
+.urth-dashboard #dashboard-hidden-container .cell .grid-control.close-btn {
+    display: none; /* hide controls which aren't used in hidden cells */
+}
+
+
+.urth-dashboard #dashboard-hidden-container .cell .gs-resize-handle {
+    display: none;
+}
+.urth-dashboard #dashboard-hidden-container .cell .grid-control.add-btn:hover {
+    color: #306c9e;
+    cursor: pointer;
+}
+
+.urth-dashboard #dashboard-hidden-container .header {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: center;
+        -ms-flex-align: center;
+            align-items: center;
+    margin: 2em 0;
+}
+.urth-dashboard #dashboard-hidden-container .header .title {
+    margin: 0 1em 0 0;
+}
+.urth-dashboard #dashboard-hidden-container .header .btn:not(.btn-info) {
+    background-color: transparent;
+    border: 1px solid black;
+}
+
+/* static view */
+.view-only .grid-stack-static .cell.ui-state-disabled {
+    /* override disabled state set by jquery-ui */
+    opacity: 1;
+    -webkit-filter: none;
+            filter: none;
+}
+.view-only .grid-stack-static .cell.ui-state-disabled .grid-control-container {
+    display: none;
+}
+.view-only #dashboard-hidden-container {
+    display: none;
+}
+
+/* Edit cell animation */
+.cell.edit-select {
+    -webkit-animation: shadow-fade 2s linear 250ms;
+            animation: shadow-fade 2s linear 250ms;
+}
+@-webkit-keyframes shadow-fade {
+    0%   { box-shadow: 0 0 10px 2px #5bc0de; }
+    100% { box-shadow: 0 0 10px 2px transparent; }
+}
+@keyframes shadow-fade {
+    0%   { box-shadow: 0 0 10px 2px #5bc0de; }
+    100% { box-shadow: 0 0 10px 2px transparent; }
+}
+
+/* Gridstack Overrides */
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-se,
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-sw {
+    width:  8px;
+    height: 8px;
+    bottom: 5px;
+    border: 2px solid rgb(178, 178, 178);
+    border-top: none;
+    -webkit-transform: none;
+            transform: none;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-se {
+    /*
+        computed in gridstack-custom:
+
+        right: 5px + (margin/2)px;
+    */
+    border-left: none;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-sw {
+    /*
+        computed in gridstack-custom:
+
+        left: 5px + (margin/2)px;
+    */
+    border-right: none;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-se::before,
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-sw::before {
+    content: ""; /* remove the existing drag icons */
+}
+
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-e,
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-w {
+    top: 25px;
+    bottom: 25px;
+    height: auto;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-e {
+    right: 0;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-w {
+    left: 0;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-s {
+    width: auto;
+}

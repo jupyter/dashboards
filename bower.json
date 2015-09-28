@@ -1,0 +1,22 @@
+{
+  "name": "dashboard-nbexts",
+  "version": "0.1.0",
+  "authors": [
+    "Jupyter Community"
+  ],
+  "main": "main.js",
+  "moduleType": [
+    "amd"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "gridstack": "5bbd8d5f54edc48",
+    "requirejs": "~2.1.20"
+  }
+}

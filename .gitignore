@@ -55,3 +55,16 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Project specific
+dist/
+node_modules/
+.ipynb_checkpoints/
+bower_components/
+__pycache__/
+*.egg-info/
+etc/notebooks/*
+!etc/notebooks/*_demo
+!etc/notebooks/test/*
+etc/ipython_notebook_config.py
+etc/notebook.json

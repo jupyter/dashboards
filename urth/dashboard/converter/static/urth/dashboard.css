@@ -1,0 +1,108 @@
+/**
+ * Copyright (c) Jupyter Development Team.
+ * Distributed under the terms of the Modified BSD License.
+ */
+ html {
+    box-sizing: border-box;
+}
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+body {
+    margin: 0;
+}
+
+body.grid-view {
+    background-color: #606672;
+    background-image: url(img/noisy-texture.png);
+}
+
+#outer-dashboard {
+    position: relative;
+    padding: 15px 0;
+    background-color: white;
+    min-height: 100vh;
+    box-shadow: 0 0 59px 19px rgba(0, 0, 0, 0.5);
+}
+
+/* busy indicator */
+.busy-indicator {
+    visibility: hidden;
+    position: fixed;
+    top: -8px;
+    height: 8px;
+    width: inherit;
+    border-radius: 0;
+    /* change 'visibility' after 'top' transition is done */
+    transition: top 0.3s, visibility 0s linear 0.3s;
+}
+.busy-indicator.show {
+    top: 0;
+    visibility: visible;
+    transition-delay: 0s; /* change 'visibility' before 'top' transition is done */
+}
+
+/* cell Run buttons */
+.thebe_controls button[data-action="run-above"],
+.thebe_controls button[data-action="run"] {
+  display: none;
+}
+/* input areas and cell execution indicators */
+.thebe_wrap .input,
+.thebe_wrap .prompt,
+.thebe_wrap .output_prompt,
+.thebe_wrap .out_prompt_overlay {
+  display: none !important;
+}
+/* kernel restart/interrupt/shutdown controls for the page */
+body .kernel_controls {
+  display: none;
+}
+/* output clearing button */
+.prompt .close {
+  display: none;
+}
+
+.ui-dialog-titlebar,
+.mpl-message {
+    display: none;
+}
+
+#dashboard-container {
+    margin: 0 auto;
+
+    /* styles taken from `#notebook` selector in Notebook */
+    font-size: 14px;
+    line-height: 20px;
+}
+
+#dashboard-container .grid-stack-item.rendered_html {
+    /*
+        computed in dashboard.js:
+
+        padding: (margin/2)px  (margin/2 + 6)px;
+     */
+}
+
+#dashboard-container > :not(.grid-stack-item) {
+    display: none;
+}
+
+.show-row-only {
+    background: none;
+}
+.show-row-only #outer-dashboard {
+    min-height: auto;
+    box-shadow: none;
+    width: auto;
+}
+.show-row-only #dashboard-container {
+    padding: 0;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+.show-row-only.single-cell .grid-stack-item {
+    width: 100%;
+    height: 100%;
+}

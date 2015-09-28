@@ -1,0 +1,33 @@
+{
+  "name": "dashboard-nbexts",
+  "version": "0.1.0",
+  "description": "Extensions for Jupyter / IPython Notebook to enable the authoring and deployment of dashboards from notebooks.",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "autoprefixer": "^5.2.0",
+    "bower": "^1.4.1",
+    "postcss-cli": "^1.5.0"
+  },
+  "config": {
+    "css_nb_dir": "urth_dash_js/notebook/dashboard-view",
+    "css_th_dir": "urth/dashboard/converter/static/urth"
+  },
+  "scripts": {
+    "test": "make test",
+    "css": "postcss --use autoprefixer $npm_package_config_css_nb_dir/*.css --dir $npm_package_config_css_nb_dir/ --config postcss-config.json && postcss --use autoprefixer $npm_package_config_css_th_dir/*.css --dir $npm_package_config_css_th_dir/ --config postcss-config.json",
+    "bower": "bower install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyter-incubator/dashboards.git"
+  },
+  "keywords": [
+    "ipython",
+    "jupyter",
+    "urth"
+  ],
+  "author": "Jupyter Community"
+}

@@ -1,0 +1,5 @@
+{
+  "load_extensions": {
+    "urth_dash_js/notebook/main": true
+  }
+}

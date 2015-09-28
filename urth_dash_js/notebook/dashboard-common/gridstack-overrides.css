@@ -1,0 +1,12 @@
+/**
+ * Copyright (c) Jupyter Development Team.
+ * Distributed under the terms of the Modified BSD License.
+ */
+
+/****************************************************
+ *  Override Gridstack width properties so that we  *
+ *  can show a margin between horizontal cells.     *
+ ****************************************************/
+.grid-stack > .grid-stack-item {
+    min-width: 0;
+}
