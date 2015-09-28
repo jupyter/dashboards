@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import time
 import re
+import os.path
 import glob
 from tempfile import mkdtemp
 from IPython.utils.path import get_ipython_dir
@@ -30,7 +31,7 @@ ENV TMPNB_MODE {tmpnb_mode}
 COPY . /var/www/html/
 '''
 
-def to_php_app(notebook_fn, app_location=None):
+def to_php_app(notebook_fn, app_location=None, template_fn=None):
     '''
     Converts a notebook into a PHP Thebe application that will contact the
     Jupyter kernel server given in the KERNEL_SERVICE_URL environment variable
@@ -41,7 +42,7 @@ def to_php_app(notebook_fn, app_location=None):
     :returns:
     '''
     # Invoke nbconvert to get the HTML
-    full_output = to_thebe_html(notebook_fn, {}, 'html', os.getcwd())
+    full_output = to_thebe_html(notebook_fn, {}, 'html', os.getcwd(), template_fn)
 
     # Get a reasonable human readable name for the app
     notebook_basename = os.path.basename(notebook_fn)
@@ -265,12 +266,12 @@ def install_notebook_components(components, components_dir):
     #         we wish to install the components in, but running the command
     #         will create a bower_components under that directory. So we
     #         currently install to a tmp dir and move the bower_components folder
-    #         to be the install fodler we want.
+    #         to be the install folder we want.
     tmp_install_dir = mkdtemp()
     subprocess.check_call(['bower', 'install'] + components + ['--allow-root', '--config.interactive=false'], cwd=tmp_install_dir)
     shutil.move(os.path.join(tmp_install_dir,'bower_components'), components_dir)
 
-def to_thebe_html(path, env_vars, fmt, cwd):
+def to_thebe_html(path, env_vars, fmt, cwd, template_fn):
     '''
     Converts a notebook at path with env vars and current working directory set.
     If the conversion subprocess emits anything on its stderr, raises
@@ -288,7 +289,7 @@ def to_thebe_html(path, env_vars, fmt, cwd):
             '--stdout',
             '--TemplateExporter.template_path=["{}"]'.format(TEMPLATES_PATH),
             '--template',
-            'thebe.tpl',
+            template_fn if template_fn is not None and os.path.isfile(os.path.join(TEMPLATES_PATH, template_fn)) else 'thebe.tpl',
             '--to',
             fmt,
             path
