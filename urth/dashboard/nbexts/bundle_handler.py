@@ -60,7 +60,7 @@ class NewBundleHandler(IPythonHandler):
             raise web.HTTPError(400, 'unknown bundle type')
 
     def _create_app_bundle(self, abs_nb_path, bundle_dir_suffix=None,
-        bundle_root=None, overwrite=False):
+        bundle_root=None, overwrite=False, template_fn=None):
         '''
         Creates an application bundle containing a manifest.yml for Cloud
         Foundry and a Dockerfile for Docker.
@@ -128,7 +128,7 @@ class NewBundleHandler(IPythonHandler):
         else:
             raise RuntimeError('could not create bundle directory')
         # Do the conversion
-        converter.to_php_app(abs_nb_path, bundle_dir)
+        converter.to_php_app(abs_nb_path, bundle_dir, template_fn)
 
         # Return metadata
         return {
@@ -199,7 +199,7 @@ class NewBundleHandler(IPythonHandler):
 
         :param abs_nb_path:
         '''
-        md = self._create_app_bundle(abs_nb_path, bundle_root=self.nb_dir, overwrite=True)
+        md = self._create_app_bundle(abs_nb_path, bundle_root=self.nb_dir, overwrite=True, template_fn='local.tpl')
         with open(md['bundle_dir']+'/index.php', encoding="utf-8") as f:
             php = f.read()
         # Just hack the replacement of the one PHP bit for now. Would be better
