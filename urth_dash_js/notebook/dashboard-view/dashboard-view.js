@@ -10,10 +10,12 @@
 define([
     'require',
     './dashboard-actions',
+    './polymer-support',
     '../link-css'
 ], function(
     require,
     DashboardActions,
+    PolymerSupport,
     linkCSS
 ) {
     'use strict';
@@ -45,6 +47,8 @@ define([
 
     var dashboard;
 
+    PolymerSupport.init();
+
     var dbActions = new DashboardActions({
         enterDashboardMode: function(doEnableGrid) {
             require(['./dashboard'], function(Dashboard) {
@@ -57,17 +61,24 @@ define([
                         defaultCellWidth: 4,
                         defaultCellHeight: 4,
                         minCellHeight: 2,
+                        onResize: PolymerSupport.onResize,
                         exit: function() {
                             dbActions.switchToNotebook();
                         }
                     });
                 }
-                dashboard.setInteractive(doEnableGrid);
+                dashboard.setInteractive({
+                    enable: doEnableGrid,
+                    complete: function() {
+                        PolymerSupport.notifyResizeAll();
+                    }
+                });
             });
         },
         exitDashboardMode: function() {
             dashboard.destroy();
             dashboard = null;
+            PolymerSupport.notifyResizeAll();
         },
         showAll: function() {
             dashboard.showAllCells();
