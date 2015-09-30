@@ -31,10 +31,14 @@ define([
 
             var target = event.path ? event.path[0] : event.target;
             resizableElements = resizableElements.add(target);
-            // target.assignParentResizable(this);
-            target.notifyResize();
+            fireIronResizeEvent(target);
             event.stopPropagation();
         });
+    }
+
+    function fireIronResizeEvent(node) {
+        var evt = new Event('iron-resize', { bubbles: false });
+        node.dispatchEvent(evt);
     }
 
     function onResize(cellNode) {
@@ -42,13 +46,13 @@ define([
             return $(this).parents().is(cellNode);
         })
         .each(function() {
-            this.notifyResize();
+            fireIronResizeEvent(this);
         });
     }
 
     function notifyResizeAll() {
         resizableElements.each(function() {
-            this.notifyResize();
+            fireIronResizeEvent(this);
         });
     }
 
