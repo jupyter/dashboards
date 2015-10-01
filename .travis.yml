@@ -1,0 +1,28 @@
+sudo: required
+
+language: python
+
+python:
+    - 3.4
+
+services:
+  - docker
+
+before_install:
+- sudo apt-get update -qq
+- sudo apt-get install -y nodejs
+- docker pull jupyter/pyspark-notebook:3.2
+
+install:
+  - npm install
+
+script:
+- make test
+- make sdist
+- make install
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+  slack: cloudet:rMfRKhvsbZuCIRZpTct3kBI4
