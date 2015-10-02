@@ -8,7 +8,7 @@ Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording
 
 * Dashboard layout mode for arranging notebook cell outputs in a grid-like fashion
 * Dashboard view mode for interacting with an assembled dashboard within the Jupyter Notebook
-* Ability to share notebooks with dashboard layout metadata in them with other Jupyter Notebook
+* Ability to share notebooks with dashboard layout metadata in them with other Jupyter Notebook users
 * Ability to nbconvert a notebook to a separate dashboard web application
 
 ## What It Lacks
@@ -112,9 +112,11 @@ It's within the scope of this incubator project to allow users to both:
 1. Dashboard layouts within notebooks, persist the layout metadata within the notebook JSON, and share those dashboard-notebooks with other Jupyter users, and
 2. Convert and deploy dashboard-notebooks as standalone web applications. 
 
-At the moment, the second point is still very much a proof of concept. It currently relies on [thebe](https://github.com/oreillymedia/thebe) as a client for talking to a remote kernel, [tmpnb](https://github.com/jupyter/tmpnb) for provisioning remote kernels, and proper configuration of the kernel environment so that dashboard-launched kernels have access to the same data, libraries, etc. as the notebook authoring environment.
+At the moment, the second point is still very much a proof of concept. It currently relies on [thebe](https://github.com/oreillymedia/thebe) as a client for talking to a remote kernel, [tmpnb](https://github.com/jupyter/tmpnb) for provisioning remote kernels, and proper configuration of the kernel environment so that dashboard-launched kernels have access to the same data, libraries, etc. as the notebook authoring environment. Security is practically non-existent, scalability is limited, and compatibility is fixed with an older version of Jupyter.
 
-If you'd like to try external deployment today, you can do one of two things. 
+None of these are inherent flaws. Dashboards are simply a new use case that pushes the Jupyter dependencies beyond their current limits. It's wonderful, in fact, that we are able to show dashboard deployment using what exists in open source today. Over time, we'll shore this facet up with the community (see https://github.com/jupyter-incubator/dashboards/issues/13).
+
+All this said, if you'd like to try external deployment today for your **non-production use case**, you can do one of two things. 
 
 First, you can click *File &rarr; Deploy As &rarr; Local Dashboard*. This will use the local Jupyter Notebook instance both as a static web server for the dashboard assets (via the `/files` endpoint) and as the kernel provisioner (via `/api/kernels`). Keep in mind, however, that kernels launched by Thebe are not tracked in the Notebook UI and cannot be cleaned up easily.
 
