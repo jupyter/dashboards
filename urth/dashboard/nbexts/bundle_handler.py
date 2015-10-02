@@ -156,8 +156,8 @@ class NewBundleHandler(IPythonHandler):
             md['tmpnb_mode']
         )
         converter.to_git_repository(md['bundle_dir'])
-        bundle_url_path = url_path_join(self.application.settings['base_url'],
-            'bundle',
+        # The jupyter_server already includes the base_url
+        bundle_url_path = url_path_join('bundle',
             md['bundle_id'],
             md['notebook_basename'] + '.git'
         )
