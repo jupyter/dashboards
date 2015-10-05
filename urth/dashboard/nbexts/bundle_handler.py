@@ -199,7 +199,7 @@ class NewBundleHandler(IPythonHandler):
 
         :param abs_nb_path:
         '''
-        md = self._create_app_bundle(abs_nb_path, bundle_root=self.nb_dir, overwrite=True, template_fn='local.tpl')
+        md = self._create_app_bundle(abs_nb_path, bundle_root=os.path.join(self.nb_dir, 'local_dashboards'), overwrite=True, template_fn='local.tpl')
         with open(md['bundle_dir']+'/index.php', encoding="utf-8") as f:
             php = f.read()
         # Just hack the replacement of the one PHP bit for now. Would be better
@@ -211,6 +211,7 @@ class NewBundleHandler(IPythonHandler):
             fh.write(html)
         bundle_url_path = url_path_join(self.application.settings['base_url'],
             'files',
+            'local_dashboards',
             escape.url_escape(md['bundle_id'], False),
             'index.html'
         )

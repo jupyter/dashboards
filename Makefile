@@ -25,6 +25,7 @@ clean:
 	@-rm -rf dist
 	@-rm -rf *.egg-info
 	@-rm -rf etc/notebooks/test_app
+	@-rm -rf etc/notebooks/local_dashboards
 	@-rm -rf node_modules
 	@-rm -rf urth_dash_js/notebook/bower_components
 	@-find . -name __pycache__ -exec rm -fr {} \;
