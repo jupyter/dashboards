@@ -37,8 +37,9 @@ def to_php_app(notebook_fn, app_location=None, template_fn=None):
     Jupyter kernel server given in the KERNEL_SERVICE_URL environment variable
     to execute code.
 
-    :param notebook_fn:
-    :param app_location:
+    :param notebook_fn: notebook file path
+    :param app_location: output directory
+    :param template_fn: template file name
     :returns:
     '''
     # Invoke nbconvert to get the HTML
