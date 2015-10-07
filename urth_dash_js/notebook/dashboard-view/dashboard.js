@@ -37,6 +37,9 @@ define([
     var cssLoaded = false;
     var idCounter = 0;
 
+    // duration => the resize transition on gridstack and gridstack cells
+    var RESIZE_DURATION = 350;
+
     var Dashboard = function(opts) {
         this.$container = $(opts.container);
         this.opts = opts;
@@ -150,6 +153,18 @@ define([
                 $('body').toggleClass('dragging', event.type === 'dragstart');
             })
             .data('gridstack');
+
+        if (typeof this.opts.onResize === 'function') {
+            var self = this;
+            this.$container.on('resizestop', function(event, ui) {
+                // Gridstack fires this event before the resizing animation has finished
+                // (see https://github.com/troolee/gridstack.js/issues/159). Temporary workaround
+                // is to fire our callback after the resize transition has finished.
+                setTimeout(function() {
+                    self.opts.onResize(event.target);
+                }, RESIZE_DURATION);
+            });
+        }
 
         // setup dynamic style rules which depend on margin size
         var halfMargin = this.opts.gridMargin / 2;
@@ -476,9 +491,14 @@ define([
             height: grid.height
         };
         this._updateCellMetadata($cell, layout, batch);
+
+        // notify contents that cell may have been resized
+        if (typeof this.opts.onResize === 'function') {
+            this.opts.onResize($cell.get(0));
+        }
     };
 
-    Dashboard.prototype._toggleHiddenCellCode = function(evt) {
+    Dashboard.prototype._toggleHiddenCellCode = function(event) {
         $('#dashboard-hidden-container').toggleClass('show-code');
         var $button = $(event.target);
         $button.toggleClass('btn-info');
@@ -514,13 +534,17 @@ define([
      * Set dashboard to allow draggging/resizing/showing/hiding or enable static mode.
      * @param  {boolean} doEnable   if `false`, sets dashboard to static mode
      */
-    Dashboard.prototype.setInteractive = function(doEnable) {
+    Dashboard.prototype.setInteractive = function(args) {
         this._loaded.then(function() {
-            this.gridstack.set_static(!doEnable);
-            if (doEnable) {
+            this.gridstack.set_static(!args.enable);
+            if (args.enable) {
                 this.gridstack.enable();
             } else {
                 this.gridstack.disable();
+            }
+            // if enabling grid, need to wait for resize transition to finish
+            if (typeof args.complete === 'function') {
+                setTimeout(args.complete, args.enable ? RESIZE_DURATION : 0);
             }
         }.bind(this));
     };
