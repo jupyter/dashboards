@@ -111,6 +111,8 @@ define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog
 
             initThebe({
                 url: Urth.thebe_url
+            }).notebook.events.on('kernel_created.Kernel kernel_created.Session', function(e) {
+                ErrorLog.enable(window.IPython);
             });
 
             var row = getQueryParam('row');
@@ -131,8 +133,6 @@ define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog
 
         executeAll: function() {
             thebe.run_cell(0, thebe.cells.length);
-            // have to register after first cell exec?
-            ErrorLog.enable(window.IPython);
         }
     };
 });
