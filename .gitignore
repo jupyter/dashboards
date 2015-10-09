@@ -65,6 +65,6 @@ __pycache__/
 *.egg-info/
 etc/notebooks/*
 !etc/notebooks/*_demo
-!etc/notebooks/test/*
+!etc/notebooks/test/
 etc/ipython_notebook_config.py
 etc/notebook.json
