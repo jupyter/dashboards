@@ -255,7 +255,7 @@ define([
     };
 
     // Update cell's metadata.
-    // Set `batch` to true if updating multiple cells. Will need to call `save_notebook` afterwards.
+    // Set `batch` to true if updating multiple cells. Will need to call `set_dirty` afterwards.
     Dashboard.prototype._updateCellMetadata = function($cell, layout, batch) {
         var metadata = this._getCellMetadata($cell);
         if (layout) {
@@ -266,7 +266,7 @@ define([
             metadata.urth.dashboard.hidden = true;
         }
         if (!batch) {
-            IPython.notebook.save_notebook();
+            IPython.notebook.set_dirty(true);
         }
     };
 
@@ -424,7 +424,7 @@ define([
             self._updateCellMetadata($(this), layout, true);
         });
 
-        IPython.notebook.save_notebook();
+        IPython.notebook.set_dirty(true);
     };
 
     Dashboard.prototype._hideCell = function($cell, batch, prepend) {
@@ -514,7 +514,7 @@ define([
             .each(function() {
                 self._showCell($(this), true /* batch */);
             });
-        IPython.notebook.save_notebook();
+        IPython.notebook.set_dirty(true);
     };
 
     /**
@@ -527,7 +527,7 @@ define([
             .each(function() {
                 self._hideCell($(this), true /* batch */, false /* prepend */);
             });
-        IPython.notebook.save_notebook();
+        IPython.notebook.set_dirty(true);
     };
 
     /**
