@@ -27,6 +27,7 @@ define([
     var exitDbModeCallback;
     var showAllCallback;
     var hideAllCallback;
+    var scrollToBottom;
 
     function queryState() {
         var idx = window.location.search.slice(1).split(/[&=]/).indexOf('dashboard');
@@ -56,6 +57,10 @@ define([
         exitDbModeCallback();
         updateUrlState(false);
         toggleHeaders(true); // enable header and toolbar
+
+        // restore scrolling behavior
+        IPython.Notebook.prototype.scroll_to_bottom = scrollToBottom;
+        scrollToBottom = null;
     }
 
     function enterDashboardMode(newState, prevState) {
@@ -71,6 +76,10 @@ define([
 
         enterDbModeCallback(newState === STATE_DASHBOARD_AUTH /* doEnableGrid */);
         updateUrlState(newState === STATE_DASHBOARD_VIEW);
+
+        // disable scroll to bottom of notebook
+        scrollToBottom = IPython.Notebook.prototype.scroll_to_bottom;
+        IPython.Notebook.prototype.scroll_to_bottom = function() {};
     }
 
     var isHeaderVisible = true;
