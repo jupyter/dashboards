@@ -9,6 +9,32 @@ define([
 ], function($, IPython) {
     'use strict';
 
+    var do_bundle = function(type) {
+        // Notebook name might change so read it here
+        // Do base_url here too because I don't know when that changes
+        var base_url = IPython.notebook.base_url;
+        var path = IPython.notebook.notebook_path;
+        var url = (
+            location.protocol + '//' +
+            location.host +
+            base_url +
+            'bundle?type=' + type + 
+            '&notebook=' + encodeURIComponent(path)
+        );
+
+        // Have to open new window immediately to avoid popup blockers
+        var w = window.open('', IPython._target);
+        if (IPython.notebook.dirty) {
+            // Delay requesting the bundle until a dirty notebook is saved
+            IPython.notebook.save_notebook().then(function() {
+                w.location = url;
+            });
+        } else {
+            w.location = url;
+        }
+    };
+
+    // Add the menu items after DOM ready
     $(function() {
         var $li = $('<li>')
             .addClass('dropdown-submenu')
@@ -29,18 +55,7 @@ define([
         if (window.location.search.indexOf('enable_bluemix_deploy') > 0) {
             // still possible to trigger if added and just disabled
             $a.on('click', function() {
-                // Notebook name might change so read it here
-                // Do base_url here too because I don't know when that changes
-                var base_url = IPython.notebook.base_url;
-                var path = IPython.notebook.notebook_path;
-                // Have to open immediately to avoid popup blockers
-                window.open(
-                    location.protocol + '//' +
-                    location.host +
-                    base_url +
-                    'bundle?type=bluemix&notebook='+
-                    encodeURIComponent(path)
-                );
+                do_bundle('bluemix');
             });
         }
         else {
@@ -53,40 +68,17 @@ define([
             .text('Local Dashboard')
             .appendTo($li)
             .on('click', function() {
-                // Notebook name might change so read it here
-                // Do base_url here too because I don't know when that changes
-                var base_url = IPython.notebook.base_url;
-                var path = IPython.notebook.notebook_path;
-
-                // Have to open immediately to avoid popup blockers
-                window.open(
-                    location.protocol + '//' +
-                    location.host +
-                    base_url +
-                    'bundle?type=dashboard&notebook='+
-                    encodeURIComponent(path)
-                );
+                do_bundle('dashboard');
             });
 
         $li = $('<li>')
             .insertAfter($('#download_pdf'));
         $('<a>')
-            .text('Dashboard Bundle (zip)')
+            .attr('href', '#')
+            .text('Dashboard Bundle (.zip)')
             .appendTo($li)
             .on('click', function() {
-                // Notebook name might change so read it here
-                // Do base_url here too because I don't know when that changes
-                var base_url = IPython.notebook.base_url;
-                var path = IPython.notebook.notebook_path;
-
-                // Have to open immediately to avoid popup blockers
-                window.open(
-                    location.protocol + '//' +
-                    location.host +
-                    base_url +
-                    'bundle?type=zip&notebook='+
-                    encodeURIComponent(path)
-                );
+                do_bundle('zip');
             });
     });
 });
