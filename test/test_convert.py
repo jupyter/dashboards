@@ -131,3 +131,37 @@ class TestConverter(unittest.TestCase):
                 result == expected_results[i],
                 'Did not find expected components {0} in {1}'.format(expected_results[i], result)
             )
+
+    def test_get_cell_references_comment(self):
+        self.assertTrue(urth.dashboard.converter._get_references)
+        no_references = urth.dashboard.converter._get_references({'source':'!ls', 'cell_type':'code'})
+        self.assertTrue(no_references is None)
+        cell = {'cell_type':'markdown', 'source':'<!--associate:\na\nb/\n#comment\n-->'}
+        references = urth.dashboard.converter._get_references(cell)
+        self.assertTrue('a' in references and 'b/' in references, str(references))
+        self.assertEqual(len(references), 3, str(references))
+        cell = {'cell_type':'markdown', 'source':'<!--associate:c\na\nb/\n#comment\n-->'}
+        references = urth.dashboard.converter._get_references(cell)
+        self.assertTrue('a' in references and 'b/' in references and 'c' in references, str(references))
+        self.assertEqual(len(references), 3, str(references))
+
+    def test_get_cell_references_precode(self):
+        self.assertTrue(urth.dashboard.converter._get_references)
+        no_references = urth.dashboard.converter._get_references({'source':'!ls', 'cell_type':'code'})
+        self.assertTrue(no_references is None)
+        cell = {'cell_type':'markdown', 'source':'```\na\nb/\n#comment\n```'}
+        references = urth.dashboard.converter._get_references(cell)
+        self.assertTrue('a' in references and 'b/' in references, str(references))
+        self.assertEqual(len(references), 3, str(references))
+        cell = {'cell_type':'markdown', 'source':'```c\na\nb/\n#comment\n```'}
+        references = urth.dashboard.converter._get_references(cell)
+        self.assertTrue('a' in references and 'b/' in references and 'c' in references, str(references))
+        self.assertEqual(len(references), 3, str(references))
+
+    def test_glob(self):
+        self.assertTrue('test/resources/env.ipynb' in urth.dashboard.converter._glob(os.getcwd(), 'test/'))
+        self.assertTrue('test/resources/env.ipynb' in urth.dashboard.converter._glob(os.getcwd(), 'test/resources/'))
+        self.assertTrue('AUTHORS' in urth.dashboard.converter._glob(os.getcwd(), '*'), urth.dashboard.converter._glob(os.getcwd(), '*'))
+        self.assertTrue('urth_dash_js/notebook/dashboard-view/dashboard.js' in urth.dashboard.converter._glob(os.getcwd(), 'urth_dash_js/**/dashboard.js'), urth.dashboard.converter._glob(os.getcwd(), 'urth_dash_js/**/dashboard.js'))
+        self.assertTrue('urth_dash_js/notebook/dashboard-view/dashboard.js' in urth.dashboard.converter._glob(os.getcwd(), 'urth_dash_js/**'), urth.dashboard.converter._glob(os.getcwd(), 'urth_dash_js/**'))
+        self.assertTrue('urth_dash_js/notebook/dashboard-view/dashboard.js' in urth.dashboard.converter._glob(os.getcwd(), '**/dashboard.js'), urth.dashboard.converter._glob(os.getcwd(), '**/dashboard.js'))

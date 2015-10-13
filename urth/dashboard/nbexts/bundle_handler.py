@@ -56,6 +56,8 @@ class NewBundleHandler(IPythonHandler):
             self._get_app_zip(abs_nb_path)
         elif bundle_type == 'dashboard':
             self._get_local_app(abs_nb_path)
+        elif bundle_type == 'ipynb':
+            self._get_ipynb_with_files(abs_nb_path)
         else:
             raise web.HTTPError(400, 'unknown bundle type')
 
@@ -189,6 +191,53 @@ class NewBundleHandler(IPythonHandler):
         self.set_header('Content-Disposition', 'attachment; filename={}.zip'.format(md['notebook_basename']))
         self.set_header('Content-Type', 'application/zip')
         with open(md['bundle_dir'] + '.zip', 'rb') as zipfile:
+            self.write(zipfile.read())
+        self.flush()
+        self.finish()
+
+    def _get_ipynb_with_files(self, abs_nb_path):
+        '''
+        Creates a zip file containing the ipynb and associated files.
+
+        :param abs_nb_path: absolute path to the notebook file
+        '''
+        notebook_basename = os.path.basename(abs_nb_path)
+        notebook_basename = os.path.splitext(notebook_basename)[0]
+
+        # pick a tmp directory for the "bundle"
+        bundle_id = generate_id()
+        bundle_dir = os.path.join(self.tmp_dir,
+            bundle_id,
+            notebook_basename
+        )
+        zipfile_path = os.path.join(self.tmp_dir,
+            bundle_id,
+            notebook_basename
+        )
+        # Try up to three times to make the bundle directory
+        for i in range(3):
+            try:
+                os.makedirs(bundle_dir)
+            except OSError as exc:
+                if exc.errno == errno.EEXIST:
+                    pass
+                else:
+                    raise exc
+            else:
+                break
+        else:
+            raise RuntimeError('could not create bundle directory')
+
+        referenced_files = converter.get_referenced_files(abs_nb_path, 4)
+        # make the zip Archive, is there a more efficient way that copy+zip?
+        converter.copylist(os.path.dirname(abs_nb_path), bundle_dir, referenced_files)
+        shutil.copy2(abs_nb_path, os.path.join(bundle_dir, os.path.basename(abs_nb_path)))
+        shutil.make_archive(zipfile_path, 'zip', bundle_dir)
+
+        # send the archive
+        self.set_header('Content-Disposition', 'attachment; filename={}.zip'.format(notebook_basename))
+        self.set_header('Content-Type', 'application/zip')
+        with open(zipfile_path + '.zip', 'rb') as zipfile:
             self.write(zipfile.read())
         self.flush()
         self.finish()

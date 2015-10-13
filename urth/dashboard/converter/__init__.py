@@ -7,6 +7,8 @@ import subprocess
 import time
 import re
 import os.path
+import errno
+import fnmatch
 import glob
 from tempfile import mkdtemp
 from IPython.utils.path import get_ipython_dir
@@ -44,7 +46,6 @@ def to_php_app(notebook_fn, app_location=None, template_fn=None):
     '''
     # Invoke nbconvert to get the HTML
     full_output = to_thebe_html(notebook_fn, {}, 'html', os.getcwd(), template_fn)
-
     # Get a reasonable human readable name for the app
     notebook_basename = os.path.basename(notebook_fn)
     notebook_basename = os.path.splitext(notebook_basename)[0]
@@ -54,6 +55,10 @@ def to_php_app(notebook_fn, app_location=None, template_fn=None):
         output_path = app_location
     else:
         output_path = mkdtemp()
+
+    # Handle associated files
+    referenced_files = get_referenced_files(notebook_fn, 4)
+    copylist(os.path.dirname(notebook_fn), output_path, referenced_files)
 
     # Write out the index.php file
     with open(os.path.join(output_path, notebook_dash), 'wb') as f:
@@ -304,3 +309,125 @@ def to_thebe_html(path, env_vars, fmt, cwd, template_fn):
     if stderr:
         raise RuntimeError('nbconvert wrote to stderr: {}'.format(stderr))
     return stdout
+
+def get_references(abs_nb_path, version):
+    '''
+    Retrieves the raw references to files, folders, and exclusions
+    from a notebook's markdown cell comments.
+    '''
+    notebook = nbformat.read(abs_nb_path, version)
+    referenced_list = []
+    for cell in notebook.cells:
+        references = _get_references(cell)
+        if references:
+            referenced_list = referenced_list + references
+    return referenced_list
+
+def get_referenced_files(abs_nb_path, version):
+    '''
+    Retrieves the full list of files referenced by a notebook's
+    markdown cell comments, as relative paths. Temporarily changes
+    the current working directory when called.
+    '''
+    expanded = _expand_references(os.path.dirname(abs_nb_path), get_references(abs_nb_path, version))
+    return expanded
+
+def _get_references(cell):
+    '''
+    Retrieves the list of references from a cell, according to
+    an expected way of identifying and separating them.
+    '''
+    referenced = None
+    # invisible after execution: unrendered HTML comment
+    if cell.get('cell_type').startswith('markdown') and cell.get('source').startswith('<!--associate:'):
+        referenced = []
+        lines = cell.get('source')[len('<!--associate:'):].splitlines()
+        for line in lines:
+            if line.startswith('-->'):
+                break
+            # Trying to go out of the current directory leads to
+            # trouble when deploying
+            if line.find('../') < 0 and not line.startswith('#'):
+                referenced.append(line)
+    # visible after execution: rendered as a code element within a pre element
+    elif cell.get('cell_type').startswith('markdown') and cell.get('source').find('```') >= 0:
+        referenced = []
+        source = cell.get('source')
+        offset = source.find('```')
+        lines = source[offset + len('```'):].splitlines()
+        for line in lines:
+            if line.startswith('```'):
+                break
+            # Trying to go out of the current directory leads to
+            # trouble when deploying
+            if line.find('../') < 0 and not line.startswith('#'):
+                referenced.append(line)
+    return referenced
+
+def _expand_references(dirpath, references):
+    referenced_files = []
+    negations = []
+    for reference in references:
+        if reference.startswith('!'):
+            negations = negations + _glob(reference[1:])
+        else:
+            referenced_files = referenced_files + _glob(dirpath, reference)
+    for negated in negations:
+        try:
+            referenced_files.remove(negated)
+        except ValueError as err:
+            pass
+    return referenced_files
+
+def _glob(dirpath, pattern):
+    globbed = []
+    if pattern and pattern.find('/') < 0:
+        # simple shell glob
+        cwd = os.getcwd()
+        os.chdir(dirpath)
+        globbed = glob.glob(pattern)
+        os.chdir(cwd)
+    elif pattern.endswith('/'):
+        # entire subtree
+        pattern_dir = os.path.join(dirpath, pattern[:-1])
+        if os.path.isdir(pattern_dir):
+            for root, dirs, files in os.walk(pattern_dir):
+                for file in files:
+                    joined = os.path.join(root[len(dirpath) + 1:], file)
+                    globbed.append(joined)
+    elif pattern.find('**') >= 0:
+        # path wildcard
+        ends = pattern.split('**')
+        if len(ends) == 2:
+            for root, dirs, files in os.walk(dirpath):
+                for file in files:
+                    joined = os.path.join(root[len(dirpath) + 1:], file)
+                    if joined.startswith(ends[0]) and joined.endswith(ends[1]):
+                        globbed.append(joined)
+    else:
+        # segments should be respected
+        for root, dirs, files in os.walk(dirpath):
+            for file in files:
+                joined = os.path.join(root[len(dirpath) + 1:], file)
+                if fnmatch.fnmatch(joined, pattern):
+                    globbed.append(joined)
+    return globbed
+
+def copylist(src, dst, filepath_list):
+    '''
+    Copies the filepath_list, relative to src, into dst.
+    '''
+    # copy them to their own tree, making dirs as needed
+    for f in filepath_list:
+        if os.path.isfile(os.path.join(src, f)):
+            parent_relative = os.path.dirname(f)
+            if parent_relative:
+                parent_dst = os.path.join(dst, parent_relative)
+                try:
+                    os.makedirs(parent_dst)
+                except OSError as exc:
+                    if exc.errno == errno.EEXIST:
+                        pass
+                    else:
+                        raise exc
+            shutil.copy2(os.path.join(src, f), os.path.join(dst, f))
