@@ -45,7 +45,7 @@ requirejs(['urth/dashboard'], function(Dashboard) {
         requirejs(['urth_widgets/js/init/init'], function(widgetInit) {
             // Initialize the widgets which we assume is blocking here (which it
             // is as of right now ...)
-            widgetInit('static/urth_components');
+            widgetInit('static/');
             // Now that all dependencies are ready, execute everything
             Dashboard.executeAll();
         }, function(err) {
