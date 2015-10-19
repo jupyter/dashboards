@@ -26,9 +26,13 @@ define([
         var w = window.open('', IPython._target);
         if (IPython.notebook.dirty) {
             // Delay requesting the bundle until a dirty notebook is saved
-            IPython.notebook.save_notebook().then(function() {
-                w.location = url;
-            });
+            var d = IPython.notebook.save_notebook();
+            // https://github.com/jupyter/notebook/issues/618
+            if(d) {
+                d.then(function() {
+                    w.location = url;
+                });
+            }
         } else {
             w.location = url;
         }
