@@ -50,6 +50,9 @@ define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog
         // override this function since it messes with images (invoking jquery.resizable on them)
         IPython.OutputArea.prototype._dblclick_to_reset_size = function() {};
 
+        // finally, let's start the kernel (rather than waiting for it to be lazily loaded)
+        thebe.start_kernel(function() {});
+
         return thebe;
     }
 
