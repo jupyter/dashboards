@@ -88,7 +88,7 @@ define([
         .insertAfter($('#download_ipynb'));
         $('<a>')
             .attr('href', '#')
-            .text('iPython Bundled Notebook (.zip)')
+            .text('IPython Bundled Notebook (.zip)')
             .appendTo($li)
             .on('click', function() {
                 do_bundle('ipynb');
