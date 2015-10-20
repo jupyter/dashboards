@@ -310,6 +310,15 @@ def to_thebe_html(path, env_vars, fmt, cwd, template_fn):
         raise RuntimeError('nbconvert wrote to stderr: {}'.format(stderr))
     return stdout
 
+def get_referenced_files(abs_nb_path, version):
+    '''
+    Retrieves the full list of files referenced by a notebook's
+    markdown cell comments, as relative paths. Temporarily changes
+    the current working directory when called.
+    '''
+    expanded = _expand_references(os.path.dirname(abs_nb_path), get_references(abs_nb_path, version))
+    return expanded
+
 def get_references(abs_nb_path, version):
     '''
     Retrieves the raw references to files, folders, and exclusions
@@ -322,15 +331,6 @@ def get_references(abs_nb_path, version):
         if references:
             referenced_list = referenced_list + references
     return referenced_list
-
-def get_referenced_files(abs_nb_path, version):
-    '''
-    Retrieves the full list of files referenced by a notebook's
-    markdown cell comments, as relative paths. Temporarily changes
-    the current working directory when called.
-    '''
-    expanded = _expand_references(os.path.dirname(abs_nb_path), get_references(abs_nb_path, version))
-    return expanded
 
 def _get_references(cell):
     '''
@@ -366,52 +366,64 @@ def _get_references(cell):
 
 def _expand_references(dirpath, references):
     referenced_files = []
-    negations = []
-    for reference in references:
-        if reference.startswith('!'):
-            negations = negations + _glob(reference[1:])
-        else:
-            referenced_files = referenced_files + _glob(dirpath, reference)
-    for negated in negations:
-        try:
-            referenced_files.remove(negated)
-        except ValueError as err:
-            pass
+    referenced_files = _glob(dirpath, references)
     return referenced_files
 
-def _glob(dirpath, pattern):
+def _glob(dirpath, references):
     globbed = []
-    if pattern and pattern.find('/') < 0:
-        # simple shell glob
-        cwd = os.getcwd()
-        os.chdir(dirpath)
-        globbed = glob.glob(pattern)
-        os.chdir(cwd)
-    elif pattern.endswith('/'):
-        # entire subtree
-        pattern_dir = os.path.join(dirpath, pattern[:-1])
-        if os.path.isdir(pattern_dir):
-            for root, dirs, files in os.walk(pattern_dir):
-                for file in files:
-                    joined = os.path.join(root[len(dirpath) + 1:], file)
-                    globbed.append(joined)
-    elif pattern.find('**') >= 0:
-        # path wildcard
-        ends = pattern.split('**')
-        if len(ends) == 2:
-            for root, dirs, files in os.walk(dirpath):
-                for file in files:
-                    joined = os.path.join(root[len(dirpath) + 1:], file)
-                    if joined.startswith(ends[0]) and joined.endswith(ends[1]):
-                        globbed.append(joined)
-    else:
-        # segments should be respected
+    negations = []
+    must_walk = []
+    for pattern in references:
+        if pattern and pattern.find('/') < 0:
+            # simple shell glob
+            cwd = os.getcwd()
+            os.chdir(dirpath)
+            if pattern.startswith('!'):
+                negations = negations + glob.glob(pattern[1:])
+            else:
+                globbed = globbed + glob.glob(pattern)
+            os.chdir(cwd)
+        elif pattern:
+            must_walk.append(pattern)
+
+    for pattern in must_walk:
+        pattern_is_negation = pattern.startswith('!')
+        if pattern_is_negation:
+            testpattern = pattern[1:]
+        else:
+            testpattern = pattern
         for root, dirs, files in os.walk(dirpath):
             for file in files:
                 joined = os.path.join(root[len(dirpath) + 1:], file)
-                if fnmatch.fnmatch(joined, pattern):
-                    globbed.append(joined)
-    return globbed
+                if testpattern.endswith('/'):
+                    if joined.startswith(testpattern):
+                        if pattern_is_negation:
+                            negations.append(joined)
+                        else:
+                            globbed.append(joined)
+                elif testpattern.find('**') >= 0:
+                    # path wildcard
+                    ends = testpattern.split('**')
+                    if len(ends) == 2:
+                        if joined.startswith(ends[0]) and joined.endswith(ends[1]):
+                            if pattern_is_negation:
+                                negations.append(joined)
+                            else:
+                                globbed.append(joined)
+                else:
+                    # segments should be respected
+                    if fnmatch.fnmatch(joined, testpattern):
+                        if pattern_is_negation:
+                            negations.append(joined)
+                        else:
+                            globbed.append(joined)
+
+    for negated in negations:
+        try:
+            globbed.remove(negated)
+        except ValueError as err:
+            pass
+    return set(globbed)
 
 def copylist(src, dst, filepath_list):
     '''
