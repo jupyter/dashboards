@@ -1,0 +1,234 @@
+<link rel="import" href="../polymer/polymer.html">
+<dom-module id="urth-timeline">
+    <template>
+        <style>
+            #axis * {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            .animating #window, .animating .handle-label, .animating .handle {
+                transition: all 1s ease;
+            }
+            
+            .handle{
+                position:absolute;
+                display:inline-block;
+                background-color:rgb(76, 175, 80);
+                height:30%;
+                bottom:0%;
+                width:1%;
+                z-index:10;
+                cursor:ew-resize;
+            }
+            #axis {
+                height:50px;
+                position:relative;
+                background-color:rgba(170,170,170,0.1);
+                border-right:solid 1px #aaa;
+                border-left:solid 1px #aaa;
+                margin-bottom: 30px;  
+            }
+            
+            #window{
+                display:inline-block;
+                position:absolute;
+                background-color:rgb(76, 175, 80);
+                height:30%;
+                bottom:0%;
+                z-index:1;
+                opacity: 0.5;
+                cursor:move;
+            }
+            .handle-label {
+                position: absolute;
+                bottom: 100%;
+                left: -100%;
+                width: 200px;
+                font-size: 10px;
+            }
+            #axis-label-right {
+                right:0px;
+            }
+            .axis-label {
+                position: absolute;
+                top: 100%;
+                width: 200px;
+                font-size: 10px;
+            }
+        </style>
+        <div id='axis'>
+            <span class='axis-label'>{{startDate}}</span>
+            <div id='left_handle' class='handle' on-track='track' style$='{{compute_left_handle_style(window_start)}}'>
+                <span class='handle-label'>{{windowStartDate}}</span>
+            </div>
+            <div id='window' class='window' on-track='track' style$='{{compute_window_style(window_start, window_end)}}'>
+            </div>
+            <div id='right_handle' on-track='track' class='handle' style$='{{compute_right_handle_style(window_end)}}'>
+                <span class='handle-label'>{{windowEndDate}}</span>
+            </div>
+            <span id='axis-label-right' class='axis-label'>{{endDate}}</span>
+        </div>
+    </template>        
+    <script>
+        Polymer({
+            is: "urth-timeline",
+            compute_left_handle_style: function(window_start){
+                return 'left:' + window_start + '%;';
+            },
+            compute_right_handle_style: function(window_end){
+                return 'left:' + window_end + '%;';
+            },
+            compute_window_style: function(window_start, window_end){
+                var width = window_end - window_start;
+                return  'left:' + window_start + '%; width:' + width + '%;'
+            },
+            computeChange : function(mouse_delta){
+                var timeline_width = this.$.axis.getBoundingClientRect().width;
+                var timeline_change = (this.end - this.start) * (mouse_delta / timeline_width);
+                return  Math.round(timeline_change * 100) / 100;
+            },
+            computeWindowDates: function(){
+                var window = this.endDate.getTime() - this.startDate.getTime();
+                
+                this.windowStartDate = new Date(this.startDate.getTime() + (window * (this.window_start/100)))
+                this.windowEndDate = new Date(this.startDate.getTime() + (window * (this.window_end/100)))
+            },
+            adjustWindow: function(){
+                this.$.axis.classList.add('animating')
+                
+                if(this.window_end - this.window_start >= 75) {
+                    var axis_length = (this.endDate.getTime() - this.startDate.getTime());
+                    var additional_length = axis_length / 2;
+                    var new_axis_length = axis_length * 2;
+                    this.endDate = new Date(this.endDate.getTime() + additional_length);
+                    this.startDate = new Date(this.startDate.getTime() - additional_length);
+                    this.window_start = 100*((this.windowStartDate.getTime() - this.startDate.getTime()) / new_axis_length);
+                    this.window_end = 100*((this.windowEndDate.getTime() - this.startDate.getTime()) / new_axis_length);
+                    console.log('shrinkin');
+                }
+
+                if(this.window_end - this.window_start <= 25) {
+                    var axis_length = (this.windowEndDate.getTime() - this.windowStartDate.getTime());
+                    var additional_length = axis_length;
+                    var new_axis_length = axis_length*3;
+                    this.endDate = new Date(this.windowEndDate.getTime() + additional_length);
+                    this.startDate = new Date(this.windowStartDate.getTime() - additional_length);
+                    this.window_start = 100*((this.windowStartDate.getTime() - this.startDate.getTime()) / new_axis_length);
+                    this.window_end = 100*((this.windowEndDate.getTime() - this.startDate.getTime()) / new_axis_length);
+                    console.log('shrinkin');
+                }
+                
+                if(this.window_start <= 5) {
+                    
+                    var interval = this.endDate.getTime() - this.startDate.getTime();
+                    var shift = interval * 0.25;
+                    this.endDate = new Date(this.endDate.getTime() - shift);
+                    this.startDate = new Date(this.startDate.getTime() - shift);
+                    this.window_start += 25;
+                    this.window_end += 25;
+                    console.log('slide to the left');
+                }
+
+                if(this.window_end >= 95) {
+                    var interval = this.endDate.getTime() - this.startDate.getTime();
+                    var shift = interval * 0.25;
+                    this.endDate = new Date(this.endDate.getTime() + shift);
+                    this.startDate = new Date(this.startDate.getTime() + shift);
+                    this.window_start -= 25;
+                    this.window_end -= 25;
+                    console.log('slide to the right');
+                }
+                setTimeout(function(){
+                   this.$.axis.classList.remove('animating'); 
+                }.bind(this), 1500);
+                this.fire('window-changed', {window_start : this.windowStartDate, window_end :this.windowEndDate})
+
+            },
+            track: function(e) {
+                var change = this.computeChange(e.detail.ddx || 0);
+                if(e.target.track_condition(change)) {
+                    e.target.track_effect(change)
+                }
+                
+                this.computeWindowDates();
+                if(e.detail.state == 'end') {
+                    this.adjustWindow();
+                }
+                this.computeWindowDates();
+            },
+            attached : function(){
+                // Bind the effects of the track events for each element
+                this.$.left_handle.track_effect = function(change){
+                    this.window_start = parseFloat(this.$.left_handle.style.left) + change;
+                }.bind(this);
+                this.$.right_handle.track_effect = function(change){
+                    this.window_end = parseFloat(this.$.right_handle.style.left) + change;
+                }.bind(this);
+                this.$.window.track_effect = function(change){
+                    this.window_start = parseFloat(this.$.left_handle.style.left) + change;
+                    this.window_end = parseFloat(this.$.right_handle.style.left) + change;
+                }.bind(this);
+                
+                // Bind conditions to elements to determine if the track change is valid
+                this.$.left_handle.track_condition = function(change) {
+                    var new_start = parseFloat(this.$.left_handle.style.left) + change;
+                    return new_start >= this.start && new_start < this.window_end
+                }.bind(this);
+                this.$.right_handle.track_condition = function(change) {
+                    var new_end = parseFloat(this.$.right_handle.style.left) + change 
+                    return new_end <= this.end && new_end > this.window_start
+                }.bind(this);
+                this.$.window.track_condition = function(change) {
+                    var new_start = parseFloat(this.$.left_handle.style.left) + change;
+                    var new_end = parseFloat(this.$.right_handle.style.left) + change;                
+                    return new_start >= this.start && new_end <= this.end;
+                }.bind(this);
+                
+                this.computeWindowDates();
+                this.fire('window-changed', {window_start : this.windowStartDate, window_end :this.windowEndDate})
+            },
+            properties: {
+                windowStartDate : {
+                    type : Date,
+                    notify: true
+                },
+                window_start : {
+                    type : Number,
+                    notify: true,
+                    value : 25
+                },
+                window_end : {
+                    type : Number,
+                    notify: true,
+                    value : 75
+                },
+                windowEndDate : {
+                    type : Date,
+                    notify: true
+                },
+                start : {
+                    type : Number,
+                    notify: true,
+                    value : 0
+                },
+                startDate : {
+                    type : Date,
+                    notify: true
+                },
+                end : {
+                    type : Number,
+                    notify: true,
+                    value : 100
+                },
+                endDate : {
+                    type : Date,
+                    notify: true
+                },
+            }
+        });
+    </script>
+</dom-module>
