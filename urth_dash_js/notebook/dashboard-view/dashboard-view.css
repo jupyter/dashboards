@@ -5,8 +5,10 @@
 
 /* hide extraneous cell parts when in dashboard view  */
 .urth-dashboard .celltoolbar,
-.urth-dashboard .container:not(.show-code) .cell > .input,
-.urth-dashboard .container:not(.show-code) .prompt {
+.urth-dashboard .container .cell.grid-stack-item > .input,
+.urth-dashboard .container:not(.show-code) .cell:not(.grid-stack-item) > .input,
+.urth-dashboard .container .cell.grid-stack-item .prompt ,
+.urth-dashboard .container:not(.show-code) .cell:not(.grid-stack-item) .prompt {
     display: none !important; /* Necessary to override inline style set by notebook */
 }
 
@@ -14,9 +16,9 @@
 .grid-stack#notebook-container {
     padding-left: 0;
     padding-right: 0;
-    transition: all 0.75s;
-    transition-delay: 0.25s;
-    transition-property: background-color, box-shadow;
+    transition: background-color 0.75s 0.25s,
+                box-shadow 0.75s 0.25s,
+                height 0.3s;
 }
 body:not(.view-only) .grid-stack#notebook-container:hover {
     background-color: transparent;
@@ -63,8 +65,12 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
         right: (margin/2)px;
      */
 }
-.grid-stack:hover .dashboard-item-background,
-.urth-dashboard #dashboard-hidden-container .cell {
+.grid-stack .cell:not(.grid-stack-item) .dashboard-item-background {
+    left: 0;
+    right: 0;
+}
+.grid-stack:hover .grid-stack-item .dashboard-item-background,
+.grid-stack .cell:not(.grid-stack-item) {
     box-shadow: 0 1px 5px 1px rgba(87,87,87,0.2);
 }
 .urth-dashboard .ui-draggable-dragging.cell,
@@ -78,9 +84,6 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
         margin-left: (margin/2)px;
         margin-right: (margin/2)px;
      */
-}
-.urth-dashboard #notebook-container .cell:not(.grid-stack-item) {
-    display: none;
 }
 
 /* Grid cell controls */
@@ -109,7 +112,7 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
         left: (margin/2)px;
      */
 }
-.urth-dashboard #dashboard-hidden-container .cell .grid-control-container.grid-control-nw {
+.urth-dashboard .cell:not(.grid-stack-item) .grid-control-container.grid-control-nw {
     left: 0;
 }
 .urth-dashboard .cell .grid-control-container.grid-control-ne {
@@ -121,7 +124,7 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
         right: (margin/2)px;
      */
 }
-.urth-dashboard #dashboard-hidden-container .cell .grid-control-container.grid-control-ne {
+.urth-dashboard .cell:not(.grid-stack-item) .grid-control-container.grid-control-ne {
     right: 0;
 }
 .urth-dashboard .cell .grid-control {
@@ -132,8 +135,8 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
 }
 
 /* Grid cell controls: drag */
-.urth-dashboard .cell:hover .drag-handle:hover {
-    border-color: #306c9e;
+.urth-dashboard .cell .drag-handle:hover {
+    color: #306c9e;
     cursor: move; /* for old IE */
     cursor: -webkit-grab;
     cursor: grab;
@@ -144,50 +147,39 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
     cursor: grabbing !important;
 }
 
-/* Grid cell controls: edit cell */
-.urth-dashboard .cell:hover .edit-btn:hover {
-    color: #306c9e;
-    cursor: pointer;
-}
-
-/* Grid cell controls: hide cell */
-.urth-dashboard .cell:hover .close-btn:hover {
+/* Grid cell controls: hover behavior */
+.urth-dashboard .cell .grid-control.close-btn:hover {
     color: red;
     cursor: pointer;
 }
-
-/* Hidden Cells */
-.urth-dashboard #dashboard-hidden-container {
-    padding: 15px;
-    margin-top: 5em;
-}
-
-.urth-dashboard #dashboard-hidden-container .cell {
-    min-height: 100px;
-    background-color: #fff;
-    position: relative;
-    border: none;
-}
-
-.urth-dashboard #dashboard-hidden-container .cell:not(:first-child) {
-    margin-top: 15px;
-}
-
-.urth-dashboard #dashboard-hidden-container .cell .grid-control.drag-handle,
-.urth-dashboard #dashboard-hidden-container .cell .grid-control.close-btn {
-    display: none; /* hide controls which aren't used in hidden cells */
-}
-
-
-.urth-dashboard #dashboard-hidden-container .cell .gs-resize-handle {
-    display: none;
-}
-.urth-dashboard #dashboard-hidden-container .cell .grid-control.add-btn:hover {
+.urth-dashboard .cell .grid-control.edit-btn:hover,
+.urth-dashboard .cell .grid-control.add-btn:hover {
     color: #306c9e;
     cursor: pointer;
 }
 
-.urth-dashboard #dashboard-hidden-container .header {
+/* Hide specific grid controls based on hidden state */
+.urth-dashboard .cell.grid-stack-item .grid-control.add-btn,
+.urth-dashboard .cell:not(.grid-stack-item) .grid-control.drag-handle,
+.urth-dashboard .cell:not(.grid-stack-item) .grid-control.close-btn,
+.urth-dashboard .cell:not(.grid-stack-item) .gs-resize-handle {
+    display: none;
+}
+
+/* Hidden Cells */
+.urth-dashboard #dashboard-hidden-header {
+    height: 150px;
+    padding: 15px;
+}
+
+.grid-stack .cell:not(.grid-stack-item) {
+    position: absolute;
+    min-height: 100px;
+
+    transition: left 0.3s, top 0.3s, height 0.3s, width 0.3s;
+}
+
+.urth-dashboard #dashboard-hidden-header .header {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
@@ -195,11 +187,12 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
         -ms-flex-align: center;
             align-items: center;
     margin: 2em 0;
+    padding-top: 50px;
 }
-.urth-dashboard #dashboard-hidden-container .header .title {
+.urth-dashboard #dashboard-hidden-header .header .title {
     margin: 0 1em 0 0;
 }
-.urth-dashboard #dashboard-hidden-container .header .btn:not(.btn-info) {
+.urth-dashboard #dashboard-hidden-header .header .btn:not(.btn-info) {
     background-color: transparent;
     border: 1px solid black;
 }
@@ -214,7 +207,8 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
 .view-only .grid-stack-static .cell.ui-state-disabled .grid-control-container {
     display: none;
 }
-.view-only #dashboard-hidden-container {
+.view-only #dashboard-hidden-header,
+.view-only .cell:not(.grid-stack-item) {
     display: none;
 }
 
