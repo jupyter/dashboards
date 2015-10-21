@@ -43,11 +43,11 @@ requirejs(['urth/dashboard'], function(Dashboard) {
         // but we don't have another way to detect and determine if / how these
         // should be setup at the moment.
         requirejs(['urth_widgets/js/init/init'], function(widgetInit) {
-            // Initialize the widgets which we assume is blocking here (which it
-            // is as of right now ...)
-            widgetInit('static/');
-            // Now that all dependencies are ready, execute everything
-            Dashboard.executeAll();
+            // Initialize the widgets
+            widgetInit('static/').then(function() {
+                // Now that all dependencies are ready, execute everything
+                Dashboard.executeAll();
+            });
         }, function(err) {
             console.warn('urth widgets not available');
             // Continue with execution of cells
