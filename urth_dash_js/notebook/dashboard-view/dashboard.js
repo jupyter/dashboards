@@ -81,7 +81,7 @@ define([
                 this._saveGrid(); // save notebook if any new layout metadata was created
             }
 
-            $(window).on('resize', _.debounce(function() {
+            $(window).on('resize.Dashboard', _.debounce(function() {
                 self._calcCellWidth();
                 self._repositionHiddenCells();
             }, 200));
@@ -497,7 +497,8 @@ define([
         if (this.$container.find('.cell:not(.grid-stack-item)').length === 0) {
             this.$hiddenHeader.addClass('hidden');
         }
-        this._repositionHiddenCells();
+        // wait for Gridstack to finish resizing before recalculating positions of hidden cells
+        this.$container.one('transitionend', this._repositionHiddenCells.bind(this));
 
         // update metadata
         var grid = $cell.data('_gridstack_node');
@@ -572,6 +573,8 @@ define([
      * Delete dashboard resources
      */
     Dashboard.prototype.destroy = function() {
+        $(window).off('resize.Dashboard');
+
         this.gridstack.removeStylesheet();
         this.gridstack.destroy(false /* detach_node */);
         this.$container.removeData('gridstack'); // remove stored instance, so we can re-init
