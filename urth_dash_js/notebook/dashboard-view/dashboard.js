@@ -139,6 +139,7 @@ define([
                 vertical_margin: this.opts.gridMargin,
                 cell_height: this.opts.rowHeight,
                 width: this.opts.numCols,
+                min_width: 0, // disables single-column mode (which reorders DOM nodes)
                 animate: true,
                 draggable: {
                     handle: '.drag-handle',
