@@ -33,7 +33,6 @@ clean:
 js: REPO?=cloudet/pyspark-notebook-bower
 js:
 	@docker run -it --rm \
-		-u jovyan \
 		-v `pwd`:/src \
 		$(REPO) bash -c 'cd /src && npm install && npm run css && npm run bower'
 
