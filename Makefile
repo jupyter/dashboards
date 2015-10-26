@@ -52,7 +52,7 @@ demo: configs
 			$(CMD)'
 
 dev: NB_HOME?=/home/jovyan/.ipython
-dev: REPO?=jupyter/pyspark-notebook:3.2
+dev: REPO?=cloudet/pyspark-notebook-bower
 dev: CMD?=sh -c "ipython notebook --no-browser --port 8888 --ip='*'"
 dev: AUTORELOAD?=no
 dev: configs js
@@ -88,7 +88,7 @@ dev-with-widgets: configs js
 		$(REPO) bash -c 'pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1) && \
 			$(CMD)'
 
-install: REPO?=jupyter/pyspark-notebook:3.2
+install: REPO?=cloudet/pyspark-notebook-bower
 install: CMD?=exit
 install:
 	@docker run -it --rm \
@@ -97,7 +97,7 @@ install:
 			pip install $$(ls -1 *.tar.gz | tail -n 1) && \
 			$(CMD)'
 
-sdist: REPO?=jupyter/pyspark-notebook:3.2
+sdist: REPO?=cloudet/pyspark-notebook-bower
 sdist: RELEASE?=
 sdist: BUILD_NUMBER?=0
 sdist: GIT_COMMIT?=HEAD
@@ -110,7 +110,7 @@ sdist: js
 			python setup.py sdist && \
 			cp -r dist /src'
 
-test: REPO?=jupyter/pyspark-notebook:3.2
+test: REPO?=cloudet/pyspark-notebook-bower
 test: CMD?=bash -c 'cd /src; python3 -B -m unittest discover -s test'
 test:
 	@docker run -it --rm \
