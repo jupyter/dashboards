@@ -30,6 +30,12 @@ clean:
 	@-rm -rf urth_dash_js/notebook/bower_components
 	@-find . -name __pycache__ -exec rm -fr {} \;
 
+js: REPO?=cloudet/pyspark-notebook-bower
+js:
+	@docker run -it --rm \
+		-v `pwd`:/src \
+		$(REPO) bash -c 'cd /src && npm install && npm run css && npm run bower'
+
 demo: NB_HOME?=/home/jovyan/.ipython
 demo: REPO?=cloudet/pyspark-notebook-bower
 demo: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
@@ -45,13 +51,10 @@ demo: configs
 			$(CMD)'
 
 dev: NB_HOME?=/home/jovyan/.ipython
-dev: REPO?=jupyter/pyspark-notebook:3.2
+dev: REPO?=cloudet/pyspark-notebook-bower
 dev: CMD?=sh -c "ipython notebook --no-browser --port 8888 --ip='*'"
 dev: AUTORELOAD?=no
-dev: configs
-	npm install
-	npm run css
-	npm run bower
+dev: configs js
 	@docker run -it --rm \
 		-p 9500:8888 \
 		-e USE_HTTP=1 \
@@ -68,11 +71,8 @@ dev-with-widgets: NB_HOME?=/home/jovyan/.ipython
 dev-with-widgets: REPO?=cloudet/pyspark-notebook-bower
 dev-with-widgets: CMD?=sh -c "ipython notebook --no-browser --port 8888 --ip='*'"
 dev-with-widgets: AUTORELOAD?=no
-dev-with-widgets: configs
+dev-with-widgets: configs js
 # We volume mount the config, so don't let the container corrupt the committed copy
-	npm install
-	npm run css
-	npm run bower
 	@docker run -it --rm \
 		-p 9500:8888 \
 		-e USE_HTTP=1 \
@@ -87,7 +87,7 @@ dev-with-widgets: configs
 		$(REPO) bash -c 'pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1) && \
 			$(CMD)'
 
-install: REPO?=jupyter/pyspark-notebook:3.2
+install: REPO?=cloudet/pyspark-notebook-bower
 install: CMD?=exit
 install:
 	@docker run -it --rm \
@@ -96,14 +96,11 @@ install:
 			pip install $$(ls -1 *.tar.gz | tail -n 1) && \
 			$(CMD)'
 
-sdist: REPO?=jupyter/pyspark-notebook:3.2
+sdist: REPO?=cloudet/pyspark-notebook-bower
 sdist: RELEASE?=
 sdist: BUILD_NUMBER?=0
 sdist: GIT_COMMIT?=HEAD
-sdist:
-	@npm install
-	@npm run css
-	@npm run bower
+sdist: js
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		$(REPO) bash -c 'cp -r /src /tmp/src && \
@@ -112,7 +109,7 @@ sdist:
 			python setup.py sdist && \
 			cp -r dist /src'
 
-test: REPO?=jupyter/pyspark-notebook:3.2
+test: REPO?=cloudet/pyspark-notebook-bower
 test: CMD?=bash -c 'cd /src; python3 -B -m unittest discover -s test'
 test:
 	@docker run -it --rm \
