@@ -84,5 +84,14 @@ define([
             .on('click', function() {
                 do_bundle('zip');
             });
+        $li = $('<li>')
+        .insertAfter($('#download_ipynb'));
+        $('<a>')
+            .attr('href', '#')
+            .text('IPython Bundled Notebook (.zip)')
+            .appendTo($li)
+            .on('click', function() {
+                do_bundle('ipynb');
+            });
     });
 });
