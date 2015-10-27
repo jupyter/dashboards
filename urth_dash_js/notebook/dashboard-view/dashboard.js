@@ -457,6 +457,12 @@ define([
         IPython.notebook.set_dirty(true);
     };
 
+    Dashboard.prototype._onResize = function(node) {
+        if (typeof this.opts.onResize === 'function') {
+            this.opts.onResize(node);
+        }
+    };
+
     Dashboard.prototype._hideCell = function($cell, batch) {
         var self = this;
         this.$container.one('change', function() {
@@ -477,6 +483,7 @@ define([
             // cell's width increases). We need to recalculate the cell offsets after the
             // transition has finished.
             $cell.one('transitionend', function() {
+                self._onResize($cell.get(0));
                 self._repositionHiddenCells();
             });
         });
@@ -495,6 +502,12 @@ define([
             left: ''
         });
 
+        // notify contents that cell may have been resized
+        var self = this;
+        $cell.one('transitionend', function() {
+            self._onResize($cell.get(0));
+        });
+
         if (this.$container.find('.cell:not(.grid-stack-item)').length === 0) {
             this.$hiddenHeader.addClass('hidden');
         }
@@ -510,11 +523,6 @@ define([
             height: grid.height
         };
         this._updateCellMetadata($cell, layout, batch);
-
-        // notify contents that cell may have been resized
-        if (typeof this.opts.onResize === 'function') {
-            this.opts.onResize($cell.get(0));
-        }
     };
 
     Dashboard.prototype._toggleHiddenCellCode = function(event) {
