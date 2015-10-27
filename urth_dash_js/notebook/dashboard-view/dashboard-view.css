@@ -218,6 +218,10 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
 .view-only .cell:not(.grid-stack-item) {
     display: none;
 }
+.view-only .grid-stack .dashboard-item-background,
+.view-only .grid-stack .dashboard-item-border {
+    display: none;
+}
 
 /* Edit cell animation */
 .cell.edit-select {
