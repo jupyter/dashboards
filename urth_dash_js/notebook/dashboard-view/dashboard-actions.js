@@ -96,6 +96,8 @@ define([
         $('#header-container').toggle(doShow && isHeaderVisible);
         $('.header-bar').toggle(doShow && isHeaderVisible);
         $('div#maintoolbar').toggle(doShow && isToolbarVisible);
+        // make sure notebook resizes properly
+        IPython.notebook.events.trigger('resize-header.Page');
     }
 
     function updateUrlState(inDashboardViewMode) {
