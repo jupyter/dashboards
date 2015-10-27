@@ -127,9 +127,12 @@ define([
         this.$container.find('.cell').each(function(idx) {
             // Gridstack expects horizontal margins to be handled within the cell. To accomplish
             // that, we need to wrap the cell contents in an element.
+            // Also, we add a separate div to show the border, since we want to show that above
+            // the cell contents. This is necessary since cell contents may overflow the cell
+            // bounds, but we still want to show the user those boundaries.
             var el = $(this);
             if (el.find('> .dashboard-item-background').length === 0) {
-                el.prepend('<div class="dashboard-item-background">');
+                el.prepend('<div class="dashboard-item-background"/><div class="dashboard-item-border"/>');
             }
 
             var metadata = self._getCellMetadata(el);
@@ -184,13 +187,13 @@ define([
         var styleRules = [
             // position background across cell, with margins on sides
             {
-                selector: '.grid-stack .grid-stack-item .dashboard-item-background',
+                selector: '.grid-stack .grid-stack-item .dashboard-item-background, .grid-stack .grid-stack-item .dashboard-item-border',
                 rules: 'left: ' + halfMargin + 'px; right: ' + halfMargin + 'px;'
             },
 
             // set horizontal margin on cell contents
             {
-                selector: '.grid-stack .grid-stack-item.cell > :not(.dashboard-item-background):not(.ui-resizable-handle):not(.grid-control-container)',
+                selector: '.grid-stack .grid-stack-item.cell > :not(.dashboard-item-background):not(.dashboard-item-border):not(.ui-resizable-handle):not(.grid-control-container)',
                 rules: 'margin: 0 ' + halfMargin + 'px;'
             },
 
@@ -593,6 +596,7 @@ define([
                 .removeClass('ui-resizable-autoHide'); // jquery bug, cannot remove class using API
 
         $('.dashboard-item-background').remove();
+        $('.dashboard-item-border').remove();
 
         $('.grid-stack').removeClass('grid-stack');
         $('.grid-stack-item').removeClass('grid-stack-item');

@@ -50,7 +50,8 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
         padding: 0 (margin/2)px;
      */
 }
-.grid-stack .dashboard-item-background {
+.grid-stack .dashboard-item-background,
+.grid-stack .dashboard-item-border {
     position: absolute;
     background-color: white;
     top: 0;
@@ -65,11 +66,17 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
         right: (margin/2)px;
      */
 }
-.grid-stack .cell:not(.grid-stack-item) .dashboard-item-background {
+.grid-stack .dashboard-item-border {
+    background-color: transparent;
+    z-index: 10;
+    pointer-events: none; /* "pass through" mouse events */
+}
+.grid-stack .cell:not(.grid-stack-item) .dashboard-item-background,
+.grid-stack .cell:not(.grid-stack-item) .dashboard-item-border {
     left: 0;
     right: 0;
 }
-.grid-stack:hover .grid-stack-item .dashboard-item-background,
+.grid-stack:hover .grid-stack-item .dashboard-item-border,
 .grid-stack .cell:not(.grid-stack-item) {
     box-shadow: 0 1px 5px 1px rgba(87,87,87,0.2);
 }
@@ -77,7 +84,7 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
 .urth-dashboard .ui-resizable-resizing.cell {
     opacity: 0.75;
 }
-.grid-stack .cell > :not(.dashboard-item-background):not(.ui-resizable-handle) {
+.grid-stack .cell > :not(.dashboard-item-background):not(.dashboard-item-border):not(.ui-resizable-handle) {
     /*
         computed by gridstack-custom:
 
@@ -209,6 +216,10 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
 }
 .view-only #dashboard-hidden-header,
 .view-only .cell:not(.grid-stack-item) {
+    display: none;
+}
+.view-only .grid-stack .dashboard-item-background,
+.view-only .grid-stack .dashboard-item-border {
     display: none;
 }
 
