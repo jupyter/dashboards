@@ -52,7 +52,6 @@ define([
 
     function exitDashboardMode() {
         // Revert changes done in enterDashboardMode()
-        $('#notebook').css('height', '');
         $('body').removeClass('view-only');
         $('#urth-notebook-view').addClass('selected');
         $('#urth-dashboard-auth, #urth-dashboard-view').removeClass('selected');

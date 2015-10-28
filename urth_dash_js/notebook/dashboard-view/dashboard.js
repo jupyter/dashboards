@@ -229,6 +229,10 @@ define([
     };
 
     Dashboard.prototype._repositionHiddenCells = function() {
+        if (!this.interactive) {
+            return;
+        }
+
         var offsetpx = $('#dashboard-hidden-header').outerHeight();
 
         // recalculate hidden cells offsets
@@ -569,11 +573,16 @@ define([
     Dashboard.prototype.setInteractive = function(args) {
         this._loaded.then(function() {
             this.gridstack.set_static(!args.enable);
+            this.interactive = !!args.enable;
             if (args.enable) {
                 this.gridstack.enable();
+                this._repositionHiddenCells();
             } else {
                 this.gridstack.disable();
+                // clear the notebook height
+                $('#notebook').css('height', '');
             }
+
             // if enabling grid, need to wait for resize transition to finish
             if (typeof args.complete === 'function') {
                 setTimeout(args.complete, args.enable ? RESIZE_DURATION : 0);
@@ -602,6 +611,7 @@ define([
         $('.grid-stack-item').removeClass('grid-stack-item');
         $('.grid-control-container').remove();
         this.$hiddenHeader.remove();
+        $('#notebook').css('height', '');
         $('#notebook-container').css('width', '').css('height', '');
         $('body').removeClass('urth-dashboard');
     };
