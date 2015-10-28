@@ -591,9 +591,25 @@ define([
         this.gridstack.destroy(false /* detach_node */);
         this.$container.removeData('gridstack'); // remove stored instance, so we can re-init
 
+        // remove all data-gs-* attributes
+        this.$container.find('> .cell').each(function() {
+            var attrs = this.attributes;
+            var toRemove = [];
+            for (var attr in attrs) {
+                if (typeof attrs[attr] === 'object' &&
+                        typeof attrs[attr].name === 'string' &&
+                        (/^data-gs/).test(attrs[attr].name)) {
+                    toRemove.push(attrs[attr].name);
+                }
+            }
+            for (var i = 0; i < toRemove.length; i++) {
+                this.removeAttribute(toRemove[i]);
+            }
+        });
+
         $('.grid-stack-item')
                 .resizable('destroy').draggable('destroy')
-                .removeClass('ui-resizable-autoHide'); // jquery bug, cannot remove class using API
+                .removeClass('ui-resizable-autohide'); // jquery bug, cannot remove class using API
 
         $('.dashboard-item-background').remove();
         $('.dashboard-item-border').remove();
