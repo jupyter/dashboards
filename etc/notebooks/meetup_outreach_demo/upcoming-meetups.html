@@ -1,0 +1,160 @@
+<dom-module id="upcoming-meetups">
+    <template>
+        <style is="custom-style">
+            :host iron-list {
+                height: 400px;
+            }
+
+            :host .header .row,
+            :host .meetup-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 0.3em 1em;
+            }
+            :host .header .row {
+                align-items: flex-end;
+            }
+            :host .event {
+                flex: 1 1 45%;
+            }
+            :host .date {
+                flex: 1 1 20%;
+            }
+            :host .city {
+                flex: 1 1 15%;
+            }
+            :host .rsvp-count {
+                flex: 1 1 10%;
+            }
+            :host .change {
+                flex: 1 1 10%;
+            }
+
+            :host .header {
+                background-color: #305b81;
+                color: white;
+                height: 95px;
+                padding: 10px;
+            }
+            :host .header h2 {
+                position: absolute;
+                margin-top: 0.83em;
+                font-size: 1.5em;
+            }
+            :host .header .row {
+                height: 75px;
+            }
+            :host .header .change {
+                text-align: center;
+            }
+            
+            :host .meetup-row-wrapper {
+                padding: 0.3em 0.2em 0 0.2em;
+            }
+
+            :host .meetup-row .event a {
+                display: block;
+            }
+            :host .meetup-row .event .group-name {
+                font-size: smaller;
+                margin-left: 1em;
+            }
+            :host .meetup-row .change.positive {
+                color: green;
+            }
+            :host .meetup-row .change.positive .arrow:before {
+                content: "\f176";
+            }
+            :host .meetup-row .change.negative {
+                color: red;
+            }
+            :host .meetup-row .change.negative .arrow:before {
+                content: "\f175";
+            }
+        </style>
+
+        <paper-material class="header">
+            <h2>Upcoming Meetups</h2>
+            <div class="row">
+                <span class="event">Meetup Event</span>
+                <span class="date">Date</span>
+                <span class="city">City</span>
+                <span class="rsvp-count">RSVPs</span>
+                <span class="change">[[changeLabel]]</span>
+            </div>
+        </paper-material>
+        <iron-list items="[[items]]">
+            <template>
+                <div class="meetup-row-wrapper">
+                    <paper-material class="meetup-row">
+                        <span class="event">
+                            <a href="[[item.event_url]]" target="_blank">[[item.name]]</a>
+                            <a class="group-name" href="[[item.group.url]]" target="_blank">[[item.group.name]]</a>
+                        </span>
+                        <time class="date" datetime="[[getISOString(item.time)]]">[[getLocaleDateString(item.time)]]</time>
+                        <span class="city">[[item.venue_loc]]</span>
+                        <span class="rsvp-count">[[item.yes_rsvp_count]]</span>
+                        <span class$="[[getChangeOverTimeClass(item.change_over_time)]]">
+                            <span class="fa arrow"></span>
+                            <span>[[getChangeOverTime(item.change_over_time)]]</span>
+                        </span>
+                    </paper-material>
+                </div>
+            </template>
+        </iron-list>
+    </template>
+
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'upcoming-meetups',
+
+            properties: {
+                items: {
+                    type: Array,
+                    value: function() { return []; }
+                },
+                
+                changeLabel: {
+                    type: String,
+                    value: ''
+                }
+            },
+
+            created: function() {
+                this.dateStringOptions = {weekday:'short', year:'numeric', month: 'short', day:'numeric'};
+                this.locale = navigator.language || navigator.browserLanguage || navigator.systemLanguage || navigator.userLanguage;
+            },
+
+            getISOString: function(time) {
+                return (new Date(time)).toISOString();
+            },
+            
+            getLocaleDateString: function(time) {
+                return (new Date(time)).toLocaleDateString(this.locale, this.dateStringOptions);
+            },
+            
+            getChangeOverTime: function(change) {
+                if (change === 0) {
+                    return '-';
+                }
+                return Math.abs(change);
+            },
+            
+            getChangeOverTimeClass: function(change) {
+                var cls = 'change';
+                if (change > 0) {
+                    cls += ' positive'
+                } else if (change < 0) {
+                    cls += ' negative'
+                }
+                // zero is also a valid value, but has no class
+                return cls;
+            }
+        });
+    })();
+    </script>
+
+</dom-module>

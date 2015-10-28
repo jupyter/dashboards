@@ -1,0 +1,278 @@
+<dom-module id="dynamic-list">
+    <template>
+        <style>
+            :host .header {
+                background-color: #305b81;
+                color: white;
+                padding: 10px;
+            }
+                
+            :host .controls {
+                display: flex;
+                justify-content: space-between;
+            }
+                
+            :host iron-list {
+                height: 850px;
+            }
+                
+            :host .count {
+                font-size: smaller;
+                text-transform: uppercase;
+            }                
+            :host .count .new-items {
+                margin-left: 1em;
+                color: white;
+            }
+                
+            :host paper-toggle-button {
+                --paper-toggle-button-unchecked-button-color: darkgray;
+                --default-primary-color: white;
+            }
+                
+            :host paper-toggle-button:hover {
+                cursor: pointer;
+            }
+            
+            .member-card {
+                display: flex;
+                flex-flow: column wrap;
+                align-content: flex-start;
+                height: 50px;
+                margin: 10px 10px 0 10px;
+            }
+            .member-card img {
+                width: 50px;
+                height: 50px;
+                flex: 100%;
+                margin-right: 10px;
+            }
+            .member-card .member-name {
+                font-size: larger;
+                line-height: 25px;
+            }
+            .member-card .member-name,
+            .member-card .cmu {
+                flex: 50%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: calc(100% - 70px);
+            }
+            .member-card a {
+                color: #305b81;
+                text-decoration: none;
+            }
+            .member-card a:hover {
+                text-decoration: underline;
+            }
+            .member-card .contact-button {
+                text-transform: uppercase;
+                font-size: 0.6em;
+                line-height: 1em;
+                margin-left: 1em;
+                padding: 0.3em;
+                border-radius: 0.2em;
+                background-color: #305b81;
+                color: white;
+            }
+            .member-card:not(:hover) .contact-button {
+                display: none;
+            }
+                
+            :host .member-card[data-converted] {
+                background-color: rgba(130, 209, 245, 0.2);
+            }
+        </style>
+        
+        <paper-material class="header">
+            <h2>[[heading]]</h2>
+            <div class="controls">
+                <div class="count">
+                    <span>[[getVisibleItemsCount(visibleItems.*)]]</span> items
+                    <template is="dom-if" if="[[hasNewItems(newItems.*)]]">
+                        <a class="new-items" on-click="flush" href="javascript:"><span>[[getNewItemsCount(newItems.*)]]</span> updates available</a>
+                    </template>
+                </div>
+                <div class="toggle-btn-container">
+                    <paper-toggle-button checked="{{liveUpdate}}"></paper-toggle-button>
+                    <label id="stream-label">Live Update</label>
+                </div>
+            </div>
+        </paper-material>
+        <template is="dom-if" if="[[getVisibleItemsCount(visibleItems.*)]]">
+            <iron-list items="[[visibleItems]]" id="list">
+                <template>
+                    <div>
+                        <paper-material class="member-card" data-converted$="[[item.converted]]">
+                            <img src="[[item.member.photo]]">
+                            <a class="member-name" href="[[getMemberUrl(item)]]" target="_blank">
+                                <span>[[item.member.member_name]]</span>
+                                <span class="contact-button" data-contact-id$="[[item.member.member_id]]" on-click="_onContactClick">Contact</span>
+                            </a>
+                            <div class="cmu"><span>[[toFixed(item.cmu_dist)]]</span> km from <a href="[[item.cmu.event_url]]" target="_blank">[[item.cmu.name]]</a></div>
+                        </paper-material>
+                    </div>
+                </template>
+            </iron-list>
+        </template>
+    </template>
+
+    <script>
+    (function () {
+        'use strict';
+
+        Polymer({
+            is: 'dynamic-list',
+
+            properties: {
+                heading: {
+                    type: String,
+                    value: 'Dynamic List'
+                },
+                items: {
+                    type: Array,
+                    value: function() { return []; }
+                },
+
+                visibleItems: {
+                    type: Array,
+                    value: function() { return []; }
+                },
+
+                newItems: {
+                    type: Array,
+                    value: function() { return []; }
+                },
+
+                liveUpdate: {
+                    type: Boolean,
+                    value: true,
+                    observer: '_liveUpdateChanged'
+                },
+
+                /**
+                 * If specified, ensures that visible items are unique
+                 * based on the given property name.
+                 */
+                idProp: {
+                    type: String,
+                    value: ''
+                }
+            },
+
+            _keys: null, // unique candidate member IDs
+
+            observers: [
+                '_itemsChanged(items.*)'
+            ],
+
+            created: function() {
+                this._keys = {};
+            },
+
+            attached: function() {
+                this._contactedFunc = document.getElementById('candidateContacted');
+            },
+
+            _itemsChanged: function(change) {
+                if (this.items.length === 0) {
+                    return;
+                }
+
+                if (change.path === 'items') {
+                    if (this.idProp) {
+                        for (var i = 0, len = this.items.length; i < len; i++) {
+                            var item = this.items[i];
+                            var id = item[this.idProp];
+                            if (!this._keys.hasOwnProperty(id)) {
+                                this.unshift('newItems', item);
+                                this._keys[id] = 1;
+                            }
+                        }
+                    } else {
+                        this.unshift.apply(this, ['newItems'].concat(this.items));
+                    }
+                } else if (change.path === 'items.splices') {
+                    // item was added/removed
+                    console.error('Not implemented');
+                } else {
+                    // individual item or its sub-props changed
+                    console.error('Not implemented');
+                }
+
+                if (this.liveUpdate) {
+                    this.flush(); // update main list with new items
+                }
+            },
+
+            _liveUpdateChanged: function(newVal, oldVal) {
+                console.log('live update:',this.liveUpdate);
+                if (newVal) {
+                    this.flush();
+                }
+            },
+
+            _onContactClick: function(e) {
+                if (e.model.get('item.converted')) {
+                    // already contacted this candidate; nothing to do here
+                    return;
+                }
+
+                // update global conversion list in python
+                var id = parseInt(e.target.getAttribute('data-contact-id'), 10);
+                this._contactedFunc.args = {id: id};
+                this._contactedFunc.invoke();
+
+                // update model for this element
+                e.model.set('item.converted', true);
+            },
+
+            getVisibleItemsCount: function(e) {
+                return this.visibleItems.length;
+            },
+
+            getNewItemsCount: function(e) {
+                return this.newItems.length;
+            },
+
+            getMemberUrl: function(item) {
+                return 'http://www.meetup.com/members/' + item.member.member_id + '/';
+            },
+
+            // only show new items count if *not* streaming
+            hasNewItems: function(e) {
+                return this.getNewItemsCount() !== 0 && !this.liveUpdate;
+            },
+
+            toFixed: function(dist) {
+                return parseFloat(dist).toFixed(2);
+            },
+
+            // Copies new (hidden) items into the visible list.
+            flush: function(e) {
+                this.unshift.apply(this, ['visibleItems'].concat(this.newItems));
+                this.set('newItems', []);
+                if (e) {
+                    e.preventDefault();
+                }
+            },
+
+            // For demo purposes only.
+            // Simulate a mouse click on a random element in the list.
+            _simulateContactClick: function() {
+                if (!this.visibleItems.length) {
+                    return;
+                }
+                var el = this.$$('#list');
+                var visibleNodes = Array.prototype.filter.call(el.children, function(item) {
+                    return item.tagName !== 'TEMPLATE';
+                });
+                var idx = Math.floor(Math.random() * visibleNodes.length);
+                var node = visibleNodes[idx];
+                node.querySelector('.contact-button').dispatchEvent(new MouseEvent('click', {bubbles:true}));
+            }
+        });
+    })();
+    </script>
+</dom-module>
