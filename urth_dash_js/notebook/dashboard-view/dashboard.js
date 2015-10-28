@@ -171,7 +171,7 @@ define([
 
         if (typeof this.opts.onResize === 'function') {
             var self = this;
-            this.$container.on('resizestop', function(event, ui) {
+            this.$container.on('dragstop resizestop', function(event, ui) {
                 // Gridstack fires this event before the resizing animation has finished
                 // (see https://github.com/troolee/gridstack.js/issues/159). Temporary workaround
                 // is to fire our callback after the resize transition has finished.
