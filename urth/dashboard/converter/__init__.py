@@ -198,84 +198,9 @@ def add_urth_widgets(output_path, notebook_file):
     # static/urth_widgets
     shutil.copytree(urth_widgets_js_dir, output_js_dir)
 
-    # Read the notebook's contents and get the required components
-    notebook_components = get_notebook_components(notebook_file)
-
-    # Add the components for urth widgets to the list of widgets to be installed
-    urth_widgets = get_urth_widgets(urth_widgets_dir)
-
-    # Combine the urth widget's components and the notebook's components for a
-    # complete list of what needs to be installed
-    all_components = notebook_components + urth_widgets
-
     # Install the bower componentsin the urth
-    install_notebook_components(all_components, output_urth_components_dir)
+    shutil.copytree(os.path.join(urth_widgets_dir, 'bower_components'), output_urth_components_dir)
 
-def get_urth_widgets(urth_widgets_dir):
-    '''
-    Builds a list of the directories where the urth widgets' bower components are
-    located on the filesystem.
-    NOTE: This is very specific to urth widgets and should be refactored to
-          generically load dependencies of a notebook.
-
-    :param urth_widgets_dir: The directory where the urth widgets extension is
-        installed on the filesystem.
-    '''
-    urth_widgets_components = []
-    for urth_dir in glob.glob(os.path.join(urth_widgets_dir, 'bower_components/urth-*')):
-        urth_widgets_components.append(urth_dir)
-    return urth_widgets_components
-
-def get_cell_components(cell_source):
-    '''
-    Finds any link html tags within the cell source. If these tags have
-    a package attribute those values will be returned.
-
-    :param cell_source: The source code within a notebook cell
-    '''
-    link_regex = '<link([^>]*)>'
-    package_regex = 'package\s*=\s*[\'"]([^\'"]*)[\'"]'
-    link_matches = re.findall(link_regex, cell_source)
-    link_attributes = ' '.join(link_matches)
-    all_components = re.findall(package_regex, link_attributes)
-    return all_components
-
-def get_notebook_components(notebook_file):
-    '''
-    Builds a list of bower components found within the notebook.
-
-    :param notebook_file: The absolute path to the notebook file to read.
-    '''
-    # with open(notebook_file) as notebook:
-    #     notebook_text = notebook.read()
-    #     notebook.close()
-
-    notebook = nbformat.read(notebook_file, 4)
-
-    all_components = []
-    # Ensure no error cells first
-    for cell in notebook.cells:
-        all_components = all_components + get_cell_components(cell.get('source'))
-
-    return all_components
-
-
-def install_notebook_components(components, components_dir):
-    '''
-    Installs a list of bower components into a specified directory by calling
-    bower install.
-
-    :param components: The components to be installed
-    :param components_dir: The directory to install the components.
-    '''
-    #   NOTE: Ideally we would just want to do a bower install in the directory
-    #         we wish to install the components in, but running the command
-    #         will create a bower_components under that directory. So we
-    #         currently install to a tmp dir and move the bower_components folder
-    #         to be the install folder we want.
-    tmp_install_dir = mkdtemp()
-    subprocess.check_call(['bower', 'install'] + components + ['--allow-root', '--config.interactive=false'], cwd=tmp_install_dir)
-    shutil.move(os.path.join(tmp_install_dir,'bower_components'), components_dir)
 
 def to_thebe_html(path, env_vars, fmt, cwd, template_fn):
     '''
