@@ -153,8 +153,12 @@ define([
                 vertical_margin: this.opts.gridMargin,
                 cell_height: this.opts.rowHeight,
                 width: this.opts.numCols,
-                min_width: 0, // disables single-column mode (which reorders DOM nodes)
-                animate: true,
+                // disables single-column mode (which reorders DOM nodes)
+                min_width: 0,
+                // Disable animation when first creating Gridstack so it doesn't do a resize
+                // transition on cells when first created. We enable animation later (in
+                // `setInteractive`).
+                animate: false,
                 draggable: {
                     handle: '.drag-handle',
                     scroll: true
@@ -224,8 +228,6 @@ define([
             }
         ];
         this.gridstack.generateStylesheet(styleRules);
-
-        this.gridstack.enable(); // enable widgets moving/resizing
     };
 
     Dashboard.prototype._repositionHiddenCells = function() {
@@ -573,19 +575,19 @@ define([
     Dashboard.prototype.setInteractive = function(args) {
         this._loaded.then(function() {
             this.gridstack.set_static(!args.enable);
+            this.gridstack.set_animation(args.enable);
             this.interactive = !!args.enable;
             if (args.enable) {
-                this.gridstack.enable();
+                this.gridstack.enable(); // enable widgets moving/resizing
                 this._repositionHiddenCells();
             } else {
-                this.gridstack.disable();
+                this.gridstack.disable(); // disable widgets moving/resizing
                 // clear the notebook height
                 $('#notebook').css('height', '');
             }
 
-            // if enabling grid, need to wait for resize transition to finish
             if (typeof args.complete === 'function') {
-                setTimeout(args.complete, args.enable ? RESIZE_DURATION : 0);
+                args.complete();
             }
         }.bind(this));
     };
@@ -600,7 +602,7 @@ define([
         this.gridstack.destroy(false /* detach_node */);
         this.$container.removeData('gridstack'); // remove stored instance, so we can re-init
 
-        // remove all data-gs-* attributes
+        // remove all 'data-gs-*' attributes from cells
         this.$container.find('> .cell').each(function() {
             var attrs = this.attributes;
             var toRemove = [];
@@ -614,6 +616,15 @@ define([
             for (var i = 0; i < toRemove.length; i++) {
                 this.removeAttribute(toRemove[i]);
             }
+        });
+
+        // remove all 'grid-stack-*' class names from container
+        this.$container.attr('class', function(idx, className) {
+            return className.split(' ')
+                .filter(function(val) {
+                    return !/^grid-stack-/.test(val);
+                })
+                .join(' ');
         });
 
         $('.grid-stack-item')
