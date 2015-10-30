@@ -64,13 +64,13 @@
                 color: green;
             }
             :host .meetup-row .change.positive .arrow:before {
-                content: "⬆";
+                content: "\2b06";
             }
             :host .meetup-row .change.negative {
                 color: red;
             }
             :host .meetup-row .change.negative .arrow:before {
-                content: "⬇";
+                content: "\2b07";
             }
         </style>
 
@@ -96,7 +96,7 @@
                         <span class="city">[[item.venue_loc]]</span>
                         <span class="rsvp-count">[[item.yes_rsvp_count]]</span>
                         <span class$="[[getChangeOverTimeClass(item.change_over_time)]]">
-                            <span class="fa arrow"></span>
+                            <span class="arrow"></span>
                             <span>[[getChangeOverTime(item.change_over_time)]]</span>
                         </span>
                     </paper-material>
