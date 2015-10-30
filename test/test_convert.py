@@ -106,32 +106,6 @@ class TestConverter(unittest.TestCase):
         self.assertTrue(os.path.exists(os.path.join(location, 'static/urth_widgets')), 'urth widgets folder does not exist')
         self.assertTrue(os.path.exists(os.path.join(location, 'static/urth_components')), 'bower components were not moved')
 
-    def test_get_cell_components(self):
-        self.assertTrue(urth.dashboard.converter.get_cell_components)
-        test_values = [
-            '''<link package='PolymerElements/package1' >''',
-            '''<some random=tag />''',
-            '''<link href='//some/url' package="PolymerElements/package2" >''',
-            '''<link href='//some/url' package ="PolymerElements/package4" >''',
-            '''<link href='//some/url' package= 'PolymerElements/package5' >''',
-            '''<link href='//some/url'
-                package='PolymerElements/package6' debug>'''
-        ]
-        expected_results = [
-            ['PolymerElements/package1'],
-            [],
-            ['PolymerElements/package2'],
-            ['PolymerElements/package4'],
-            ['PolymerElements/package5'],
-            ['PolymerElements/package6']
-        ]
-        for i in range(0, len(test_values)):
-            result = urth.dashboard.converter.get_cell_components(test_values[i])
-            self.assertTrue(
-                result == expected_results[i],
-                'Did not find expected components {0} in {1}'.format(expected_results[i], result)
-            )
-
     def test_get_cell_references_comment(self):
         self.assertTrue(urth.dashboard.converter._get_references)
         no_references = urth.dashboard.converter._get_references({'source':'!ls', 'cell_type':'code'})
