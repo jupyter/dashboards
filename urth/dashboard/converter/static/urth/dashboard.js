@@ -50,10 +50,18 @@ define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog
         // override this function since it messes with images (invoking jquery.resizable on them)
         IPython.OutputArea.prototype._dblclick_to_reset_size = function() {};
 
-        // finally, let's start the kernel (rather than waiting for it to be lazily loaded)
-        thebe.start_kernel(function() {});
+        // hook the error handler to kernel / session events
+        thebe.events.on('kernel_created.Kernel kernel_created.Session', function(e) {
+            ErrorLog.enable(window.IPython);
+        });
 
-        return thebe;
+        // finally, let's start the kernel (rather than waiting for it to be lazily loaded)
+        var kernel_ready = new $.Deferred();
+        thebe.start_kernel(function() {
+            kernel_ready.resolve();
+        });
+
+        return kernel_ready;
     }
 
     function initGrid(deferred) {
@@ -112,26 +120,30 @@ define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog
         init: function() {
             $container = $('#dashboard-container');
 
-            initThebe({
+            // initialize thebe
+            var thebe_ready = initThebe({
                 url: Urth.thebe_url
-            }).notebook.events.on('kernel_created.Kernel kernel_created.Session', function(e) {
-                ErrorLog.enable(window.IPython);
             });
 
+            // initialize the grid layout
+            var grid_ready = $.Deferred();
             var row = getQueryParam('row');
-            var deferred = $.Deferred();
             if (!row) {
-                // default dashboard view
-                initGrid(deferred);
-                deferred.then(_showDashboard);
+                // initialize the grid and show it once ready
+                initGrid(grid_ready);
+                grid_ready.then(_showDashboard);
             } else {
                 // show only given row/column
                 var col = getQueryParam('col');
                 showRow(row, col);
                 _showDashboard();
-                deferred.resolve();
+                // resolve the grid promise
+                grid_ready.resolve();
             }
-            return deferred;
+
+            // we're fully initialized when both grid and thebe
+            // are initialized
+            return $.when(grid_ready, thebe_ready);
         },
 
         executeAll: function() {
