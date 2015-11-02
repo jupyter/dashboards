@@ -5,11 +5,16 @@ import os
 from setuptools import setup
 from setuptools.command.install import install
 
-from IPython.html.nbextensions import install_nbextension
-from IPython.html.services.config import ConfigManager
+from notebook.nbextensions import install_nbextension
+from notebook.services.config import ConfigManager
+from jupyter_core.paths import jupyter_config_dir
 
-VERSION_FILE = os.path.join(os.path.dirname(__file__), 'VERSION')
-EXT_DIR = os.path.join(os.path.dirname(__file__), 'urth_dash_js')
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+VERSION_NS = {}
+with open(os.path.join(HERE, 'urth/dashboard/_version.py')) as f:
+    exec(f.read(), {}, VERSION_NS)
+EXT_DIR = os.path.join(HERE, 'urth_dash_js')
 SERVER_EXT_CONFIG = "c.NotebookApp.server_extensions.append('urth.dashboard.nbexts')"
 
 class InstallCommand(install):
@@ -24,7 +29,7 @@ class InstallCommand(install):
         cm.update('notebook', {"load_extensions": {'urth_dash_js/notebook/main': True}})
 
         print('Installing notebook server extension')
-        fn = os.path.join(cm.profile_dir, 'ipython_notebook_config.py')
+        fn = os.path.join(jupyter_config_dir(), 'jupyter_notebook_config.py')
 
         if os.path.isfile(fn):
             with open(fn, 'r+') as fh:
@@ -38,26 +43,14 @@ class InstallCommand(install):
                 fh.write('c = get_config()\n')
                 fh.write(SERVER_EXT_CONFIG)
 
-# Apply version to build
-VERSION = '0.1'
-if os.path.isfile(VERSION_FILE):
-    # CI build, read metadata and append
-    with open(VERSION_FILE, 'r') as fh:
-        BUILD_INFO = fh.readline().strip()
-    BUILD_NUMBER, _ = BUILD_INFO.split('-')
-    VERSION += '.dev' + BUILD_NUMBER
-else:
-    # Local development build
-    VERSION += '.dev0'
-
 setup(
     name='urth-dash-nbexts',
     author='Jupyter Community',
     maintainer='Jupyter Community',
     description='IPython / Jupyter extensions to enable dashboard creation and deployment',
-    version=VERSION,
+    version=VERSION_NS['__version__'],
     license='BSD',
-    platforms=['IPython Notebook 3.x'],
+    platforms=['IPython Notebook 4.x'],
     packages=[
         'urth', 
         'urth.dashboard', 

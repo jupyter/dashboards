@@ -48,12 +48,6 @@ docker-machine create -d virtualbox dev
 eval "$(docker-machine env dev)"
 ```
 
-Pull the Docker image that we'll use for development (including bower because we want to work with declarative widgets).
-
-```
-docker pull cloudet/pyspark-notebook-bower
-```
-
 Clone this repository in a local directory that docker can volume mount:
 
 ```
@@ -65,11 +59,17 @@ cd !$
 git clone https://github.com/jupyter-incubator/dashboards.git
 ```
 
+Pull a base Docker image and build a subimage from it that includes bower both as a dashboard dev dependency and as a prereq for example notebooks that use declarative widgets.
+
+```
+cd dashboards
+make build
+```
+
 Run the notebook server in a docker container:
 
 ```
 # run notebook server in container
-cd dashboards
 make dev
 ```
 
