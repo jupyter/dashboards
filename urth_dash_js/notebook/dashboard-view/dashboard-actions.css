@@ -14,7 +14,7 @@
     top: 3px;
 }
 
-#urth-dashboard-toolbar-buttons {
+.urth-dashboard-toolbar-buttons {
     display: -webkit-inline-flex;
     display: -ms-inline-flexbox;
     display: inline-flex;
@@ -22,10 +22,16 @@
         -ms-flex-align: baseline;
             align-items: baseline;
 }
-#urth-dashboard-toolbar-buttons .navbar-text {
+#maintoolbar .urth-dashboard-toolbar-buttons .navbar-text {
     margin: 0 5px;
 }
-body:not(.urth-dashboard) #urth-dashboard-toolbar-buttons,
-.urth-dashboard.view-only #urth-dashboard-toolbar-buttons {
+body:not(.urth-dashboard) #urth-dashboard-showhide-toolbar-buttons,
+.urth-dashboard.view-only #urth-dashboard-showhide-toolbar-buttons {
     display: none;
+}
+
+#urth-dashboard-showhide-toolbar-buttons > button:first-of-type,
+#urth-dashboard-view-toolbar-buttons > button:first-of-type {
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
 }

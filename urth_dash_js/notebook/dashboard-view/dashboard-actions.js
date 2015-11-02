@@ -23,6 +23,11 @@ define([
     var STATE_DASHBOARD_VIEW = 'view';
     var dashboardState = STATE_NOTEBOOK;
 
+    var VIEW_BTN_IDX = {};
+    VIEW_BTN_IDX[STATE_NOTEBOOK] = 1;
+    VIEW_BTN_IDX[STATE_DASHBOARD_AUTH] = 2;
+    VIEW_BTN_IDX[STATE_DASHBOARD_VIEW] = 3;
+
     var enterDbModeCallback;
     var exitDbModeCallback;
     var showAllCallback;
@@ -47,6 +52,7 @@ define([
         } else {
             enterDashboardMode(newState, dashboardState /* prev state */);
         }
+        setViewButtonEnabled(newState);
         dashboardState = newState;
     }
 
@@ -81,6 +87,13 @@ define([
         // disable scroll to bottom of notebook
         scrollToBottom = IPython.Notebook.prototype.scroll_to_bottom;
         IPython.Notebook.prototype.scroll_to_bottom = function() {};
+    }
+
+    function setViewButtonEnabled(state) {
+        var idx = VIEW_BTN_IDX[state];
+        $('#urth-dashboard-view-toolbar-buttons > button:nth-of-type(' + idx + ')')
+            .addClass('active')
+            .siblings().removeClass('active');
     }
 
     var isHeaderVisible = true;
@@ -167,6 +180,36 @@ define([
     };
 
     DashboardActions.prototype.addToolbarItems = function() {
+        // switch view group
+        var notebookView = {
+            help: 'Notebook view. Edit the code.',
+            icon: 'fa-code',
+            help_index: '',
+            handler: function() { toggleDashboardMode(STATE_NOTEBOOK); }
+        };
+        var layoutView = {
+            help: 'Layout view. Size and position dashboard cells.',
+            icon: 'fa-th-large',
+            help_index: '',
+            handler: function() { toggleDashboardMode(STATE_DASHBOARD_AUTH); }
+        };
+        var dashboardView = {
+            help: 'Dashboard view. Preview the dashboard.',
+            icon: 'fa-dashboard',
+            help_index: '',
+            handler: function() { toggleDashboardMode(STATE_DASHBOARD_VIEW); }
+        };
+        IPython.keyboard_manager.actions.register(notebookView, 'notebook-view', 'urth');
+        IPython.keyboard_manager.actions.register(layoutView, 'layout-view', 'urth');
+        IPython.keyboard_manager.actions.register(dashboardView, 'dashboard-view', 'urth');
+
+        IPython.toolbar.add_buttons_group(['urth.notebook-view', 'urth.layout-view', 'urth.dashboard-view'],
+                'urth-dashboard-view-toolbar-buttons');
+        $('#urth-dashboard-view-toolbar-buttons')
+            .addClass('urth-dashboard-toolbar-buttons')
+            .prepend('<span class="navbar-text">View:</span>');
+
+        // show/hide all cells group
         var showAllCells = {
             help: 'Add all cells to the dashboard view',
             icon: 'fa-eye',
@@ -183,9 +226,13 @@ define([
         IPython.keyboard_manager.actions.register(hideAllCells, 'hide-all-cells', 'urth');
 
         IPython.toolbar.add_buttons_group(['urth.show-all-cells', 'urth.hide-all-cells'],
-                'urth-dashboard-toolbar-buttons');
-        $('#urth-dashboard-toolbar-buttons')
+                'urth-dashboard-showhide-toolbar-buttons');
+        $('#urth-dashboard-showhide-toolbar-buttons')
+            .addClass('urth-dashboard-toolbar-buttons')
             .prepend('<span class="navbar-text">Dashboard:</span>');
+
+        // activate the button corresponding to the current view
+        setViewButtonEnabled(dashboardState);
     };
 
     DashboardActions.prototype.switchToNotebook = function() {
