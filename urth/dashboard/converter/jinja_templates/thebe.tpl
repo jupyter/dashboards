@@ -61,7 +61,7 @@
     </div>
     <div id="dashboard-container" class="container">
         {%- for cell in nb.cells -%}
-            {%- if (cell.metadata is defined) and (cell.metadata.urth is defined) and (cell.metadata.urth.dashboard is defined) -%}
+            {%- if (cell.metadata is defined) and (cell.metadata.urth is defined) and (cell.metadata.urth.dashboard is defined) and (cell.metadata.urth.dashboard.layout is defined) -%}
                 {%- set hidden = cell.metadata.urth.dashboard.hidden -%}
                 {%- set layout = cell.metadata.urth.dashboard.layout -%}
             {%- else -%}
