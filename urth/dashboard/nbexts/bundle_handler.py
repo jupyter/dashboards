@@ -1,8 +1,8 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from IPython.html.utils import url_path_join, url2path
-from IPython.html.base.handlers import IPythonHandler
+from notebook.utils import url_path_join, url2path
+from notebook.base.handlers import IPythonHandler
 from tornado import web
 from tornado import escape
 from .. import converter

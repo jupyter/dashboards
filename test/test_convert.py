@@ -7,14 +7,14 @@ import os
 import tempfile
 from zipfile import ZipFile
 import urth.dashboard.converter
-from IPython.utils.path import get_ipython_dir
+from jupyter_core.paths import jupyter_data_dir
 
 TEST_URL = 'http://jupyter.example.com:8888/'
-URTH_WIDGETS_DIR = os.path.join(get_ipython_dir(), 'nbextensions/urth_widgets/')
+URTH_WIDGETS_DIR = os.path.join(jupyter_data_dir(), 'nbextensions/urth_widgets/')
 URTH_WIDGETS_JS_DIR = os.path.join(URTH_WIDGETS_DIR, 'js')
 URTH_VIZ_DIR = os.path.join(URTH_WIDGETS_DIR, 'components/urth-viz')
 URTH_CORE_DIR = os.path.join(URTH_WIDGETS_DIR, 'components/urth-core')
-BOWER_COMPONENT_DIR = os.path.join(get_ipython_dir(), 'nbextensions/urth_widgets/bower_components/component-a')
+BOWER_COMPONENT_DIR = os.path.join(jupyter_data_dir(), 'nbextensions/urth_widgets/bower_components/component-a')
 
 class TestConverter(unittest.TestCase):
 
