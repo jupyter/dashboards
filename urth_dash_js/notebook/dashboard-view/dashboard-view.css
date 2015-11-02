@@ -68,8 +68,10 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
 }
 .grid-stack .dashboard-item-border {
     background-color: transparent;
+    color: transparent;
     z-index: 10;
     pointer-events: none; /* "pass through" mouse events */
+    transition: background-color 0.2s, color 0.2s;
 }
 .grid-stack .cell:not(.grid-stack-item) .dashboard-item-background,
 .grid-stack .cell:not(.grid-stack-item) .dashboard-item-border {
@@ -170,6 +172,35 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
 .urth-dashboard .cell:not(.grid-stack-item) .grid-control.drag-handle,
 .urth-dashboard .cell:not(.grid-stack-item) .grid-control.close-btn,
 .urth-dashboard .cell:not(.grid-stack-item) .gs-resize-handle {
+    display: none;
+}
+
+/* drag/drop cell overlay*/
+.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack-item .dashboard-item-border {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-justify-content: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-align-items: center;
+        -ms-flex-align: center;
+            align-items: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #b2b2b2;
+    font-size: 50px;
+    pointer-events: auto;
+}
+.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack-item .dashboard-item-border:hover {
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack-item .grid-control-container,
+.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack-item .ui-resizable-handle {
+    display: none !important; /* important needed to override inline style set by gridstack */
+}
+.urth-dashboard:not(.all_cell_drag):not(.view-only) .dashboard-item-border i,
+.urth-dashboard .grid-stack > .cell:not(.grid-stack-item) .dashboard-item-border i {
     display: none;
 }
 

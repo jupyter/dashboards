@@ -43,6 +43,8 @@ define([
     var HIDDEN_CELLS_MARGIN = 10;
     var HIDDEN_CELLS_BOTTOM_MARGIN = 20;
 
+    var DRAG_HANDLE = '.drag-handle';
+
     var Dashboard = function(opts) {
         this.$container = $(opts.container);
         this.opts = opts;
@@ -132,7 +134,7 @@ define([
             // bounds, but we still want to show the user those boundaries.
             var el = $(this);
             if (el.find('> .dashboard-item-background').length === 0) {
-                el.prepend('<div class="dashboard-item-background"/><div class="dashboard-item-border"/>');
+                el.prepend('<div class="dashboard-item-background"/><div class="dashboard-item-border"><i class="fa fa-arrows"/></div>');
             }
 
             var metadata = self._getCellMetadata(el);
@@ -160,7 +162,7 @@ define([
                 // `setInteractive`).
                 animate: false,
                 draggable: {
-                    handle: '.drag-handle',
+                    handle: DRAG_HANDLE,
                     scroll: true
                 },
                 resizable: {
@@ -577,13 +579,15 @@ define([
             this.gridstack.set_static(!args.enable);
             this.gridstack.set_animation(args.enable);
             this.interactive = !!args.enable;
+
             if (args.enable) {
                 this.gridstack.enable(); // enable widgets moving/resizing
+                $(window).on('keydown.Dashboard keyup.Dashboard', this._onShiftKey.bind(this));
                 this._repositionHiddenCells();
             } else {
                 this.gridstack.disable(); // disable widgets moving/resizing
-                // clear the notebook height
-                $('#notebook').css('height', '');
+                $(window).off('keydown.Dashboard keyup.Dashboard');
+                $('#notebook').css('height', ''); // clear the notebook height
             }
 
             if (typeof args.complete === 'function') {
@@ -592,11 +596,20 @@ define([
         }.bind(this));
     };
 
+    // when shift key is held down (only in Dashboard Layout), allow dragging from full cell body
+    Dashboard.prototype._onShiftKey = function(e) {
+        var allCellDragEnable = e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey;
+        $(document.body).toggleClass('all_cell_drag', allCellDragEnable);
+        // set draggable area to either full cell or the smaller drag handle
+        var handle = allCellDragEnable ? '.dashboard-item-border' : DRAG_HANDLE;
+        this.$container.find('> .grid-stack-item').draggable('option', 'handle', handle);
+    };
+
     /**
      * Delete dashboard resources
      */
     Dashboard.prototype.destroy = function() {
-        $(window).off('resize.Dashboard');
+        $(window).off('resize.Dashboard keydown.Dashboard keyup.Dashboard');
 
         this.gridstack.removeStylesheet();
         this.gridstack.destroy(false /* detach_node */);
