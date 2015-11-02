@@ -47,9 +47,6 @@ define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog
             }, 500);
         });
 
-        // override this function since it messes with images (invoking jquery.resizable on them)
-        IPython.OutputArea.prototype._dblclick_to_reset_size = function() {};
-
         // hook the error handler to kernel / session events
         thebe.events.on('kernel_created.Kernel kernel_created.Session', function(e) {
             ErrorLog.enable(window.IPython);
