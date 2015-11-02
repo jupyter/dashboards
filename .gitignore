@@ -73,6 +73,7 @@ etc/notebooks/*
 !etc/notebooks/images/
 etc/notebooks/*_demo/.dashboard_cache
 etc/notebooks/*_demo/.ipynb_checkpoints
+etc/jupyter_notebook_config.py
 etc/ipython_notebook_config.py
 etc/notebook.json
 
