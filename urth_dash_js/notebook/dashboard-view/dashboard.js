@@ -591,7 +591,9 @@ define([
             }
 
             if (typeof args.complete === 'function') {
-                args.complete();
+                // call `complete` asynchronously, since we need to let Gridstack to finish
+                // fully rendering
+                setTimeout(args.complete, 0);
             }
         }.bind(this));
     };

@@ -29,8 +29,7 @@ define([
         $(cell.element).on('iron-request-resize-notifications', function(event) {
             console.log('Polymer element requesting resize notifications');
 
-            // find the "real" event target, which may be in shadow DOM
-            var target = Polymer.dom(event.originalEvent).rootTarget;
+            var target = event.path ? event.path[0] : event.target;
             resizableElements = resizableElements.add(target);
             fireIronResizeEvent(target);
             event.stopPropagation();

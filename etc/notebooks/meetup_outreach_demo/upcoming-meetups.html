@@ -124,6 +124,14 @@
                 }
             },
 
+            behaviors: [
+                Polymer.IronResizableBehavior
+            ],
+
+            listeners: {
+                'iron-resize': '_onResize'
+            },
+
             created: function() {
                 this.dateStringOptions = {weekday:'short', year:'numeric', month: 'short', day:'numeric'};
                 this.locale = navigator.language || navigator.browserLanguage || navigator.systemLanguage || navigator.userLanguage;
@@ -153,6 +161,16 @@
                 }
                 // zero is also a valid value, but has no class
                 return cls;
+            },
+
+            _onResize: function(event) {
+                if (this._resizing) {
+                    return;
+                }
+                this._resizing = true;
+                // notify descendants to resize
+                this.notifyResize();
+                this._resizing = false;
             }
         });
     })();
