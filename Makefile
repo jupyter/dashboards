@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: build clean configs dev dev-with-widgets help install js sdist system-test-local system-test-remote test 
+.PHONY: build clean configs dev dev-with-widgets help install js sdist system-test-local system-test-remote test
 
 PYTHON?=python3
 
