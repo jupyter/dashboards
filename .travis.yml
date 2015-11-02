@@ -3,22 +3,14 @@ sudo: required
 language: python
 
 python:
-    - 3.4
+- 3.4
 
 services:
-  - docker
+- docker
 
 addons:
   sauce_connect:
     no_ssl_bump_domains: all
-
-before_install:
-- sudo apt-get update -qq
-- sudo apt-get install -y nodejs
-- docker pull cloudet/pyspark-notebook-bower
-
-install:
-  - npm install
 
 script:
 - make test-python2
