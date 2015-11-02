@@ -11,8 +11,8 @@ import errno
 import fnmatch
 import glob
 from tempfile import mkdtemp
-from IPython.utils.path import get_ipython_dir
-import IPython.nbformat as nbformat
+from jupyter_core.paths import jupyter_data_dir
+import nbformat
 
 # Absolute path to nbconvert templates
 TEMPLATES_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), 'jinja_templates'))
@@ -68,7 +68,7 @@ def to_php_app(notebook_fn, app_location=None, template_fn=None):
     # Copy static assets for Thebe
     shutil.copytree(STATICS_PATH, os.path.join(output_path, 'static'))
     # Copy static assets for dashboard layout
-    deps = os.path.join(get_ipython_dir(), 'nbextensions/urth_dash_js/notebook')
+    deps = os.path.join(jupyter_data_dir(), 'nbextensions/urth_dash_js/notebook')
     components = [
         'bower_components/gridstack/dist/gridstack.min.css',
         'bower_components/gridstack/dist/gridstack.min.js',
@@ -188,7 +188,7 @@ def add_urth_widgets(output_path, notebook_file):
     :param output_path: The output path of the dashboard being assembled
     :param notebook_file: The absolute path to the notebook file being packaged
     '''
-    ipython_dir = get_ipython_dir()
+    ipython_dir = jupyter_data_dir()
     # Root of urth widgets within Jupyter
     urth_widgets_dir = os.path.join(ipython_dir, 'nbextensions/urth_widgets')
     # JavaScript entry point for widgets in Jupyter
@@ -232,7 +232,8 @@ def to_thebe_html(path, env_vars, fmt, cwd, template_fn):
     proc = subprocess.Popen([
             'ipython',
             'nbconvert',
-            '--quiet',
+            '--log-level',
+            'ERROR',
             '--stdout',
             '--TemplateExporter.template_path=["{}"]'.format(TEMPLATES_PATH),
             '--template',
