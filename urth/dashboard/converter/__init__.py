@@ -199,8 +199,8 @@ def add_urth_widgets(output_path, notebook_file):
 
     # Check if any of the cells contain widgets, if not we do not to copy the bower_components
     notebook = nbformat.read(notebook_file, 4)
-    cell_widget_bools = map(lambda cell: cell_uses_widgets(cell.get('source')), notebook.cells)
-    if True not in cell_widget_bools:
+    any_cells_with_widgets = any(cell_uses_widgets(cell.get('source')) for cell in notebook.cells)
+    if not any_cells_with_widgets:
         return
 
     # Root of urth widgets within a dashboard app
