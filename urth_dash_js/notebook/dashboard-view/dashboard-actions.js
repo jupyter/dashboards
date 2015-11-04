@@ -10,11 +10,15 @@
 define([
     'require',
     'jquery',
-    'base/js/namespace'
+    'base/js/namespace',
+    'text!./sub-menu.html',
+    'text!./view-menu.html'
 ], function(
     require,
     $,
-    IPython
+    IPython,
+    subMenuTemplate,
+    viewMenuTemplate
 ) {
     'use strict';
 
@@ -61,6 +65,7 @@ define([
         $('body').removeClass('view-only');
         $('#urth-notebook-view').addClass('selected');
         $('#urth-dashboard-auth, #urth-dashboard-view').removeClass('selected');
+        $('#urth-dashboard-show-all, #urth-dashboard-hide-all').addClass('disabled');
         exitDbModeCallback();
         updateUrlState(false);
         toggleHeaders(true); // enable header and toolbar
@@ -72,11 +77,13 @@ define([
 
     function enterDashboardMode(newState, prevState) {
         // Add a class to the document body so our styles can take effect
-        $('body')
-            .toggleClass('view-only', newState === STATE_DASHBOARD_VIEW);
+        $('body').toggleClass('view-only', newState === STATE_DASHBOARD_VIEW);
+
+        // style menus accordingly
         $('#urth-notebook-view').removeClass('selected');
         $('#urth-dashboard-auth').toggleClass('selected', newState === STATE_DASHBOARD_AUTH);
         $('#urth-dashboard-view').toggleClass('selected', newState === STATE_DASHBOARD_VIEW);
+        $('#urth-dashboard-show-all, #urth-dashboard-hide-all').toggleClass('disabled', newState === STATE_DASHBOARD_VIEW);
 
         // disable header and toolbar as necessary
         toggleHeaders(newState === STATE_DASHBOARD_AUTH);
@@ -143,40 +150,23 @@ define([
     };
 
     DashboardActions.prototype.addMenuItems = function() {
-        $('#view_menu').append('<li class="divider"/>');
+        // View menu items
+        $('#view_menu').append('<li class="divider"/>', viewMenuTemplate);
+        $('#urth-notebook-view').click(toggleDashboardMode.bind(null, STATE_NOTEBOOK));
+        $('#urth-dashboard-auth').click(toggleDashboardMode.bind(null, STATE_DASHBOARD_AUTH));
+        $('#urth-dashboard-view').click(toggleDashboardMode.bind(null, STATE_DASHBOARD_VIEW));
 
-        [{
-            id: 'urth-notebook-view',
-            text: 'Notebook',
-            'class': dashboardState === STATE_NOTEBOOK ? 'selected' : '',
-            action: toggleDashboardMode.bind(null, STATE_NOTEBOOK)
-        }, {
-            id: 'urth-dashboard-auth',
-            text: 'Layout Dashboard',
-            action: toggleDashboardMode.bind(null, STATE_DASHBOARD_AUTH)
-        }, {
-            id: 'urth-dashboard-view',
-            text: 'View Dashboard',
-            'class': dashboardState === STATE_DASHBOARD_VIEW ? 'selected' : '',
-            action: toggleDashboardMode.bind(null, STATE_DASHBOARD_VIEW)
-        }]
-        .forEach(function(item) {
-            // Add the UI element to the View menu
-            var $li = $('<li/>', {
-                    id: item.id,
-                    'class': item['class']
-                })
-                .addClass('urth-dashboard-menu-item');
-            var $a = $('<a/>', {
-                    href : '#',
-                    text: item.text
-                })
-                .click(item.action)
-                .appendTo($li);
+        // initial selected menu item
+        if (dashboardState === STATE_NOTEBOOK) {
+            $('#urth-notebook-view').addClass('selected');
+        } else if (dashboardState === STATE_DASHBOARD_VIEW) {
+            $('#urth-dashboard-view').addClass('selected');
+        }
 
-            // Add the UI element to the View menu
-            $('#view_menu').append($li);
-        });
+        // Cell menu items
+        $('#cell_menu').append('<li class="divider"/>', subMenuTemplate);
+        $('#urth-dashboard-show-all').click(showAllCallback);
+        $('#urth-dashboard-hide-all').click(hideAllCallback);
     };
 
     DashboardActions.prototype.addToolbarItems = function() {
@@ -208,28 +198,6 @@ define([
         $('#urth-dashboard-view-toolbar-buttons')
             .addClass('urth-dashboard-toolbar-buttons')
             .prepend('<span class="navbar-text">View:</span>');
-
-        // show/hide all cells group
-        var showAllCells = {
-            help: 'Add all cells to the dashboard view',
-            icon: 'fa-eye',
-            help_index: '',
-            handler: showAllCallback
-        };
-        var hideAllCells = {
-            help: 'Remove all cells from the dashboard view',
-            icon: 'fa-eye-slash',
-            help_index: '',
-            handler: hideAllCallback
-        };
-        IPython.keyboard_manager.actions.register(showAllCells, 'show-all-cells', 'urth');
-        IPython.keyboard_manager.actions.register(hideAllCells, 'hide-all-cells', 'urth');
-
-        IPython.toolbar.add_buttons_group(['urth.show-all-cells', 'urth.hide-all-cells'],
-                'urth-dashboard-showhide-toolbar-buttons');
-        $('#urth-dashboard-showhide-toolbar-buttons')
-            .addClass('urth-dashboard-toolbar-buttons')
-            .prepend('<span class="navbar-text">Dashboard:</span>');
 
         // activate the button corresponding to the current view
         setViewButtonEnabled(dashboardState);

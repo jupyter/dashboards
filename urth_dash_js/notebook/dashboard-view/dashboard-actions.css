@@ -25,12 +25,7 @@
 #maintoolbar .urth-dashboard-toolbar-buttons .navbar-text {
     margin: 0 5px;
 }
-body:not(.urth-dashboard) #urth-dashboard-showhide-toolbar-buttons,
-.urth-dashboard.view-only #urth-dashboard-showhide-toolbar-buttons {
-    display: none;
-}
 
-#urth-dashboard-showhide-toolbar-buttons > button:first-of-type,
 #urth-dashboard-view-toolbar-buttons > button:first-of-type {
     border-top-left-radius: 2px;
     border-bottom-left-radius: 2px;
