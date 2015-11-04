@@ -105,6 +105,11 @@ class TestConverter(unittest.TestCase):
         urth.dashboard.converter.add_urth_widgets(location, 'test/resources/env.ipynb')
         self.assertTrue(os.path.exists(os.path.join(location, 'static/urth_widgets')), 'urth widgets folder does not exist')
         self.assertTrue(os.path.exists(os.path.join(location, 'static/urth_components')), 'bower components were not moved')
+        # Testing to make sure we do not add bower components if we do not need to
+        location = tempfile.mkdtemp()
+        urth.dashboard.converter.add_urth_widgets(location, 'test/resources/no_imports.ipynb')
+        self.assertFalse(os.path.exists(os.path.join(location, 'static/urth_widgets')), 'urth widgets folder exists when it should not')
+        self.assertFalse(os.path.exists(os.path.join(location, 'static/urth_components')), 'bower components were moved')
 
     def test_get_cell_references_comment(self):
         self.assertTrue(urth.dashboard.converter._get_references)
@@ -161,3 +166,9 @@ class TestConverter(unittest.TestCase):
     def test_glob_splatsplat_leading(self):
         globs = urth.dashboard.converter._glob(os.path.join(os.getcwd(), 'urth_dash_js'), ['**/dashboard.js'])
         self.assertTrue('notebook/dashboard-view/dashboard.js' in globs, globs)
+
+    def test_cell_uses_widgets(self):
+        self.assertTrue(urth.dashboard.converter.cell_uses_widgets)
+        self.assertTrue(urth.dashboard.converter.cell_uses_widgets('<urth-core-import>'), 'urth-core-import was not found when it should have been')
+        self.assertTrue(urth.dashboard.converter.cell_uses_widgets('<link is="urth-core-import">'), 'urth-core-import was not found when it should have been')
+        self.assertFalse(urth.dashboard.converter.cell_uses_widgets('<link>'), 'urth-core-import was found when it should not have been')
