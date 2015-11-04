@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "gridstack": "5bbd8d5f54edc48",
-    "requirejs": "~2.1.20"
+    "requirejs": "~2.1.20",
+    "requirejs-text": "~2.0.14"
   }
 }

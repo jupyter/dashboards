@@ -27,7 +27,8 @@ define([
         ],
         paths: {
             Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.min.js'),
-            lodash: require.toUrl('../bower_components/lodash/lodash.js')
+            lodash: require.toUrl('../bower_components/lodash/lodash.js'),
+            text: require.toUrl('../bower_components/requirejs-text/text.js')
             // jquery-ui is already loaded by Notebook, as 'jqueryui'
         },
         map: {
@@ -46,12 +47,13 @@ define([
     linkCSS('./dashboard-view/dashboard-actions.css');
 
     var dashboard;
+    var $helpArea;
 
     PolymerSupport.init();
 
     var dbActions = new DashboardActions({
         enterDashboardMode: function(doEnableGrid) {
-            require(['./dashboard'], function(Dashboard) {
+            require(['./dashboard', 'text!./help.html'], function(Dashboard, helpTemplate) {
                 if (!dashboard) {
                     dashboard = Dashboard.create({
                         container: $('#notebook-container'),
@@ -66,6 +68,7 @@ define([
                             dbActions.switchToNotebook();
                         }
                     });
+                    $helpArea = $(helpTemplate).prependTo($('#notebook_panel'));
                 }
                 dashboard.setInteractive({
                     enable: doEnableGrid,
@@ -79,6 +82,7 @@ define([
             dashboard.destroy();
             dashboard = null;
             PolymerSupport.notifyResizeAll();
+            $helpArea.remove();
         },
         showAll: function() {
             dashboard.showAllCells();
