@@ -162,9 +162,19 @@ def add_cf_manifest(output_path, kernel_server_url, app_name, tmpnb_mode):
             tmpnb_mode=tmpnb_mode
         ))
 
+def cell_uses_widgets(cell_source):
+    '''
+    Looks for urth-core-import in the cell and returns True if it is found,
+    False otherwise.
+    '''
+    # Using find instead of a regex to help future-proof changes that might be
+    # to how user's will use urth-core-import
+    # (i.e. <link is=urth-core-import> vs. <urth-core-import>)
+    return False if cell_source.find('urth-core-import') == -1 else True
+
 def add_urth_widgets(output_path, notebook_file):
     '''
-    Adds fronted bower components dependencies into the bundle for the dashboard
+    Adds frontend bower components dependencies into the bundle for the dashboard
     application. Creates the following directories under output_path:
 
     static/urth_widgets: Stores the js for urth_widgets which will be loaded in
@@ -187,6 +197,12 @@ def add_urth_widgets(output_path, notebook_file):
         # urth widgets not installed so skip
         return
 
+    # Check if any of the cells contain widgets, if not we do not to copy the bower_components
+    notebook = nbformat.read(notebook_file, 4)
+    cell_widget_bools = map(lambda cell: cell_uses_widgets(cell.get('source')), notebook.cells)
+    if True not in cell_widget_bools:
+        return
+
     # Root of urth widgets within a dashboard app
     output_urth_widgets_dir = os.path.join(output_path, 'static/urth_widgets/')
     # JavaScript entry point for widgets in dashboard app
@@ -198,7 +214,7 @@ def add_urth_widgets(output_path, notebook_file):
     # static/urth_widgets
     shutil.copytree(urth_widgets_js_dir, output_js_dir)
 
-    # Install the bower componentsin the urth
+    # Install the bower components into the urth_components directory
     shutil.copytree(os.path.join(urth_widgets_dir, 'bower_components'), output_urth_components_dir)
 
 
