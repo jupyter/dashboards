@@ -68,6 +68,8 @@ etc/notebooks/*
 !etc/notebooks/test/
 !etc/notebooks/*_demo/*
 !etc/notebooks/*_tutorial
+!etc/notebooks/index.ipynb
+!etc/notebooks/images/
 etc/notebooks/*_demo/.dashboard_cache
 etc/notebooks/*_demo/.ipynb_checkpoints
 etc/ipython_notebook_config.py
