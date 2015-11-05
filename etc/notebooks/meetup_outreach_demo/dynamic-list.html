@@ -36,28 +36,35 @@
             
             .member-card {
                 display: flex;
-                flex-flow: column wrap;
-                align-content: flex-start;
-                height: 50px;
+                height: 60px;
                 margin: 10px 10px 0 10px;
             }
             .member-card img {
-                width: 50px;
-                height: 50px;
-                flex: 100%;
+                width: 60px;
+                height: 60px;
+                flex: 0 0 auto;
                 margin-right: 10px;
+            }
+            .member-card .right-side {
+                display: inline-flex;
+                flex-flow: column nowrap;
+                flex-grow: 1;
+                width: calc(100% - 70px);
+                padding-bottom: 2px;
+            }
+            .member-card .member-name,
+            .member-card .event-name,
+            .member-card .cmu {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
             .member-card .member-name {
                 font-size: larger;
                 line-height: 25px;
             }
-            .member-card .member-name,
             .member-card .cmu {
-                flex: 50%;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: calc(100% - 70px);
+                font-size: smaller;
             }
             .member-card a {
                 color: #305b81;
@@ -106,11 +113,14 @@
                     <div>
                         <paper-material class="member-card" data-converted$="[[item.converted]]">
                             <img src="[[item.member.photo]]">
-                            <a class="member-name" href="[[getMemberUrl(item)]]" target="_blank">
-                                <span>[[item.member.member_name]]</span>
-                                <span class="contact-button" data-contact-id$="[[item.member.member_id]]" on-click="_onContactClick">Contact</span>
-                            </a>
-                            <div class="cmu"><span>[[toFixed(item.cmu_dist)]]</span> km from <a href="[[item.cmu.event_url]]" target="_blank">[[item.cmu.name]]</a></div>
+                            <div class="right-side">
+                                <a class="member-name" href="[[getMemberUrl(item)]]" target="_blank">
+                                    <span>[[item.member.member_name]]</span>
+                                    <span class="contact-button" data-contact-id$="[[item.member.member_id]]" on-click="_onContactClick">Contact</span>
+                                </a>
+                                <a class="event-name" href="[[item.event.event_url]]" target="_blank">[[item.event.event_name]]</a>
+                                <div class="cmu"><span>[[toFixed(item.cmu_dist)]]</span> km from <a href="[[item.cmu.event_url]]" target="_blank">[[item.cmu.name]]</a></div>
+                            </div>
                         </paper-material>
                     </div>
                 </template>
