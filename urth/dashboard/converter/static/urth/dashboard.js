@@ -57,9 +57,11 @@ define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog
 
         // finally, let's start the kernel (rather than waiting for it to be lazily loaded)
         var kernel_ready = new $.Deferred();
-        thebe.start_kernel(function() {
-            kernel_ready.resolve();
-        });
+        if(Urth.tmpnb_mode) {
+            thebe.call_spawn(kernel_ready.resolve);
+        } else {
+            thebe.start_kernel(kernel_ready.resolve);
+        }
 
         return kernel_ready;
     }
