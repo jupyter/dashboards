@@ -105,6 +105,10 @@ To see the Jupyter instance with both extensions working:
 1. Run `docker-machine ls` and note the IP of the dev machine.
 2. Visit http://THAT_IP:9500 in your browser
 
+#### Deploying Declarative Widgets
+
+When deploying a dashboard with declarative widgets you must run the entire  notebook before deploying. This requirement is needed at the moment to ensure all of the widgets are properly copied into the dashboard's static files.
+
 ## Package
 
 The dashboard features are implemented as a Jupyter Notebook extension against the stock 3.2.x version of the notebook project, not a fork. With the dev setup above, if you run `make sdist` you should get a source tarball in the `dist/` directory of your clone. You should be able to install that tarball using `pip` anywhere you please with one caveat: the `setup.py` assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at `pip install` time.
