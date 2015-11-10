@@ -90,7 +90,7 @@ dev-with-widgets-python3: _dev-with-widgets
 
 _dev-with-widgets: NB_HOME?=/home/jovyan/.ipython
 _dev-with-widgets: REPO?=cloudet/pyspark-notebook-bower
-_dev-with-widgets: CMD?="ipython notebook --no-browser --port 8888 --ip='*'"
+_dev-with-widgets: CMD?=bash -c "ipython notebook --no-browser --port 8888 --ip='*'"
 _dev-with-widgets: AUTORELOAD?=no
 _dev-with-widgets: configs js
 	# We volume mount the config, so don't let the container corrupt the committed copy
@@ -105,8 +105,7 @@ _dev-with-widgets: configs js
 		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/profile_default/nbconfig/notebook.json \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
-		$(REPO) bash -c '$(SETUP_CMD) pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1) && \
-			$(CMD)'
+		$(REPO) bash -c '$(SETUP_CMD) pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1);  $(CMD)'
 
 install: install-$(PYTHON)
 
