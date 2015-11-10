@@ -105,6 +105,21 @@ To see the Jupyter instance with both extensions working:
 1. Run `docker-machine ls` and note the IP of the dev machine.
 2. Visit http://THAT_IP:9500 in your browser
 
+
+### Develop Against Python 2.7
+
+You can run a development environment against python 2.7 by adding an environment variable to your make calls.
+
+```
+# Run a development environment against 2.7
+PYTHON=python2 make dev
+# Run a development environment, with declarative widgets, against 2.7
+PYTHON=python2 make dev-with-widgets
+# Run unit tests against 2.7
+PYTHON=python2 make test
+```
+
+
 ## Package
 
 The dashboard features are implemented as a Jupyter Notebook extension against the stock 3.2.x version of the notebook project, not a fork. With the dev setup above, if you run `make sdist` you should get a source tarball in the `dist/` directory of your clone. You should be able to install that tarball using `pip` anywhere you please with one caveat: the `setup.py` assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at `pip install` time.
