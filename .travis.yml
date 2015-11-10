@@ -17,9 +17,11 @@ install:
   - npm install
 
 script:
-- make test
+- make test-python2
+- make test-python3
 - make sdist
-- make install
+- make install-python2
+- make install-python3
 
 notifications:
   email:
