@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: build clean dev help sdist test install remote
+.PHONY: build clean configs demo dev dev-with-widgets help install js sdist test
 
 help:
 	@echo 'Host commands:'
@@ -97,15 +97,11 @@ install:
 			$(CMD)'
 
 sdist: REPO?=cloudet/pyspark-notebook-bower
-sdist: RELEASE?=
-sdist: BUILD_NUMBER?=0
-sdist: GIT_COMMIT?=HEAD
 sdist: js
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		$(REPO) bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
-			echo "$(BUILD_NUMBER)-$(GIT_COMMIT)" > VERSION && \
 			python setup.py sdist && \
 			cp -r dist /src'
 
