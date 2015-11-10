@@ -4,7 +4,7 @@ Extensions for Jupyter / IPython Notebook to enable the layout and deployment of
 
 ## What It Gives You
 
-Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording](https://www.youtube.com/watch?v=SJiezXPhVv8). 
+Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording](https://www.youtube.com/watch?v=SJiezXPhVv8).
 
 * Dashboard layout mode for arranging notebook cell outputs in a grid-like fashion
 * Dashboard view mode for interacting with an assembled dashboard within the Jupyter Notebook
@@ -105,10 +105,6 @@ To see the Jupyter instance with both extensions working:
 1. Run `docker-machine ls` and note the IP of the dev machine.
 2. Visit http://THAT_IP:9500 in your browser
 
-#### Deploying Declarative Widgets
-
-When deploying a dashboard with declarative widgets you must run the entire  notebook before deploying. This requirement is needed at the moment to ensure all of the widgets are properly copied into the dashboard's static files.
-
 ## Package
 
 The dashboard features are implemented as a Jupyter Notebook extension against the stock 3.2.x version of the notebook project, not a fork. With the dev setup above, if you run `make sdist` you should get a source tarball in the `dist/` directory of your clone. You should be able to install that tarball using `pip` anywhere you please with one caveat: the `setup.py` assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at `pip install` time.
@@ -118,14 +114,18 @@ The dashboard features are implemented as a Jupyter Notebook extension against t
 It's within the scope of this incubator project to allow users to both:
 
 1. Dashboard layouts within notebooks, persist the layout metadata within the notebook JSON, and share those dashboard-notebooks with other Jupyter users, and
-2. Convert and deploy dashboard-notebooks as standalone web applications. 
+2. Convert and deploy dashboard-notebooks as standalone web applications.
 
 At the moment, the second point is still very much a proof of concept. It currently relies on [thebe](https://github.com/oreillymedia/thebe) as a client for talking to a remote kernel, [tmpnb](https://github.com/jupyter/tmpnb) for provisioning remote kernels, and proper configuration of the kernel environment so that dashboard-launched kernels have access to the same data, libraries, etc. as the notebook authoring environment. Security is practically non-existent, scalability is limited, and compatibility is fixed with an older version of Jupyter.
 
 None of these are inherent flaws. Dashboards are simply a new use case that pushes the Jupyter dependencies beyond their current limits. It's wonderful, in fact, that we are able to show dashboard deployment using what exists in open source today. Over time, we'll shore this facet up with the community (see https://github.com/jupyter-incubator/dashboards/issues/13).
 
-All this said, if you'd like to try external deployment today for your **non-production use case**, you can do one of two things. 
+All this said, if you'd like to try external deployment today for your **non-production use case**, you can do one of two things.
 
 First, you can click *File &rarr; Deploy As &rarr; Local Dashboard*. This will use the local Jupyter Notebook instance both as a static web server for the dashboard assets (via the `/files` endpoint) and as the kernel provisioner (via `/api/kernels`). Keep in mind, however, that kernels launched by Thebe are not tracked in the Notebook UI and cannot be cleaned up easily.
 
 Alternatively, if you have a tmpnb instance running somewhere that spawns Notebook server containers with access to all the same libraries, extensions, and data as the notebook server you used to author the dashboard-notebook, you can click *File &rarr; Download As &rarr; Dashboard Bundle (.zip)*. Unzip the file your browser downloads and follow the README contained within to run a standalone web server for the dashboard frontend and configure it  with a pointer to your tmpnb deployment.
+
+#### Deploying Declarative Widgets
+
+When deploying a dashboard with declarative widgets you must run the entire  notebook before deploying. This requirement is needed at the moment to ensure all of the widgets are properly copied into the dashboard's static files.
