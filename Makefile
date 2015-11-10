@@ -120,7 +120,7 @@ _install: CMD?=exit
 _install:
 	@docker run -it --rm \
 		-v `pwd`:/src \
-		$(REPO) bash -c '$(SETUP_CMD) python --version; cd /src/dist && \
+		$(REPO) bash -c '$(SETUP_CMD) cd /src/dist && \
 			pip install $$(ls -1 *.tar.gz | tail -n 1) && \
 			$(CMD)'
 
