@@ -54,12 +54,12 @@ demo: configs
 
 dev: dev-$(PYTHON)
 
-dev-python2: CMD?=bash -c "$(PYTHON2_SETUP) ipython notebook --no-browser --port 8888 --ip='*'"
+dev-python2: CMD?=sh -c "$(PYTHON2_SETUP) ipython notebook --no-browser --port 8888 --ip='*'"
 dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
 dev-python2: _dev
 
 dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.4/site-packages/urth
-dev-python3: CMD?=bash -c "ipython notebook --no-browser --port 8888 --ip='*'"
+dev-python3: CMD?=sh -c "ipython notebook --no-browser --port 8888 --ip='*'"
 dev-python3: _dev
 
 _dev: NB_HOME?=/home/jovyan/.ipython
@@ -90,7 +90,7 @@ dev-with-widgets-python3: _dev-with-widgets
 
 _dev-with-widgets: NB_HOME?=/home/jovyan/.ipython
 _dev-with-widgets: REPO?=cloudet/pyspark-notebook-bower
-_dev-with-widgets: CMD?=bash -c "ipython notebook --no-browser --port 8888 --ip='*'"
+_dev-with-widgets: CMD?=sh -c "ipython notebook --no-browser --port 8888 --ip='*'"
 _dev-with-widgets: AUTORELOAD?=no
 _dev-with-widgets: configs js
 	# We volume mount the config, so don't let the container corrupt the committed copy
