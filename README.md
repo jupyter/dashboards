@@ -20,7 +20,7 @@ Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording
 
 ## Runtime Requirements
 
-* IPython Notebook 3.2.x (not Jupyter Notebook 4.x, yet) running on Python 3.x
+* IPython Notebook 3.2.x (not Jupyter Notebook 4.x, yet) running on Python 3.x or 2.7.x
 * Notebook instance running out of `profile_default`
 * [gridstack](http://troolee.github.io/gridstack.js/)
 * [font-awesome](https://fortawesome.github.io/Font-Awesome/), [thebe](https://github.com/oreillymedia/thebe) (for deployed dashboards only)
