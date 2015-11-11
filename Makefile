@@ -54,18 +54,19 @@ demo: configs
 
 dev: dev-$(PYTHON)
 
-dev-python2: CMD?=sh -c "$(PYTHON2_SETUP) ipython notebook --no-browser --port 8888 --ip='*'"
+dev-python2: SETUP_CMD?=$(PYTHON2_SETUP)
 dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
 dev-python2: _dev
 
 dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.4/site-packages/urth
-dev-python3: CMD?=sh -c "ipython notebook --no-browser --port 8888 --ip='*'"
 dev-python3: _dev
 
 _dev: NB_HOME?=/home/jovyan/.ipython
 _dev: REPO?=cloudet/pyspark-notebook-bower
 _dev: AUTORELOAD?=no
+_dev: CMD?=sh -c "python --version; ipython notebook --no-browser --port 8888 --ip='*'"
 _dev: configs js
+	# Need to use two commands here to allow for activation of multiple python versions
 	@docker run -it --rm \
 		-p 9500:8888 \
 		-e USE_HTTP=1 \
@@ -76,7 +77,7 @@ _dev: configs js
 		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/profile_default/nbconfig/notebook.json \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
-		$(REPO) $(CMD)
+		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
 
 
 dev-with-widgets: dev-with-widgets-$(PYTHON)
@@ -90,10 +91,11 @@ dev-with-widgets-python3: _dev-with-widgets
 
 _dev-with-widgets: NB_HOME?=/home/jovyan/.ipython
 _dev-with-widgets: REPO?=cloudet/pyspark-notebook-bower
-_dev-with-widgets: CMD?=sh -c "ipython notebook --no-browser --port 8888 --ip='*'"
+_dev-with-widgets: CMD?=sh -c "python --version; ipython notebook --no-browser --port 8888 --ip='*'"
 _dev-with-widgets: AUTORELOAD?=no
 _dev-with-widgets: configs js
 	# We volume mount the config, so don't let the container corrupt the committed copy
+	# Need to use two commands here to allow for activation of multiple python versions
 	@docker run -it --rm \
 		-p 9500:8888 \
 		-e USE_HTTP=1 \
@@ -105,7 +107,7 @@ _dev-with-widgets: configs js
 		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/profile_default/nbconfig/notebook.json \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
-		$(REPO) bash -c '$(SETUP_CMD) pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1);  $(CMD)'
+		$(REPO) bash -c '$(SETUP_CMD) pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1); $(CMD)'
 
 install: install-$(PYTHON)
 
@@ -134,17 +136,18 @@ sdist: js
 
 test: test-$(PYTHON)
 
-test-python2: CMD?=bash -c '$(PYTHON2_SETUP) cd /src; python -B -m unittest discover -s test'
+test-python2: SETUP_CMD?=$(PYTHON2_SETUP)
 test-python2: _test
 
-test-python3: CMD?=bash -c 'cd /src; python -B -m unittest discover -s test'
 test-python3: _test
 
 _test: REPO?=cloudet/pyspark-notebook-bower
+_test: CMD?=cd /src; python --version; python -B -m unittest discover -s test
 _test:
+	# Need to use two commands here to allow for activation of multiple python versions
 	@docker run -it --rm \
 		-v `pwd`:/src \
-		$(REPO)  $(CMD)
+		$(REPO) bash -c '$(SETUP_CMD) $(CMD)'
 
 release: POST_SDIST=register upload
 release: sdist
