@@ -47,9 +47,10 @@ class InstallCommand(install):
 
 setup(
     name='jupyter_dashboards',
-    author='Jupyter Community',
-    maintainer='Jupyter Community',
+    author='Jupyter Development Team',
+    author_email='jupyter@googlegroups.com',
     description='IPython / Jupyter extensions to enable dashboard creation and deployment',
+    url='https://github.com/jupyter-incubator/dashboards',
     version=VERSION_NS['__version__'],
     license='BSD',
     platforms=['IPython Notebook 3.x'],
