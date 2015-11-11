@@ -30,7 +30,9 @@ class NewBundleHandler(IPythonHandler):
         self.tmp_dir = tmp_dir
 
         # Make directory where bundles will reside until pickup
-        os.makedirs(self.tmp_dir, mode=0o770, exist_ok=True)
+        if not os.path.exists(self.tmp_dir):
+            # Note: Cannot use exist_ok=True because of python2 support
+            os.makedirs(self.tmp_dir, mode=0o770)
 
     @web.authenticated
     def get(self):
@@ -74,7 +76,7 @@ class NewBundleHandler(IPythonHandler):
         :return: 6-tuple of notebook basename, unique ID of the bundle,
             absolute path to the bundle directory, URL of this Jupyter server,
             URL of the kernel service that will be used as the backend for
-            the dashboard when deployed, whether the kernel service is tmpnb 
+            the dashboard when deployed, whether the kernel service is tmpnb
             or not
         '''
         notebook_basename = os.path.basename(abs_nb_path)
@@ -134,10 +136,10 @@ class NewBundleHandler(IPythonHandler):
 
         # Return metadata
         return {
-            'notebook_basename' : notebook_basename, 
-            'bundle_id' : bundle_id, 
-            'bundle_dir' : bundle_dir, 
-            'jupyter_server' : jupyter_server, 
+            'notebook_basename' : notebook_basename,
+            'bundle_id' : bundle_id,
+            'bundle_dir' : bundle_dir,
+            'jupyter_server' : jupyter_server,
             'kernel_server' : kernel_server,
             'tmpnb_mode' : tmpnb_mode
         }
@@ -152,9 +154,9 @@ class NewBundleHandler(IPythonHandler):
         '''
         md = self._create_app_bundle(abs_nb_path, '.git')
         converter.add_cf_manifest(
-            md['bundle_dir'], 
-            md['kernel_server'], 
-            md['notebook_basename'], 
+            md['bundle_dir'],
+            md['kernel_server'],
+            md['notebook_basename'],
             md['tmpnb_mode']
         )
         converter.to_git_repository(md['bundle_dir'])
@@ -176,14 +178,14 @@ class NewBundleHandler(IPythonHandler):
         '''
         md = self._create_app_bundle(abs_nb_path)
         converter.add_cf_manifest(
-            md['bundle_dir'], 
-            md['kernel_server'], 
-            md['notebook_basename'], 
+            md['bundle_dir'],
+            md['kernel_server'],
+            md['notebook_basename'],
             md['tmpnb_mode']
         )
         converter.add_dockerfile(
-            md['bundle_dir'], 
-            md['kernel_server'], 
+            md['bundle_dir'],
+            md['kernel_server'],
             md['tmpnb_mode']
         )
         # Make the zip Archive

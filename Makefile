@@ -2,6 +2,8 @@
 # Distributed under the terms of the Modified BSD License.
 
 .PHONY: build clean configs demo dev dev-with-widgets help install js sdist test
+PYTHON?=python3
+PYTHON2_SETUP?=source activate python2; pip install ipython[notebook]==3.2;
 
 help:
 	@echo 'Host commands:'
@@ -50,29 +52,48 @@ demo: configs
 			pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1) && \
 			$(CMD)'
 
-dev: NB_HOME?=/home/jovyan/.ipython
-dev: REPO?=cloudet/pyspark-notebook-bower
-dev: CMD?=sh -c "ipython notebook --no-browser --port 8888 --ip='*'"
-dev: AUTORELOAD?=no
-dev: configs js
+dev: dev-$(PYTHON)
+
+dev-python2: CMD?=bash -c "$(PYTHON2_SETUP) ipython notebook --no-browser --port 8888 --ip='*'"
+dev-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth
+dev-python2: _dev
+
+dev-python3: EXTENSION_DIR=/opt/conda/lib/python3.4/site-packages/urth
+dev-python3: CMD?=bash -c "ipython notebook --no-browser --port 8888 --ip='*'"
+dev-python3: _dev
+
+_dev: NB_HOME?=/home/jovyan/.ipython
+_dev: REPO?=cloudet/pyspark-notebook-bower
+_dev: AUTORELOAD?=no
+_dev: configs js
 	@docker run -it --rm \
 		-p 9500:8888 \
 		-e USE_HTTP=1 \
 		-e PASSWORD='' \
 		-e AUTORELOAD=$(AUTORELOAD) \
 		-v `pwd`/urth_dash_js:$(NB_HOME)/nbextensions/urth_dash_js \
-		-v `pwd`/urth:/opt/conda/lib/python3.4/site-packages/urth \
+		-v `pwd`/urth:$(EXTENSION_DIR) \
 		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/profile_default/nbconfig/notebook.json \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
 		$(REPO) $(CMD)
 
-dev-with-widgets: NB_HOME?=/home/jovyan/.ipython
-dev-with-widgets: REPO?=cloudet/pyspark-notebook-bower
-dev-with-widgets: CMD?=sh -c "ipython notebook --no-browser --port 8888 --ip='*'"
-dev-with-widgets: AUTORELOAD?=no
-dev-with-widgets: configs js
-# We volume mount the config, so don't let the container corrupt the committed copy
+
+dev-with-widgets: dev-with-widgets-$(PYTHON)
+
+dev-with-widgets-python2: SETUP_CMD?=$(PYTHON2_SETUP)
+dev-with-widgets-python2: EXTENSION_DIR=/opt/conda/envs/python2/lib/python2.7/site-packages/urth/dashboard
+dev-with-widgets-python2: _dev-with-widgets
+
+dev-with-widgets-python3: EXTENSION_DIR=/opt/conda/lib/python3.4/site-packages/urth/dashboard
+dev-with-widgets-python3: _dev-with-widgets
+
+_dev-with-widgets: NB_HOME?=/home/jovyan/.ipython
+_dev-with-widgets: REPO?=cloudet/pyspark-notebook-bower
+_dev-with-widgets: CMD?=bash -c "ipython notebook --no-browser --port 8888 --ip='*'"
+_dev-with-widgets: AUTORELOAD?=no
+_dev-with-widgets: configs js
+	# We volume mount the config, so don't let the container corrupt the committed copy
 	@docker run -it --rm \
 		-p 9500:8888 \
 		-e USE_HTTP=1 \
@@ -80,19 +101,25 @@ dev-with-widgets: configs js
 		-e AUTORELOAD=$(AUTORELOAD) \
 		-v `pwd`/../declarativewidgets:/declarativewidgets \
 		-v `pwd`/urth_dash_js:$(NB_HOME)/nbextensions/urth_dash_js \
-		-v `pwd`/urth/dashboard:/opt/conda/lib/python3.4/site-packages/urth/dashboard \
+		-v `pwd`/urth/dashboard:$(EXTENSION_DIR) \
 		-v `pwd`/etc/ipython_notebook_config.py:$(NB_HOME)/profile_default/ipython_notebook_config.py \
 		-v `pwd`/etc/notebook.json:$(NB_HOME)/profile_default/nbconfig/notebook.json \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
-		$(REPO) bash -c 'pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1) && \
-			$(CMD)'
+		$(REPO) bash -c '$(SETUP_CMD) pip install $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1);  $(CMD)'
 
-install: REPO?=cloudet/pyspark-notebook-bower
-install: CMD?=exit
-install:
+install: install-$(PYTHON)
+
+install-python2: SETUP_CMD=$(PYTHON2_SETUP)
+install-python2: _install
+
+install-python3: _install
+
+_install: REPO?=cloudet/pyspark-notebook-bower
+_install: CMD?=exit
+_install:
 	@docker run -it --rm \
 		-v `pwd`:/src \
-		$(REPO) bash -c 'cd /src/dist && \
+		$(REPO) bash -c '$(SETUP_CMD) cd /src/dist && \
 			pip install $$(ls -1 *.tar.gz | tail -n 1) && \
 			$(CMD)'
 
@@ -105,9 +132,16 @@ sdist: js
 			python setup.py sdist && \
 			cp -r dist /src'
 
-test: REPO?=cloudet/pyspark-notebook-bower
-test: CMD?=bash -c 'cd /src; python3 -B -m unittest discover -s test'
-test:
+test: test-$(PYTHON)
+
+test-python2: CMD?=bash -c '$(PYTHON2_SETUP) cd /src; python -B -m unittest discover -s test'
+test-python2: _test
+
+test-python3: CMD?=bash -c 'cd /src; python -B -m unittest discover -s test'
+test-python3: _test
+
+_test: REPO?=cloudet/pyspark-notebook-bower
+_test:
 	@docker run -it --rm \
 		-v `pwd`:/src \
-		$(REPO) $(CMD)
+		$(REPO)  $(CMD)
