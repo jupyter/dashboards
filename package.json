@@ -5,20 +5,30 @@
   "directories": {
     "test": "test"
   },
-  "dependencies": {},
+  "dependencies": {
+    "jupyter-js-output-area": "^0.1.1",
+    "jupyter-js-services": "0.0.1"
+  },
   "devDependencies": {
+    "browserify": "^12.0.1",
     "autoprefixer": "^5.2.0",
     "bower": "^1.4.1",
     "postcss-cli": "^1.5.0"
   },
   "config": {
     "css_nb_dir": "urth_dash_js/notebook/dashboard-view",
-    "css_th_dir": "urth/dashboard/converter/static/urth"
+    "css_th_dir": "urth/dashboard/converter/static/urth",
+    "db_lib_dir": "urth_dash_js/notebook/dashboard-lib",
+    "js_out": "urth_dash_js/notebook/dashboard-lib/jupyter-js-output-area",
+    "js_serv": "urth_dash_js/notebook/dashboard-lib/jupyter-js-services"
   },
   "scripts": {
+    "build": "npm run bower && npm run css && npm run build-jupyter-js-output-area && npm run build-jupyter-js-services",
     "test": "make test",
-    "css": "postcss --use autoprefixer $npm_package_config_css_nb_dir/*.css --dir $npm_package_config_css_nb_dir/ --config postcss-config.json && postcss --use autoprefixer $npm_package_config_css_th_dir/*.css --dir $npm_package_config_css_th_dir/ --config postcss-config.json",
-    "bower": "bower --allow-root install"
+    "bower": "bower --allow-root install",
+    "css": "postcss $npm_package_config_css_nb_dir/*.css -d $npm_package_config_css_nb_dir/ -c postcss-config.json && postcss $npm_package_config_css_th_dir/*.css -d $npm_package_config_css_th_dir/ -c postcss-config.json",
+    "build-jupyter-js-output-area": "mkdir -p $npm_package_config_js_out && cp -r node_modules/jupyter-js-output-area/dist/* $npm_package_config_js_out",
+    "build-jupyter-js-services": "mkdir -p $npm_package_config_js_serv && browserify node_modules/jupyter-js-services/lib/index.js --outfile $npm_package_config_js_serv/jupyter-js-services.js --standalone JupyterJsServices"
   },
   "repository": {
     "type": "git",

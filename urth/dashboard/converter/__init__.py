@@ -75,9 +75,12 @@ def to_php_app(notebook_fn, app_location=None, template_fn=None):
         'bower_components/gridstack/dist/gridstack.min.map',
         'bower_components/jquery/dist/jquery.min.js',
         'bower_components/jquery/dist/jquery.min.map',
+        'bower_components/jquery-ui/jquery-ui.min.js',
         'bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css',
         'bower_components/lodash/lodash.min.js',
-        'bower_components/requirejs/require.js'
+        'bower_components/requirejs/require.js',
+        'dashboard-lib/jupyter-js-output-area/jupyter-js-output-area.js',
+        'dashboard-lib/jupyter-js-services/jupyter-js-services.js'
     ]
     component_dirs = [
         'dashboard-common',

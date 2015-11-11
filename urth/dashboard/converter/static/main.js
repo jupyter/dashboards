@@ -11,27 +11,22 @@ requirejs.config({
     ],
     paths: {
         jquery: 'bower_components/jquery/dist/jquery.min',
+        'jquery-ui': 'bower_components/jquery-ui/jquery-ui.min',
         lodash: 'bower_components/lodash/lodash.min',
         Gridstack: 'bower_components/gridstack/dist/gridstack.min',
-        Thebe: 'thebe/main-built'
-        // jquery-ui is included in Thebe
+        'jupyter-js-services': 'dashboard-lib/jupyter-js-services/jupyter-js-services',
+        'jupyter-js-output-area': 'dashboard-lib/jupyter-js-output-area/jupyter-js-output-area'
     },
     map: {
         '*': {
             'jQuery': 'jquery'
         },
-        // jquery-ui is included in Thebe's main-built.js. Map Gridstack to load from there.
         Gridstack: {
-            'jquery-ui/core': 'Thebe',
-            'jquery-ui/mouse': 'Thebe',
-            'jquery-ui/widget': 'Thebe',
-            'jquery-ui/resizable': 'Thebe',
-            'jquery-ui/draggable': 'Thebe'
-        }
-    },
-    shim: {
-        Thebe: {
-            deps: ['jquery']
+            'jquery-ui/core': 'jquery-ui',
+            'jquery-ui/mouse': 'jquery-ui',
+            'jquery-ui/widget': 'jquery-ui',
+            'jquery-ui/resizable': 'jquery-ui',
+            'jquery-ui/draggable': 'jquery-ui'
         }
     }
 });

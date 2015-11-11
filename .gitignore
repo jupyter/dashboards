@@ -61,6 +61,7 @@ dist/
 node_modules/
 .ipynb_checkpoints/
 bower_components/
+dashboard-lib/
 __pycache__/
 *.egg-info/
 etc/notebooks/*

@@ -2,9 +2,19 @@
  * Copyright (c) Jupyter Development Team.
  * Distributed under the terms of the Modified BSD License.
  */
-define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog) {
+define([
+    'jquery',
+    'jupyter-js-services',
+    'jupyter-js-output-area'
+], function(
+    $,
+    Services,
+    OutputArea
+) {
     var $container,
-        thebe;
+        kernel;
+
+    var CONTAINER_URL = 'urth_container_url';
 
     function getQueryParam(name) {
         var vars = window.location.search.substring(1).split('&');
@@ -17,50 +27,106 @@ define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog
         return null;
     }
 
-    function initThebe(args) {
-        thebe = new Thebe.Thebe({
-            url: args.url,
-            debug: false,
-            append_kernel_controls_to: 'body',
-            next_cell_shortcut: false,
-            inject_css: false, // don't pull in mathjax, jqueryui, etc. for now
-            tmpnb_mode: Urth.tmpnb_mode || false,
-            kernel_name: Urth.kernel_name,
-            load_css: false
-        });
+    function initKernel(args) {
+        var kernelReady = $.Deferred();
 
-        window.IPython.notebook = thebe.notebook;
-        //  A Hack for exposing the base_url to the urth widgets
-        thebe.notebook.base_url = '/';
+        // TODO
+        // 1. Figure out how to load `display_data` comm messages (includes source for matplotlib, styling, etc)
+        // 2. Create this global, so extensions like matplotlib can register a comm callback:
+        //      IPython.notebook.kernel.comm_manager.register_target('matplotlib', mpl.mpl_figure_comm)
 
-        // show a busy indicator when communicating with kernel
-        var debounced;
-        thebe.events.on('kernel_busy.Kernel kernel_idle.Kernel', function(event) {
-            clearTimeout(debounced);
-            debounced = setTimeout(function() {
-                var isBusy = event.type === 'kernel_busy';
-                $('.busy-indicator')
-                    .toggleClass('show', isBusy)
-                    // Prevent progress animation when hidden by removing 'active' class.
-                    .find('.progress-bar')
-                        .toggleClass('active', isBusy);
-            }, 500);
-        });
+        var baseUrl = window.Urth.thebe_url;
+        baseUrl += (baseUrl[baseUrl.length - 1] === '/' ? '' : '/'); // ensure it ends in '/'
 
-        // hook the error handler to kernel / session events
-        thebe.events.on('kernel_created.Kernel kernel_created.Session', function(e) {
-            ErrorLog.enable(window.IPython);
-        });
-
-        // finally, let's start the kernel (rather than waiting for it to be lazily loaded)
-        var kernel_ready = new $.Deferred();
-        if(Urth.tmpnb_mode) {
-            thebe.call_spawn(kernel_ready.resolve);
+        // check for a previous container, which we can reuse
+        var containerUrl = localStorage.getItem(CONTAINER_URL);
+        var existingContainerFuture;
+        if (containerUrl) {
+            existingContainerFuture = checkExistingContainer(containerUrl);
         } else {
-            thebe.start_kernel(kernel_ready.resolve);
+            existingContainerFuture = false;
         }
 
-        return kernel_ready;
+        var dataUrlFuture;
+        if (Urth.tmpnb_mode) {
+            // TMPNB mode: check if we need to spawn a new container or use existing one
+            dataUrlFuture = $.when(existingContainerFuture).then(function(containerExists) {
+                if (!containerExists) {
+                    return callSpawn(baseUrl);
+                } else {
+                    return { url: containerUrl };
+                }
+            });
+        } else {
+            dataUrlFuture = { url: baseUrl };
+        }
+
+        $.when(dataUrlFuture).then(function(data) {
+            var options = {
+                baseUrl: data.url,
+                wsUrl: data.url.replace(/^http/, 'ws'),
+                name: 'python3'
+            };
+            Services.startNewKernel(options).then(function(_kernel) {
+                kernel = _kernel;
+
+                // show a busy indicator when communicating with kernel
+                var debounced;
+                kernel.statusChanged.connect(function(_kernel, status) {
+                    clearTimeout(debounced);
+                    debounced = setTimeout(function() {
+                        var isBusy = status === Services.KernelStatus.Busy;
+                        $('.busy-indicator')
+                            .toggleClass('show', isBusy)
+                            // Prevent progress animation when hidden by removing 'active' class.
+                            .find('.progress-bar')
+                                .toggleClass('active', isBusy);
+                    }, 500);
+                });
+                kernel.commOpened.connect(function(_kernel, commMsg) {
+                    var comm = kernel.connectToComm(commMsg.target_name, commMsg.comm_id);
+                });
+
+                // TODO IPython.notebook.events.emit('kernel_connected.Kernel', {data: kernel});
+                //          ==> IPyWidgets expects `kernel` to have `.comm_manager.new_comm`
+
+                kernelReady.resolve();
+            });
+        });
+
+        return kernelReady;
+    }
+
+    // Spawn a new kernel container. Returns promise to container URL.
+    function callSpawn(baseUrl) {
+        return $.post(baseUrl + 'api/spawn/', { image_name: 'jupyter/notebook' })
+            .then(function(data) {
+                if (data.status === 'full') {
+                    throw new Error('tmpnb server is full');
+                } else {
+                    // test if we have a full URL (new tmpnb) or partial (old tmpnb)
+                    if (!/^http/.test(data.url)) {
+                        data.url = baseUrl + data.url;
+                    }
+                    localStorage.setItem(CONTAINER_URL, data.url);
+                    return data;
+                }
+            })
+            .fail(function(e) {
+                throw new Error('Could not connect to tmpnb server');
+            });
+    }
+
+    // Check if container at URL is valid. Returns promise to boolean value.
+    function checkExistingContainer(url) {
+        return $.get(url + 'api/kernels')
+            .then(function() {
+                return true;
+            })
+            .fail(function(e) {
+                localStorage.removeItem(CONTAINER_URL);
+                return false;
+            });
     }
 
     function initGrid(deferred) {
@@ -115,38 +181,65 @@ define(['jquery', 'Thebe', 'urth-common/error-log'], function($, Thebe, ErrorLog
         $('#outer-dashboard').css('visibility', '');
     }
 
+    var outputAreaHandledMsgs = {
+        'clear_output': 1,
+        'stream': 1,
+        'display_data': 1,
+        'execute_result': 1,
+        'error': 1
+    };
+
     return {
         init: function() {
             $container = $('#dashboard-container');
 
             // initialize thebe
-            var thebe_ready = initThebe({
+            var kernelReady = initKernel({
                 url: Urth.thebe_url
             });
-
             // initialize the grid layout
-            var grid_ready = $.Deferred();
+            var gridReady = $.Deferred();
             var row = getQueryParam('row');
             if (!row) {
                 // initialize the grid and show it once ready
-                initGrid(grid_ready);
-                grid_ready.then(_showDashboard);
+                initGrid(gridReady);
+                gridReady.then(_showDashboard);
             } else {
                 // show only given row/column
                 var col = getQueryParam('col');
                 showRow(row, col);
                 _showDashboard();
                 // resolve the grid promise
-                grid_ready.resolve();
+                gridReady.resolve();
             }
 
             // we're fully initialized when both grid and thebe
             // are initialized
-            return $.when(grid_ready, thebe_ready);
+            return $.when(gridReady, kernelReady);
         },
 
         executeAll: function() {
-            thebe.run_cell(0, thebe.cells.length);
+            // thebe.run_cell(0, thebe.cells.length);
+            $('pre[data-executable]').each(function() {
+                var code = $(this).text();
+                var model = new OutputArea.OutputModel();
+                var view = new OutputArea.OutputView(model, document);
+                $(this).replaceWith(view.el);
+
+                var future = kernel.execute({
+                    code: code,
+                    silent: false
+                });
+                // future.onDone = function() {
+                //     console.log('Cell has been run');
+                // };
+                future.onIOPub = function(msg) {
+                    // console.log('onIOPub::', msg.msg_type);
+                    if (msg.msg_type in outputAreaHandledMsgs) {
+                        model.consumeMessage(msg);
+                    }
+                };
+            });
         }
     };
 });

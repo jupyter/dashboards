@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: clean dev dev-with-widgets help install js sdist test 
+.PHONY: clean dev dev-with-widgets help install js sdist test
 
 REPO:=jupyter/pyspark-notebook:a388c4a66fd4
 BOWER_REPO:=jupyter/pyspark-notebook-bower:a388c4a66fd4
@@ -46,7 +46,7 @@ clean:
 js:
 	@docker run -it --rm \
 		-v `pwd`:/src \
-		$(BOWER_REPO) bash -c 'cd /src && npm install && npm run css && npm run bower'
+		$(BOWER_REPO) bash -c 'cd /src && npm install && npm run build'
 
 dev: NB_HOME?=/root
 dev: CMD?=sh -c "jupyter notebook --no-browser --port 8888 --ip='*'"
