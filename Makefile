@@ -129,7 +129,7 @@ sdist: js
 		-v `pwd`:/src \
 		$(REPO) bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
-			python setup.py sdist && \
+			python setup.py sdist $(POST_SDIST) && \
 			cp -r dist /src'
 
 test: test-$(PYTHON)
@@ -145,3 +145,6 @@ _test:
 	@docker run -it --rm \
 		-v `pwd`:/src \
 		$(REPO)  $(CMD)
+
+release: POST_SDIST=register upload
+release: sdist
