@@ -178,13 +178,13 @@ define([
             handler: function() { toggleDashboardMode(STATE_NOTEBOOK); }
         };
         var layoutView = {
-            help: 'Layout view. Size and position dashboard cells.',
+            help: 'Dashboard Layout. Size and position dashboard cells.',
             icon: 'fa-th-large',
             help_index: '',
             handler: function() { toggleDashboardMode(STATE_DASHBOARD_AUTH); }
         };
         var dashboardView = {
-            help: 'Dashboard view. Preview the dashboard.',
+            help: 'Dashboard Preview. Preview the dashboard.',
             icon: 'fa-dashboard',
             help_index: '',
             handler: function() { toggleDashboardMode(STATE_DASHBOARD_VIEW); }
