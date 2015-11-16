@@ -30,11 +30,6 @@ define([
     function initKernel(args) {
         var kernelReady = $.Deferred();
 
-        // TODO
-        // 1. Figure out how to load `display_data` comm messages (includes source for matplotlib, styling, etc)
-        // 2. Create this global, so extensions like matplotlib can register a comm callback:
-        //      IPython.notebook.kernel.comm_manager.register_target('matplotlib', mpl.mpl_figure_comm)
-
         var baseUrl = window.Urth.thebe_url;
         baseUrl += (baseUrl[baseUrl.length - 1] === '/' ? '' : '/'); // ensure it ends in '/'
 
@@ -62,39 +57,57 @@ define([
         }
 
         $.when(dataUrlFuture).then(function(data) {
-            var options = {
+            var baseOptions = {
                 baseUrl: data.url,
-                wsUrl: data.url.replace(/^http/, 'ws'),
-                name: 'python3'
+                wsUrl: data.url.replace(/^http/, 'ws')
             };
-            Services.startNewKernel(options).then(function(_kernel) {
-                kernel = _kernel;
 
-                // show a busy indicator when communicating with kernel
-                var debounced;
-                kernel.statusChanged.connect(function(_kernel, status) {
-                    clearTimeout(debounced);
-                    debounced = setTimeout(function() {
-                        var isBusy = status === Services.KernelStatus.Busy;
-                        $('.busy-indicator')
-                            .toggleClass('show', isBusy)
-                            // Prevent progress animation when hidden by removing 'active' class.
-                            .find('.progress-bar')
-                                .toggleClass('active', isBusy);
-                    }, 500);
-                });
-                kernel.commOpened.connect(function(_kernel, commMsg) {
-                    var comm = kernel.connectToComm(commMsg.target_name, commMsg.comm_id);
-                });
+            var sessionOptions = $.extend({
+                kernelName: 'python3',
+                notebookPath: window.location.pathname
+            }, baseOptions);
 
-                // TODO IPython.notebook.events.emit('kernel_connected.Kernel', {data: kernel});
-                //          ==> IPyWidgets expects `kernel` to have `.comm_manager.new_comm`
-
-                kernelReady.resolve();
-            });
+            // try to start a new Notebook Session first so the Notebook UI shows the running kernel
+            Services.startNewSession(sessionOptions).then(
+                function success(session) {
+                    setupKernel(session.kernel);
+                    kernelReady.resolve();
+                },
+                function error() {
+                    // if Services.startNewSession fails we may not be on a Notebook server
+                    // so start kernel directly
+                    var kernelOptions = $.extend({ name: 'python3' }, baseOptions);
+                    Services.startNewKernel(kernelOptions).then(function(kernel) {
+                        setupKernel(kernel);
+                        kernelReady.resolve();
+                    });
+                }
+            );
         });
 
         return kernelReady;
+    }
+
+    // register event handlers on a new kernel
+    function setupKernel(_kernel) {
+        kernel = _kernel;
+
+        // show a busy indicator when communicating with kernel
+        var debounced;
+        kernel.statusChanged.connect(function(_kernel, status) {
+            clearTimeout(debounced);
+            debounced = setTimeout(function() {
+                var isBusy = status === Services.KernelStatus.Busy;
+                $('.busy-indicator')
+                    .toggleClass('show', isBusy)
+                    // Prevent progress animation when hidden by removing 'active' class.
+                    .find('.progress-bar')
+                        .toggleClass('active', isBusy);
+            }, 500);
+        });
+        kernel.commOpened.connect(function(_kernel, commMsg) {
+            var comm = kernel.connectToComm(commMsg.target_name, commMsg.comm_id);
+        });
     }
 
     // Spawn a new kernel container. Returns promise to container URL.
@@ -119,8 +132,15 @@ define([
 
     // Check if container at URL is valid. Returns promise to boolean value.
     function checkExistingContainer(url) {
+        url += (url[url.length - 1] === '/' ? '' : '/'); // ensure it ends in '/'
         return $.get(url + 'api/kernels')
-            .then(function() {
+            .then(function(data) {
+                if (typeof data === 'string') {
+                    // JSON conversion failed, most likely because response is HTML text telling us
+                    // that the container doesn't exist. Therefore, fail.
+                    localStorage.removeItem(CONTAINER_URL);
+                    return false;
+                }
                 return true;
             })
             .fail(function(e) {
@@ -213,13 +233,11 @@ define([
                 gridReady.resolve();
             }
 
-            // we're fully initialized when both grid and thebe
-            // are initialized
+            // we're fully initialized when both grid and thebe are initialized
             return $.when(gridReady, kernelReady);
         },
 
         executeAll: function() {
-            // thebe.run_cell(0, thebe.cells.length);
             $('pre[data-executable]').each(function() {
                 var code = $(this).text();
                 var model = new OutputArea.OutputModel();
@@ -230,11 +248,7 @@ define([
                     code: code,
                     silent: false
                 });
-                // future.onDone = function() {
-                //     console.log('Cell has been run');
-                // };
                 future.onIOPub = function(msg) {
-                    // console.log('onIOPub::', msg.msg_type);
                     if (msg.msg_type in outputAreaHandledMsgs) {
                         model.consumeMessage(msg);
                     }
