@@ -15,6 +15,7 @@ define([
         kernel;
 
     var CONTAINER_URL = 'urth_container_url';
+    var SESSION_URL = 'urth_session_url';
 
     function getQueryParam(name) {
         var vars = window.location.search.substring(1).split('&');
@@ -33,27 +34,19 @@ define([
         var baseUrl = window.Urth.thebe_url;
         baseUrl += (baseUrl[baseUrl.length - 1] === '/' ? '' : '/'); // ensure it ends in '/'
 
-        // check for a previous container, which we can reuse
-        var containerUrl = localStorage.getItem(CONTAINER_URL);
-        var existingContainerFuture;
-        if (containerUrl) {
-            existingContainerFuture = checkExistingContainer(containerUrl);
-        } else {
-            existingContainerFuture = false;
-        }
-
-        var dataUrlFuture;
+        var dataUrlFuture = { url: baseUrl };
         if (Urth.tmpnb_mode) {
             // TMPNB mode: check if we need to spawn a new container or use existing one
-            dataUrlFuture = $.when(existingContainerFuture).then(function(containerExists) {
+
+            // check for a previous container, which we can reuse
+            var containerUrl = localStorage.getItem(CONTAINER_URL);
+            dataUrlFuture = checkExistingContainer(containerUrl).then(function(containerExists) {
                 if (!containerExists) {
                     return callSpawn(baseUrl);
                 } else {
                     return { url: containerUrl };
                 }
             });
-        } else {
-            dataUrlFuture = { url: baseUrl };
         }
 
         $.when(dataUrlFuture).then(function(data) {
@@ -62,30 +55,48 @@ define([
                 wsUrl: data.url.replace(/^http/, 'ws')
             };
 
-            var sessionOptions = $.extend({
-                kernelName: 'python3',
-                notebookPath: window.location.pathname
-            }, baseOptions);
+            var sessionKernelFuture;
+            if (Urth.tmpnb_mode) {
+                // TMPNB mode: assume we only have access to kernel APIs (no session APIs)
+                var kernelOptions = $.extend({ name: 'python3' }, baseOptions);
+                sessionKernelFuture = Services.startNewKernel(kernelOptions);
+            } else {
+                // Use a per-user id to support multiple instances (kernels) of deployed dashboard
+                var sessionUrl = localStorage.getItem(SESSION_URL) || generateSessionUrl();
 
-            // try to start a new Notebook Session first so the Notebook UI shows the running kernel
-            Services.startNewSession(sessionOptions).then(
-                function success(session) {
-                    setupKernel(session.kernel);
-                    kernelReady.resolve();
-                },
-                function error() {
-                    // if Services.startNewSession fails we may not be on a Notebook server
-                    // so start kernel directly
-                    var kernelOptions = $.extend({ name: 'python3' }, baseOptions);
-                    Services.startNewKernel(kernelOptions).then(function(kernel) {
-                        setupKernel(kernel);
-                        kernelReady.resolve();
+                // Start a new session (which starts a new kernel) so our kernel is listed in the
+                // **Running** tab of the Notebook UI, allowing the user to shut it down.
+                var sessionOptions = $.extend({
+                        kernelName: 'python3',
+                        notebookPath: sessionUrl
+                    }, baseOptions);
+
+                sessionKernelFuture = Services.startNewSession(sessionOptions)
+                    .then(function(session) {
+                        localStorage.setItem(SESSION_URL, session.notebookPath);
+                        return session.kernel;
                     });
-                }
-            );
+            }
+
+            sessionKernelFuture.then(function(kernel) {
+                setupKernel(kernel);
+                kernelReady.resolve();
+            }).catch(function(e) {
+                console.error('Failed to create session/kernel:', e);
+            });
         });
 
         return kernelReady;
+    }
+
+    // generates a session URL containing a unique id
+    function generateSessionUrl() {
+        return window.location.pathname + '#' + generateId();
+    }
+
+    // adapted from http://guid.us/GUID/JavaScript
+    function generateId() {
+        return (((1+Math.random())*0x100000000)|0).toString(16).substring(1);
     }
 
     // register event handlers on a new kernel
@@ -132,6 +143,10 @@ define([
 
     // Check if container at URL is valid. Returns promise to boolean value.
     function checkExistingContainer(url) {
+        if (!url) {
+            return $.when(false); // There is no existing container
+        }
+
         url += (url[url.length - 1] === '/' ? '' : '/'); // ensure it ends in '/'
         return $.get(url + 'api/kernels')
             .then(function(data) {
