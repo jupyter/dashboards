@@ -43,6 +43,9 @@ define([
     var HIDDEN_CELLS_MARGIN = 10;
     var HIDDEN_CELLS_BOTTOM_MARGIN = 20;
 
+    var PACKED_STRATEGY = 'packed';
+    var STACKED_STRATEGY = 'stacked';
+
     var DRAG_HANDLE = '.drag-handle';
 
     var Dashboard = function(opts) {
@@ -108,11 +111,12 @@ define([
 
         // init notebook metadata
         _urthMetdata(IPython.notebook.metadata);
-        $.extend(IPython.notebook.metadata.urth.dashboard, {
+        IPython.notebook.metadata.urth.dashboard = $.extend({
             defaultCellHeight: this.opts.rowHeight,
             cellMargin: this.opts.gridMargin,
-            maxColumns: this.opts.numCols
-        });
+            maxColumns: this.opts.numCols,
+            layoutStrategy: this.opts.layoutStrategy
+        }, IPython.notebook.metadata.urth.dashboard);
 
         // init cell metadata
         var self = this;
@@ -260,7 +264,12 @@ define([
     Dashboard.prototype._addNotebookCellToDashboard = function(cell) {
         var $cell = $(cell).css({ visibility: 'hidden', display: 'block' });
 
-        var dim = this._computeCellDimensions($cell);
+        var constraints = {};
+        if(IPython.notebook.metadata.urth.dashboard.layoutStrategy === STACKED_STRATEGY) {
+          constraints = { width : this.opts.numCols};
+        }
+        var dim = this._computeCellDimensions($cell, constraints);
+
         if (!dim.isEmpty) {
             this.gridstack.add_widget($cell, 0, 0, dim.width, dim.height, true, false /* attach_node */);
             this._initVisibleCell($cell);
@@ -549,17 +558,30 @@ define([
         this._repositionHiddenCells();
     };
 
-    /**
-     * Move all cells into the dashboard view
-     */
-    Dashboard.prototype.showAllCells = function() {
+    Dashboard.prototype._showAllCells = function(layoutStrategy, constraints) {
         var self = this;
+        this.hideAllCells();
         this.$container
             .find('.cell:not(.grid-stack-item)')
             .each(function() {
-                self._showCell($(this));
+                self._showCell($(this), constraints);
             });
+        IPython.notebook.metadata.urth.dashboard.layoutStrategy = layoutStrategy;
         IPython.notebook.set_dirty(true);
+    };
+
+    /**
+     * Move all cells into the dashboard view in a packed layout
+     */
+    Dashboard.prototype.showAllCellsPacked = function() {
+        this._showAllCells(PACKED_STRATEGY);
+    };
+
+    /**
+     * Move all cells into the dashboard view in a stacked layout
+     */
+    Dashboard.prototype.showAllCellsStacked = function() {
+        this._showAllCells(STACKED_STRATEGY, { 'width' : this.opts.numCols});
     };
 
     /**
