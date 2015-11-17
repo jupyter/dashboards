@@ -32,6 +32,10 @@ N.B.: These are satisfied automatically when you follow the setup instructions b
 
 We're running a tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cloudet.xyz) with a snapshot of this project (and other related incubator projects) pre-installed.
 
+# Install It
+
+`pip install jupyter_dashboards` and then restart your notebook server
+
 ## Develop
 
 This repository is setup for a Dockerized development environment. On a Mac, do this one-time setup if you don't have a local Docker environment yet.
