@@ -63,6 +63,7 @@ define([
                             defaultCellWidth: 4,
                             defaultCellHeight: 4,
                             minCellHeight: 2,
+                            layoutStrategy: 'packed',
                             onResize: PolymerSupport.onResize,
                             exit: function() {
                                 dbActions.switchToNotebook();
@@ -85,7 +86,10 @@ define([
                 $helpArea.remove();
             },
             showAll: function() {
-                dashboard.showAllCells();
+                dashboard.showAllCellsPacked();
+            },
+            showAllStacked: function() {
+                dashboard.showAllCellsStacked();
             },
             hideAll: function() {
                 dashboard.hideAllCells();
