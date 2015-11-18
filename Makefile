@@ -1,13 +1,13 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: build clean configs dev dev-with-widgets help install js sdist system-test system-test-remote test 
+.PHONY: build clean configs dev dev-with-widgets help install js sdist system-test-local system-test-remote test 
 
 PYTHON?=python3
-PYTHON2_SETUP?=source activate python2; pip install ipython[notebook]==3.2;
 
 REPO:=jupyter/pyspark-notebook:a388c4a66fd4
 BOWER_REPO:=jupyter/pyspark-notebook-bower:a388c4a66fd4
+PYTHON2_SETUP:=source activate python2;
 
 help:
 	@echo 'Host commands:'
@@ -118,9 +118,10 @@ install-python3: _install
 _install: CMD?=exit
 _install:
 	@docker run -it --rm \
+		--user jovyan \
 		-v `pwd`:/src \
 		$(REPO) bash -c '$(SETUP_CMD) cd /src/dist && \
-			pip install $$(ls -1 *.tar.gz | tail -n 1) && \
+			pip install $$(ls -1 *.tar.gz | tail -n 1) ; \
 			$(CMD)'
 
 sdist: js
