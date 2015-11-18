@@ -35,6 +35,7 @@ define([
     var enterDbModeCallback;
     var exitDbModeCallback;
     var showAllCallback;
+    var showAllStackedCallback;
     var hideAllCallback;
     var scrollToBottom;
 
@@ -65,7 +66,7 @@ define([
         $('body').removeClass('view-only');
         $('#urth-notebook-view').addClass('selected');
         $('#urth-dashboard-auth, #urth-dashboard-view').removeClass('selected');
-        $('#urth-dashboard-show-all, #urth-dashboard-hide-all').addClass('disabled');
+        $('#urth-dashboard-show-all, #urth-dashboard-show-all-stacked, #urth-dashboard-hide-all').addClass('disabled');
         exitDbModeCallback();
         updateUrlState(false);
         toggleHeaders(true); // enable header and toolbar
@@ -83,7 +84,7 @@ define([
         $('#urth-notebook-view').removeClass('selected');
         $('#urth-dashboard-auth').toggleClass('selected', newState === STATE_DASHBOARD_AUTH);
         $('#urth-dashboard-view').toggleClass('selected', newState === STATE_DASHBOARD_VIEW);
-        $('#urth-dashboard-show-all, #urth-dashboard-hide-all').toggleClass('disabled', newState === STATE_DASHBOARD_VIEW);
+        $('#urth-dashboard-show-all, #urth-dashboard-show-all-stacked, #urth-dashboard-hide-all').toggleClass('disabled', newState === STATE_DASHBOARD_VIEW);
 
         // disable header and toolbar as necessary
         toggleHeaders(newState === STATE_DASHBOARD_AUTH);
@@ -144,6 +145,7 @@ define([
         enterDbModeCallback = args.enterDashboardMode;
         exitDbModeCallback = args.exitDashboardMode;
         showAllCallback = args.showAll;
+        showAllStackedCallback = args.showAllStacked;
         hideAllCallback = args.hideAll;
 
         queryState();
@@ -166,6 +168,7 @@ define([
         // Cell menu items
         $('#cell_menu').append('<li class="divider"/>', subMenuTemplate);
         $('#urth-dashboard-show-all').click(showAllCallback);
+        $('#urth-dashboard-show-all-stacked').click(showAllStackedCallback);
         $('#urth-dashboard-hide-all').click(hideAllCallback);
     };
 
