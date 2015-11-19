@@ -1,7 +1,6 @@
 <style>
     .help-area {
-        max-width: 45em;
-        margin: 0 auto;
+        position: relative;
     }
     .view-only .help-area {
         display: none;
@@ -10,6 +9,10 @@
         padding-top: 20px;
         text-align: center;
     }
+    .help-area .show-code-label {
+        position: absolute;
+        right: 0;
+    }
     .help-area .more-info-link {
         font-variant: small-caps;
         margin-left: 0.5em;
@@ -17,7 +20,8 @@
     .help-area .alert-info {
         display: flex;
         justify-content: center;
-        margin: 1em 0 0 0;
+        max-width: 45em;
+        margin: 1em auto 0 auto;
         box-shadow: 0 2px 7px 0 rgba(87,87,87,0.2);
     }
     .help-area:not(.show-more) .alert-info {
@@ -28,8 +32,11 @@
         padding: 0;
     }
 </style>
-<div class="help-area">
-    <div class="help-snippet">Arrange and size cells to create your dashboard. <a class="more-info-link" href="#">more info</a></div>
+<div class="help-area container">
+    <div class="help-snippet">
+        Arrange and size cells to create your dashboard. <a class="more-info-link" href="#">more info</a>
+        <label class="show-code-label"><input type="checkbox" checked="true"> Show code on hover</label>
+    </div>
     <div class="alert alert-info">
         <ul>
             <li><strong>Move cell: </strong>Click and drag <span class="fa fa-arrows"></span> to move a cell. Hold <strong>Shift</strong> to drag from anywhere on a cell.</li>
@@ -43,6 +50,9 @@
 </div>
 <script>
     (function() {
+        $('.show-code-label input').change(function() {
+            $('#notebook-container').toggleClass('hide-code', !this.checked);
+        });
         $('.more-info-link').click(function() {
             $(this).parents('.help-area').toggleClass('show-more', 200);
         });

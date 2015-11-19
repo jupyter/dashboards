@@ -70,6 +70,7 @@ define([
         exitDbModeCallback();
         updateUrlState(false);
         toggleHeaders(true); // enable header and toolbar
+        enableCodeMirror(true);
 
         // restore scrolling behavior
         IPython.Notebook.prototype.scroll_to_bottom = scrollToBottom;
@@ -88,6 +89,8 @@ define([
 
         // disable header and toolbar as necessary
         toggleHeaders(newState === STATE_DASHBOARD_AUTH);
+
+        enableCodeMirror(false);
 
         enterDbModeCallback(newState === STATE_DASHBOARD_AUTH /* doEnableGrid */);
         updateUrlState(newState === STATE_DASHBOARD_VIEW);
@@ -138,6 +141,13 @@ define([
         }
         var url = l.protocol + '//' + l.host + l.pathname + (s.length ? '?' + s : '');
         window.history.replaceState(null, null, url);
+    }
+
+    // disable editting/focussing of CodeMirror content when in dashboard mode
+    function enableCodeMirror(doEnable) {
+        $('.CodeMirror').each(function() {
+            this.CodeMirror.setOption('readOnly', doEnable ? false : 'nocursor');
+        });
     }
 
     /*************************************/

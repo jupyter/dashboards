@@ -551,7 +551,7 @@ define([
     };
 
     Dashboard.prototype._toggleHiddenCellCode = function(event) {
-        this.$container.toggleClass('show-code');
+        this.$container.toggleClass('hidden-area-show-code');
         var $button = $(event.target);
         $button.toggleClass('btn-info');
         $button.text($button.text() === 'Show code' ? 'Hide code' : 'Show code');
