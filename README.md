@@ -14,8 +14,6 @@ Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording
 ## What It Lacks
 
 * Robust story for independent dashboard deployment (see below)
-* Frontend tests
-* More backend tests
 * User docs / tutorials
 
 ## Runtime Requirements

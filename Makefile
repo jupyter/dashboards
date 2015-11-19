@@ -1,19 +1,21 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: build clean configs demo dev dev-with-widgets help install js sdist test
+.PHONY: build clean configs demo dev dev-with-widgets help install js sdist test system-test system-test-remote
 PYTHON?=python3
 PYTHON2_SETUP?=source activate python2; pip install ipython[notebook]==3.2;
 
 help:
 	@echo 'Host commands:'
-	@echo '           clean - clean built files'
-	@echo '            demo - start notebook server with stable dashboard / widget extensions'
-	@echo '             dev - start notebook server in a container with source mounted'
-	@echo 'dev-with-widgets - like dev, but with stable declarativewidgets installed'
-	@echo '         install - install latest sdist into a container'
-	@echo '           sdist - build a source distribution into dist/'
-	@echo '            test - run unit tests within a container'
+	@echo '             clean - clean built files'
+	@echo '              demo - start notebook server with stable dashboard / widget extensions'
+	@echo '               dev - start notebook server in a container with source mounted'
+	@echo '  dev-with-widgets - like dev, but with stable declarativewidgets installed'
+	@echo '           install - install latest sdist into a container'
+	@echo '             sdist - build a source distribution into dist/'
+	@echo '              test - run unit tests within a container'
+	@echo ' system-test-local - run system tests locally'
+	@echo 'system-test-remote - run system tests remotely on sauce labs, you must export SAUCE_USERNAME and SAUCE_ACCESS_KEY as environment variables'
 
 configs:
 # Make copies so that we don't volume mount git controlled files which will
@@ -40,9 +42,11 @@ js:
 
 demo: NB_HOME?=/home/jovyan/.ipython
 demo: REPO?=cloudet/pyspark-notebook-bower
+demo: OPTIONS?=--rm -it
+demo: SERVER_NAME?=urth_dashboards_demo_server
 demo: CMD?=ipython notebook --no-browser --port 8888 --ip="*"
 demo: configs
-	@docker run -it --rm \
+	@docker run $(OPTIONS) --name $(SERVER_NAME) \
 		-p 9500:8888 \
 		-v `pwd`:/dashboards \
 		-v `pwd`/../declarativewidgets:/declarativewidgets \
@@ -64,10 +68,12 @@ dev-python3: _dev
 _dev: NB_HOME?=/home/jovyan/.ipython
 _dev: REPO?=cloudet/pyspark-notebook-bower
 _dev: AUTORELOAD?=no
+_dev: OPTIONS?=--rm -it
+_dev: SERVER_NAME?=urth_dashboards_dev_server
 _dev: CMD?=sh -c "python --version; ipython notebook --no-browser --port 8888 --ip='*'"
 _dev: configs js
 	# Need to use two commands here to allow for activation of multiple python versions
-	@docker run -it --rm \
+	@docker run $(OPTIONS) --name $(SERVER_NAME) \
 		-p 9500:8888 \
 		-e USE_HTTP=1 \
 		-e PASSWORD='' \
@@ -151,3 +157,44 @@ _test:
 
 release: POST_SDIST=register upload
 release: sdist
+		$(REPO) $(CMD)
+
+system-test-local: TEST_SERVER?=192.168.99.1:4444
+system-test-local: BASEURL?=http://192.168.99.100:9500
+system-test-local: TEST_TYPE?=local
+system-test-local: SETUP_COMMAND?=(cd system-test/bin; ./run-selenium.sh)
+system-test-local: TEARDOWN_COMMAND?=(cd system-test/bin; ./kill-selenium.sh)
+system-test-local: _system-test
+
+system-test-remote: TEST_TYPE?=remote
+system-test-remote: BASEURL?=http://127.0.0.1:9500
+system-test-remote: TEST_SERVER?=ondemand.saucelabs.com
+system-test-remote:
+ifdef SAUCE_USERNAME
+	@TEST_TYPE=$(TEST_TYPE) BASEURL=$(BASEURL) TEST_SERVER=$(TEST_SERVER) $(MAKE) _system-test
+else
+	@echo Skipping unit tests because Sauce Credentials were not present
+endif
+
+_system-test: SERVER_NAME?=urth_dashboards_integration_test_server
+_system-test: REPO?=cloudet/pyspark-notebook-bower
+_system-test: CMD?=bash -c 'cd /src; npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) --test-type $(TEST_TYPE)'
+_system-test:
+	@which chromedriver || (echo "chromedriver not found (brew install chromedriver)"; exit 1)
+	@which selenium-server || (echo "selenium-server not found (brew install selenium-server-standalone)"; exit 1)
+	-@docker rm -f $(SERVER_NAME)
+	@-sh -c "$(SETUP_COMMAND)"
+	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) dev
+	@echo 'Waiting 20 seconds for server to start...'
+	@sleep 20
+	@echo 'Running system integration tests...'
+	@docker run --rm -it \
+		--net=host \
+		-p 9500:8888 \
+		-e SAUCE_USERNAME=$(SAUCE_USERNAME) \
+		-e SAUCE_ACCESS_KEY=$(SAUCE_ACCESS_KEY) \
+		-e TRAVIS_JOB_NUMBER=$(TRAVIS_JOB_NUMBER) \
+		-v `pwd`:/src \
+		$(REPO) $(CMD)
+	-@docker rm -f $(SERVER_NAME)
+	@-sh -c "$(TEARDOWN_COMMAND)"
