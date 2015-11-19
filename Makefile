@@ -159,12 +159,16 @@ release: POST_SDIST=register upload
 release: sdist
 		$(REPO) $(CMD)
 
+_system-test-local-setup:
+# Check if deps are installed when running locally
+	@which chromedriver || (echo "chromedriver not found (brew install chromedriver)"; exit 1)
+	@which selenium-server || (echo "selenium-server not found (brew install selenium-server-standalone)"; exit 1)
+
 system-test-local: TEST_SERVER?=192.168.99.1:4444
 system-test-local: BASEURL?=http://192.168.99.100:9500
 system-test-local: TEST_TYPE?=local
-system-test-local: SETUP_COMMAND?=(cd system-test/bin; ./run-selenium.sh)
 system-test-local: TEARDOWN_COMMAND?=(cd system-test/bin; ./kill-selenium.sh)
-system-test-local: _system-test
+system-test-local: _system-test-local-setup _system-test
 
 system-test-remote: TEST_TYPE?=remote
 system-test-remote: BASEURL?=http://127.0.0.1:9500
@@ -180,10 +184,7 @@ _system-test: SERVER_NAME?=urth_dashboards_integration_test_server
 _system-test: REPO?=cloudet/pyspark-notebook-bower
 _system-test: CMD?=bash -c 'cd /src; npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) --test-type $(TEST_TYPE)'
 _system-test:
-	@which chromedriver || (echo "chromedriver not found (brew install chromedriver)"; exit 1)
-	@which selenium-server || (echo "selenium-server not found (brew install selenium-server-standalone)"; exit 1)
 	-@docker rm -f $(SERVER_NAME)
-	@-sh -c "$(SETUP_COMMAND)"
 	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) dev
 	@echo 'Waiting 20 seconds for server to start...'
 	@sleep 20
