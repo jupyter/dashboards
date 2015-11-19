@@ -176,12 +176,7 @@ system-test-local: _system-test-local-setup _system-test _system-test-local-tear
 system-test-remote: TEST_TYPE?=remote
 system-test-remote: BASEURL?=http://127.0.0.1:9500
 system-test-remote: TEST_SERVER?=ondemand.saucelabs.com
-system-test-remote:
-ifdef SAUCE_USERNAME
-	@TEST_TYPE=$(TEST_TYPE) BASEURL=$(BASEURL) TEST_SERVER=$(TEST_SERVER) $(MAKE) _system-test
-else
-	@echo Skipping unit tests because Sauce Credentials were not present
-endif
+system-test-remote: _system-test
 
 _system-test: SERVER_NAME?=urth_dashboards_integration_test_server
 _system-test: REPO?=cloudet/pyspark-notebook-bower
@@ -194,7 +189,6 @@ _system-test:
 	@echo 'Running system integration tests...'
 	@docker run --rm -it \
 		--net=host \
-		-p 9500:8888 \
 		-e SAUCE_USERNAME=$(SAUCE_USERNAME) \
 		-e SAUCE_ACCESS_KEY=$(SAUCE_ACCESS_KEY) \
 		-e TRAVIS_JOB_NUMBER=$(TRAVIS_JOB_NUMBER) \
