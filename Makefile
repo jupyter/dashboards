@@ -180,6 +180,8 @@ _system-test: SERVER_NAME?=urth_dashboards_integration_test_server
 _system-test: REPO?=cloudet/pyspark-notebook-bower
 _system-test: CMD?=bash -c 'cd /src; npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) --test-type $(TEST_TYPE)'
 _system-test:
+	@which chromedriver || (echo "chromedriver not found (brew install chromedriver)"; exit 1)
+	@which selenium-server || (echo "selenium-server not found (brew install selenium-server-standalone)"; exit 1)
 	-@docker rm -f $(SERVER_NAME)
 	@-sh -c "$(SETUP_COMMAND)"
 	@OPTIONS=-d SERVER_NAME=$(SERVER_NAME) $(MAKE) dev
