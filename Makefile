@@ -163,12 +163,15 @@ _system-test-local-setup:
 # Check if deps are installed when running locally
 	@which chromedriver || (echo "chromedriver not found (brew install chromedriver)"; exit 1)
 	@which selenium-server || (echo "selenium-server not found (brew install selenium-server-standalone)"; exit 1)
+	@cd system-test/bin; ./run-selenium.sh
+
+_system-test-local-teardown:
+	@-cd system-test/bin; ./kill-selenium.sh
 
 system-test-local: TEST_SERVER?=192.168.99.1:4444
 system-test-local: BASEURL?=http://192.168.99.100:9500
 system-test-local: TEST_TYPE?=local
-system-test-local: TEARDOWN_COMMAND?=(cd system-test/bin; ./kill-selenium.sh)
-system-test-local: _system-test-local-setup _system-test
+system-test-local: _system-test-local-setup _system-test _system-test-local-teardown
 
 system-test-remote: TEST_TYPE?=remote
 system-test-remote: BASEURL?=http://127.0.0.1:9500
@@ -198,4 +201,3 @@ _system-test:
 		-v `pwd`:/src \
 		$(REPO) $(CMD)
 	-@docker rm -f $(SERVER_NAME)
-	@-sh -c "$(TEARDOWN_COMMAND)"
