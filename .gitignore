@@ -66,6 +66,7 @@ __pycache__/
 etc/notebooks/*
 !etc/notebooks/*_demo
 !etc/notebooks/test/
+!etc/notebooks/system-test/
 !etc/notebooks/*_demo/*
 !etc/notebooks/*_tutorial
 !etc/notebooks/index.ipynb
@@ -74,3 +75,8 @@ etc/notebooks/*_demo/.dashboard_cache
 etc/notebooks/*_demo/.ipynb_checkpoints
 etc/ipython_notebook_config.py
 etc/notebook.json
+
+# System testing
+**/*/selenium.log
+**/*/selenium.jar
+**/*/selenium.pid
