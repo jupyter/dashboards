@@ -13,6 +13,7 @@ addons:
     no_ssl_bump_domains: all
 
 script:
+- make build
 - make test-python2
 - make test-python3
 - make sdist

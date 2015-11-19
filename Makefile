@@ -26,10 +26,10 @@ build:
 	@-docker rm -f bower-build
 	@docker run -it --name bower-build \
 		$(REPO) bash -c 'apt-get update && \
-			apt-get install --yes npm && \
-			ln -s /usr/bin/nodejs /usr/bin/node && \
-			npm install -g bower && \
-			apt-get clean'
+		apt-get install curl && \
+		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
+		apt-get install --yes nodejs && \
+		npm install -g bower'
 	@docker commit bower-build $(BOWER_REPO)
 	@-docker rm -f bower-build
 
@@ -139,7 +139,6 @@ test-python2: _test
 
 test-python3: _test
 
-_test: REPO?=cloudet/pyspark-notebook-bower
 _test: CMD?=cd /src; python --version; python -B -m unittest discover -s test
 _test:
 # Need to use two commands here to allow for activation of multiple python versions
@@ -171,7 +170,6 @@ system-test-remote: TEST_SERVER?=ondemand.saucelabs.com
 system-test-remote: _system-test
 
 _system-test: SERVER_NAME?=urth_dashboards_integration_test_server
-_system-test: REPO?=cloudet/pyspark-notebook-bower
 _system-test: CMD?=bash -c 'cd /src; npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) --test-type $(TEST_TYPE)'
 _system-test:
 	-@docker rm -f $(SERVER_NAME)
@@ -185,5 +183,5 @@ _system-test:
 		-e SAUCE_ACCESS_KEY=$(SAUCE_ACCESS_KEY) \
 		-e TRAVIS_JOB_NUMBER=$(TRAVIS_JOB_NUMBER) \
 		-v `pwd`:/src \
-		$(REPO) $(CMD)
+		$(BOWER_REPO) $(CMD)
 	-@docker rm -f $(SERVER_NAME)
