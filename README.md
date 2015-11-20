@@ -143,6 +143,13 @@ First, you can click *File &rarr; Deploy As &rarr; Local Dashboard*. This will u
 
 Alternatively, if you have a tmpnb instance running somewhere that spawns Notebook server containers with access to all the same libraries, extensions, and data as the notebook server you used to author the dashboard-notebook, you can click *File &rarr; Download As &rarr; Dashboard Bundle (.zip)*. Unzip the file your browser downloads and follow the README contained within to run a standalone web server for the dashboard frontend and configure it  with a pointer to your tmpnb deployment.
 
-#### Deploying Declarative Widgets
+#### Deployment Caveats
 
-When deploying a dashboard with declarative widgets you must run the entire  notebook before deploying. This requirement is needed at the moment to ensure all of the widgets are properly copied into the dashboard's static files.
+It is important to realize that kernels launched by your deployed dashboard will not being running in the same directory or possibly even the same environment as your original notebook. You must refer to external, kernel-side resources in a portable manner (e.g., put it in an external data store, use absolute file paths if your only concern is *File &rarr; Deploy As &rarr; Local Dashboard*). You must also ensure your kernel environment has all the same libraries installed as your notebook authoring environment.
+
+It is also your responsibility to associate any frontend, dashboard-side assets with your notebook before packaging it for deployment. See the [associations demo](etc/notebooks/associations_demo/associations-demo.ipynb) for one mechanism you can use.
+
+If you are using [declarative widgets](https://github.com/jupyter-incubator/declarativewidgets) in your dashboard, you should be mindful of the following when you deploy your dashboard.
+
+* You must run the entire notebook successfully before deploying. This action ensures all external Polymer components are properly installed on the notebook server and can be bundled with your converted notebook.
+* You cannot use `<urth-core-import>` elements in custom Polymer widgets that you develop outside your notebook. See [issue #78](https://github.com/jupyter-incubator/dashboards/issues/78) for the discussion and current workaround.
