@@ -5,8 +5,9 @@ import os
 from setuptools import setup
 from setuptools.command.install import install
 
-from IPython.html.nbextensions import install_nbextension
-from IPython.html.services.config import ConfigManager
+from notebook.nbextensions import install_nbextension
+from notebook.services.config import ConfigManager
+from jupyter_core.paths import jupyter_config_dir
 
 # Get location of this file at runtime
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -31,7 +32,7 @@ class InstallCommand(install):
         cm.update('notebook', {"load_extensions": {'urth_dash_js/notebook/main': True}})
 
         print('Installing notebook server extension')
-        fn = os.path.join(cm.profile_dir, 'ipython_notebook_config.py')
+        fn = os.path.join(jupyter_config_dir(), 'jupyter_notebook_config.py')
 
         if os.path.isfile(fn):
             with open(fn, 'r+') as fh:
@@ -53,7 +54,7 @@ setup(
     url='https://github.com/jupyter-incubator/dashboards',
     version=VERSION_NS['__version__'],
     license='BSD',
-    platforms=['IPython Notebook 3.x'],
+    platforms=['IPython Notebook 4.x'],
     packages=[
         'urth', 
         'urth.dashboard', 

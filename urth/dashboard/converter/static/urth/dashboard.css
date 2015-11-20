@@ -106,3 +106,13 @@ body .kernel_controls {
     width: 100%;
     height: 100%;
 }
+
+/* remove cell selection rectangle (4.x) */
+#dashboard-container div.cell.selected {
+    border-color: transparent;
+}
+
+/* disable image overflow toggle behavior (4.x) */
+#dashboard-container img.unconfined {
+    max-width: 100%;
+}

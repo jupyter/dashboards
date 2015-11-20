@@ -18,7 +18,7 @@ Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording
 
 ## Runtime Requirements
 
-* IPython Notebook 3.2.x (not Jupyter Notebook 4.x, yet) running on Python 3.x or 2.7.x
+* Jupyter Notebook 4.0.x running on Python 3.x or 2.7.x (see the 0.1.x branch for IPython Notebook 3.2.x compatibility)
 * Notebook instance running out of `profile_default`
 * [gridstack](http://troolee.github.io/gridstack.js/)
 * [font-awesome](https://fortawesome.github.io/Font-Awesome/), [thebe](https://github.com/oreillymedia/thebe) (for deployed dashboards only)
@@ -50,12 +50,6 @@ docker-machine create -d virtualbox dev
 eval "$(docker-machine env dev)"
 ```
 
-Pull the Docker image that we'll use for development (including bower because we want to work with declarative widgets).
-
-```
-docker pull cloudet/pyspark-notebook-bower
-```
-
 Clone this repository in a local directory that docker can volume mount:
 
 ```
@@ -67,11 +61,17 @@ cd !$
 git clone https://github.com/jupyter-incubator/dashboards.git
 ```
 
+Pull a base Docker image and build a subimage from it that includes bower both as a dashboard dev dependency and as a prereq for example notebooks that use declarative widgets.
+
+```
+cd dashboards
+make build
+```
+
 Run the notebook server in a docker container:
 
 ```
 # run notebook server in container
-cd dashboards
 make dev
 ```
 

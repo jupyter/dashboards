@@ -7,4 +7,10 @@
 define([
     './dashboard-view/dashboard-view',
     './deploy-menu/deploy-menu'
-], function() {});
+], function() {
+    return {
+        load_ipython_extension: function() { 
+            console.debug('jupyter_dashboards loaded'); 
+        }
+    };
+});
