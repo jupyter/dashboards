@@ -1,6 +1,8 @@
+[![PyPI version](https://badge.fury.io/py/jupyter_dashboards.svg)](https://badge.fury.io/py/jupyter_dashboards) [![Build Status](https://travis-ci.org/jupyter-incubator/dashboards.svg?branch=master)](https://travis-ci.org/jupyter-incubator/dashboards) [![Google Group](https://img.shields.io/badge/-Google%20Group-lightgrey.svg)](https://groups.google.com/forum/#!forum/jupyter)
+
 # Jupyter Dynamic Dashboards from Notebooks
 
-Extensions for Jupyter / IPython Notebook to enable the layout and deployment of dashboards from notebooks.
+Extensions for Jupyter Notebook to enable the layout and deployment of dashboards from notebooks.
 
 ## What It Gives You
 
@@ -14,27 +16,24 @@ Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording
 ## What It Lacks
 
 * Robust story for independent dashboard deployment (see below)
-* User docs / tutorials
+* More formal user docs / tutorials
 
-## Runtime Requirements
+## Prerequisites
 
-* Jupyter Notebook 4.0.x running on Python 3.x or 2.7.x (see the 0.1.x branch for IPython Notebook 3.2.x compatibility)
-* Notebook instance running out of `profile_default`
-* [gridstack](http://troolee.github.io/gridstack.js/)
-* [font-awesome](https://fortawesome.github.io/Font-Awesome/), [thebe](https://github.com/oreillymedia/thebe) (for deployed dashboards only)
-* Declarative widgets extension and its dependencies (for the taxi demo)
+* Jupyter Notebook 4.0.x running on Python 3.x or Python 2.7.x
+* Edge Chrome, Firefox, or Safari
 
-N.B.: These are satisfied automatically when you follow the setup instructions below.
+Note: If you're running IPython Notebook 3.2.x, you can install the older 0.1.x version of the extension.
 
 ## Try It
 
-We're running a tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cloudet.xyz) with a snapshot of this project (and other related incubator projects) pre-installed.
+If you want to try the dashboard extension and demos without installing it yourself, visit the [jupyter-incubator/showcase binder](http://mybinder.org/repo/jupyter-incubator/showcase). If the binder site is full, try the tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cloudet.xyz).
 
-# Install It
+## Install It
 
-`pip install jupyter_dashboards` and then restart your notebook server
+`pip install jupyter_dashboards` and then restart your Notebook server if it was running during the install.
 
-## Develop
+## Develop It
 
 This repository is setup for a Dockerized development environment. On a Mac, do this one-time setup if you don't have a local Docker environment yet.
 
@@ -84,29 +83,27 @@ To see the Jupyter instance with extensions working:
 
 See the Makefile for other dev, test, build commands as well as options for each command.
 
-### Add Declarative Widgets
+### Develop with Declarative Widgets
 
-If you want to try the `taxi_demo` which combines the declarative widgets and a dashboard capabilities, do the following
+If you want [declarative widgets](https://github.com/jupyter-incubator/declarativewidgets) available in you development environment, do the following:
 
 ```
-# On your host, also clone the widgets project if you want to try dashboard+widgets together
+# On your host, clone the widgets project as a peer of the dashboards folder
 git clone https://github.com/jupyter-incubator/declarativewidgets.git
 
-# Build both projects into source tarballs
+# Build the widgets into a source tarballs
 cd declarativewidgets
 make sdist
-cd ../dashboards
-make sdist
 
-# Run a container that installs both
-make demo
+# Run a container that has both
+cd ../dashboards
+make dev-with-widgets
 ```
 
 To see the Jupyter instance with both extensions working:
 
 1. Run `docker-machine ls` and note the IP of the dev machine.
 2. Visit http://THAT_IP:9500 in your browser
-
 
 ### Develop Against Python 2.7
 
@@ -121,10 +118,9 @@ PYTHON=python2 make dev-with-widgets
 PYTHON=python2 make test
 ```
 
-
 ## Package
 
-The dashboard features are implemented as a Jupyter Notebook extension against the stock 3.2.x version of the notebook project, not a fork. With the dev setup above, if you run `make sdist` you should get a source tarball in the `dist/` directory of your clone. You should be able to install that tarball using `pip` anywhere you please with one caveat: the `setup.py` assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at `pip install` time.
+The dashboard features are implemented as a Jupyter Notebook extension against the stock 4.0.x version of the notebook project, not a fork. With the dev setup above, if you run `make sdist` you should get a source tarball in the `dist/` directory of your clone. You should be able to install that tarball using `pip` anywhere you please with one caveat: the `setup.py` assumes you are installing to profile_default. There's no easy way to determine that you want to install against a different user at `pip install` time.
 
 ## Deploy
 
