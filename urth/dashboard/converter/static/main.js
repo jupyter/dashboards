@@ -36,12 +36,33 @@ requirejs.config({
     }
 });
 
-
 requirejs(['urth/dashboard'], function(Dashboard) {
     Dashboard.init().then(function() {
-        // Ugly, because we're tying dashboards specifically to urth_widgets
-        // but we don't have another way to detect and determine if / how these
-        // should be setup at the moment.
+        // Ugly, because we're special-casing declarative widget support, but
+        // they need to be pre-loaded onto the page before we begin executing
+        // any notebook code that depends on them.
+
+        // Declarative widgets 0.2.x subclass the WidgetModel base class
+        // to guarantee message sequence. They register this new base with 
+        // the widget manager. Because the Thebe build includes these 
+        // modules and initializes the manager singleton, we need to map 
+        // them across from the Thebe loader to our loader to avoid making
+        // second, independent copies.
+        // All this goes away when we can use jupyter-js-services and 
+        // ipywidgets independently.
+        define('nbextensions/widgets/widgets/js/manager', function() {
+            return {
+                // The kernel object has a reference to the widget manager
+                // (for now at least ...)
+                WidgetManager: IPython.notebook.kernel.widget_manager.constructor
+            };
+        });
+        define('nbextensions/widgets/widgets/js/widget', function() {
+            // WidgetModel is one of the registered model types
+            return IPython.notebook.kernel.widget_manager.constructor._model_types;
+        });
+
+        // Now try to load the widgets
         requirejs(['urth_widgets/js/init/init'], function(widgetInit) {
             // Initialize the widgets
             widgetInit('static/').then(function() {
