@@ -5,10 +5,10 @@
 
 /* hide extraneous cell parts when in dashboard view  */
 .urth-dashboard .celltoolbar,
-.urth-dashboard .container .cell.grid-stack-item > .input,
-.urth-dashboard .container:not(.show-code) .cell:not(.grid-stack-item) > .input,
+.urth-dashboard.view-only .grid-stack .cell.grid-stack-item > .input,
+.urth-dashboard .container:not(.hidden-area-show-code) .cell:not(.grid-stack-item) > .input,
 .urth-dashboard .container .cell.grid-stack-item .prompt ,
-.urth-dashboard .container:not(.show-code) .cell:not(.grid-stack-item) .prompt {
+.urth-dashboard .container:not(.hidden-area-show-code) .cell:not(.grid-stack-item) .prompt {
     display: none !important; /* Necessary to override inline style set by notebook */
 }
 
@@ -16,8 +16,8 @@
 .grid-stack#notebook-container {
     padding-left: 0;
     padding-right: 0;
-    transition: background-color 0.75s 0.25s,
-                box-shadow 0.75s 0.25s,
+    transition: background-color 0.75s,
+                box-shadow 0.75s,
                 height 0.3s;
 }
 body:not(.view-only) .grid-stack#notebook-container:hover {
@@ -50,6 +50,27 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
         padding: 0 (margin/2)px;
      */
 }
+.urth-dashboard:not(.view-only) .grid-stack .cell.grid-stack-item > .input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0.5em 1em;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.urth-dashboard:not(.view-only) .grid-stack:not(.hide-code):not(:hover) .cell.grid-stack-item > .input {
+    /*display: none;*/
+}
+.urth-dashboard:not(.view-only) .grid-stack:not(.hide-code):hover .cell.grid-stack-item > .input {
+    opacity: 0.3;
+}
+.urth-dashboard:not(.view-only) .grid-stack:not(.hide-code) .cell.grid-stack-item > .input div.input_area {
+    border: none;
+    background: none;
+}
 .grid-stack .dashboard-item-background,
 .grid-stack .dashboard-item-border {
     position: absolute;
@@ -57,7 +78,7 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
     top: 0;
     bottom: 0;
     z-index: -1;
-    transition: box-shadow 0.75s 0.25s;
+    transition: box-shadow 0.75s;
 
     /*
         computed by gridstack-custom:
@@ -71,7 +92,9 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
     color: transparent;
     z-index: 10;
     pointer-events: none; /* "pass through" mouse events */
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s,
+                color 0.2s,
+                box-shadow 0.75s;
 }
 .grid-stack .cell:not(.grid-stack-item) .dashboard-item-background,
 .grid-stack .cell:not(.grid-stack-item) .dashboard-item-border {
