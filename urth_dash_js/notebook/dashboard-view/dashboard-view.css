@@ -6,9 +6,7 @@
 /* hide extraneous cell parts when in dashboard view  */
 .urth-dashboard .celltoolbar,
 .urth-dashboard.view-only .grid-stack .cell.grid-stack-item > .input,
-.urth-dashboard .container:not(.hidden-area-show-code) .cell:not(.grid-stack-item) > .input,
-.urth-dashboard .container .cell.grid-stack-item .prompt ,
-.urth-dashboard .container:not(.hidden-area-show-code) .cell:not(.grid-stack-item) .prompt {
+.urth-dashboard .container .cell .prompt {
     display: none !important; /* Necessary to override inline style set by notebook */
 }
 
@@ -233,13 +231,6 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
     padding: 15px;
 }
 
-.grid-stack .cell:not(.grid-stack-item) {
-    position: absolute;
-    min-height: 100px;
-
-    transition: left 0.3s, top 0.3s, height 0.3s, width 0.3s;
-}
-
 .urth-dashboard #dashboard-hidden-header .header {
     display: -webkit-flex;
     display: -ms-flexbox;
@@ -256,6 +247,18 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
 .urth-dashboard #dashboard-hidden-header .header .btn:not(.btn-info) {
     background-color: transparent;
     border: 1px solid black;
+}
+
+.grid-stack .cell:not(.grid-stack-item) {
+    position: absolute;
+    min-height: 100px;
+
+    transition: left 0.3s, top 0.3s, height 0.3s, width 0.3s;
+}
+
+.grid-stack .cell.code_cell:not(.grid-stack-item) .input_area {
+    max-height: 200px;
+    overflow: scroll;
 }
 
 /* static view */
