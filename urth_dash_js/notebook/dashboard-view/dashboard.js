@@ -283,9 +283,6 @@ define([
         var $header = $('<div class="header"/>')
             .appendTo(this.$hiddenHeader)
             .append('<h2 class="title">Hidden Cells</h2>');
-        $('<button class="btn btn-xs">Show code</button>')
-            .appendTo($header)
-            .click(this._toggleHiddenCellCode.bind(this));
         this.$hiddenHeader.insertAfter(this.$container); // add to DOM
 
         var self = this;
@@ -548,14 +545,6 @@ define([
             height: grid.height
         };
         this._updateCellMetadata($cell, layout);
-    };
-
-    Dashboard.prototype._toggleHiddenCellCode = function(event) {
-        this.$container.toggleClass('hidden-area-show-code');
-        var $button = $(event.target);
-        $button.toggleClass('btn-info');
-        $button.text($button.text() === 'Show code' ? 'Hide code' : 'Show code');
-        this._repositionHiddenCells();
     };
 
     Dashboard.prototype._showAllCells = function(layoutStrategy, constraints) {
