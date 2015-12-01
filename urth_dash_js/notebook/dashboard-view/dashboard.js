@@ -516,8 +516,8 @@ define([
         // compute correct dimensions (taking into account any given `constraints`)
         var dim = this._computeCellDimensions($cell, constraints);
 
-        this.gridstack.add_widget($cell, 0, 0, dim.width, dim.height, true, false /* attach_node */);
         this._initVisibleCell($cell);
+        this.gridstack.add_widget($cell, 0, 0, dim.width, dim.height, true, false /* attach_node */);
         // remove classes added by _hideCell()
         $cell.css({
             top: '',
