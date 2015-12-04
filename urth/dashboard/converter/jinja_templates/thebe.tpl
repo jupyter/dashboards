@@ -45,7 +45,7 @@
     <link rel="stylesheet" type="text/css" href="./static/urth/dashboard.css">
 </head>
 
-<body>
+<body class="urth-dashboard">
 
 <noscript>
 <div id='noscript'>
