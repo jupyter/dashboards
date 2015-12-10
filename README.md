@@ -131,7 +131,12 @@ It's within the scope of this incubator project to allow users to both:
 
 At the moment, the second point is still very much a proof of concept. It currently relies on [thebe](https://github.com/oreillymedia/thebe) as a client for talking to a remote kernel, [tmpnb](https://github.com/jupyter/tmpnb) for provisioning remote kernels, and proper configuration of the kernel environment so that dashboard-launched kernels have access to the same data, libraries, etc. as the notebook authoring environment. Security is practically non-existent, scalability is limited, and compatibility is fixed with an older version of Jupyter.
 
-None of these are inherent flaws. Dashboards are simply a new use case that pushes the Jupyter dependencies beyond their current limits. It's wonderful, in fact, that we are able to show dashboard deployment using what exists in open source today. Over time, we'll shore this facet up with the community (see https://github.com/jupyter-incubator/dashboards/issues/13).
+None of these are inherent flaws. Dashboards are simply a new use case that pushes the Jupyter dependencies beyond their current limits. It's wonderful, in fact, that we are able to show dashboard deployment using what exists in open source today.
+
+Here is our near-term roadmap for improving the deployment options:
+
+* [Deployment Roadmap](https://github.com/jupyter-incubator/dashboards/wiki/Deployment-Roadmap)
+* [Deployed Dashboard Threat Analysis](https://github.com/jupyter-incubator/dashboards/wiki/Deployed-Dashboard-Threat-Analysis) which the roadmap seeks to address
 
 All this said, if you'd like to try external deployment today for your **non-production use case**, you can do one of two things.
 
