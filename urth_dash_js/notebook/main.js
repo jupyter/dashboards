@@ -5,8 +5,7 @@
 
 /* global define */
 define([
-    './dashboard-view/dashboard-view',
-    './deploy-menu/deploy-menu'
+    './dashboard-view/dashboard-view'
 ], function() {
     return {
         load_ipython_extension: function() { 

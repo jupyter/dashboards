@@ -8,7 +8,6 @@ from setuptools.command.install import install
 
 from notebook.nbextensions import install_nbextension
 from notebook.services.config import ConfigManager
-from jupyter_core.paths import jupyter_config_dir
 
 # Get location of this file at runtime
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -19,7 +18,6 @@ with open(os.path.join(HERE, 'urth/dashboard/_version.py')) as f:
     exec(f.read(), {}, VERSION_NS)
 
 EXT_DIR = os.path.join(HERE, 'urth_dash_js')
-SERVER_EXT_CONFIG = "c.NotebookApp.server_extensions.append('urth.dashboard.nbexts')"
 
 def makedirs(path):
     '''
@@ -38,10 +36,6 @@ class InstallCommand(install):
         js_cm = ConfigManager()
         makedirs(js_cm.config_dir)
 
-        # TODO: replace when other extensions move to using JSON config
-        server_cm = jupyter_config_dir()
-        makedirs(server_cm)
-
         print('Installing Python server extension')
         install.run(self)
         
@@ -50,22 +44,6 @@ class InstallCommand(install):
 
         print('Enabling notebook JS extension')
         js_cm.update('notebook', {"load_extensions": {'urth_dash_js/notebook/main': True}})
-
-        print('Installing notebook server extension')
-        
-        # TODO: replace when other extensions move to using JSON config
-        fn = os.path.join(server_cm, 'jupyter_notebook_config.py')
-        if os.path.isfile(fn):
-            with open(fn, 'r+') as fh:
-                lines = fh.read()
-                if SERVER_EXT_CONFIG not in lines:
-                    fh.seek(0, 2)
-                    fh.write('\n')
-                    fh.write(SERVER_EXT_CONFIG)
-        else:
-            with open(fn, 'w') as fh:
-                fh.write('c = get_config()\n')
-                fh.write(SERVER_EXT_CONFIG)
 
 setup(
     name='jupyter_dashboards',
@@ -89,9 +67,7 @@ for more information.
     platforms=['Jupyter Notebook 4.0.x'],
     packages=[
         'urth', 
-        'urth.dashboard', 
-        'urth.dashboard.nbexts',
-        'urth.dashboard.converter'
+        'urth.dashboard'
     ],
     include_package_data=True,
     install_requires=[],

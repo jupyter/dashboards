@@ -52,7 +52,7 @@ clean:
 js:
 	@docker run -it --rm \
 		-v `pwd`:/src \
-		$(BOWER_REPO) bash -c 'cd /src && npm install && npm run css && npm run bower'
+		$(BOWER_REPO) bash -c 'cd /src && npm install && npm run bower'
 
 dev: dev-$(PYTHON)
 

@@ -8,9 +8,5 @@ c.NotebookApp.tornado_settings = {
     'headers': {
         'Content-Security-Policy': ''
     }
-
 }
 c.NotebookApp.allow_origin = '*'
-c.NotebookApp.server_extensions = [
-    'urth.dashboard.nbexts'
-]
