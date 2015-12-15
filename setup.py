@@ -18,33 +18,35 @@ with open(os.path.join(HERE, 'urth/dashboard/_version.py')) as f:
     exec(f.read(), {}, VERSION_NS)
 
 EXT_DIR = os.path.join(HERE, 'urth_dash_js')
-SERVER_EXT_CONFIG = "c.NotebookApp.server_extensions.append('urth.dashboard.nbexts')"
 
 class InstallCommand(install):
     def run(self):
-        print('Installing Python module')
+        # Config managers for frontend and backend
+        server_cm = ConfigManager(config_dir=jupyter_config_dir())
+        js_cm = ConfigManager()
+
+        # Ensure directories exist
+        os.makedirs(server_cm.config_dir, exist_ok=True)
+        os.makedirs(js_cm.config_dir, exist_ok=True)
+
+        print('Installing Python server extension')
         install.run(self)
-        
-        print('Installing notebook extension')
+
+        print('Installing notebook JS extension')
         install_nbextension(EXT_DIR, overwrite=True, user=True)
-        cm = ConfigManager()
-        print('Enabling extension for notebook')
-        cm.update('notebook', {"load_extensions": {'urth_dash_js/notebook/main': True}})
 
-        print('Installing notebook server extension')
-        fn = os.path.join(jupyter_config_dir(), 'jupyter_notebook_config.py')
+        print('Enabling notebook JS extension')
+        js_cm.update('notebook', {"load_extensions": {'urth_dash_js/notebook/main': True}})
 
-        if os.path.isfile(fn):
-            with open(fn, 'r+') as fh:
-                lines = fh.read()
-                if SERVER_EXT_CONFIG not in lines:
-                    fh.seek(0, 2)
-                    fh.write('\n')
-                    fh.write(SERVER_EXT_CONFIG)
-        else:
-            with open(fn, 'w') as fh:
-                fh.write('c = get_config()\n')
-                fh.write(SERVER_EXT_CONFIG)
+        print('Enabling Python server extension')
+        cfg = server_cm.get('jupyter_notebook_config')
+        server_extensions = (
+            cfg.setdefault('NotebookApp', {})
+            .setdefault('server_extensions', [])
+        )
+        if 'urth.dashboard.nbexts' not in server_extensions:
+            cfg['NotebookApp']['server_extensions'] += ['urth.dashboard.nbexts']
+        server_cm.update('jupyter_notebook_config', cfg)
 
 setup(
     name='jupyter_dashboards',
