@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2 (2015-12-15)
+
+* Revert to old jupyter\_notebook\_server.py config hack to remain compatible with jupyter\_declarativewidgets and jupyter\_cms (until they change too)
+
 ## 0.2.1 (2015-12-15)
 
 * Fix errors on install when profiles don't exist
