@@ -2,7 +2,6 @@
 # Distributed under the terms of the Modified BSD License.
 
 import os
-import errno
 from setuptools import setup
 from setuptools.command.install import install
 
@@ -20,18 +19,6 @@ with open(os.path.join(HERE, 'urth/dashboard/_version.py')) as f:
 
 EXT_DIR = os.path.join(HERE, 'urth_dash_js')
 
-def makedirs(path):
-    '''
-    mkdir -p and ignore existence errors compatible with Py2/3.
-    '''
-    try:
-        os.makedirs(path)
-    except OSError as e:
-        if e.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
-
 class InstallCommand(install):
     def run(self):
         # Config managers for frontend and backend
@@ -39,8 +26,8 @@ class InstallCommand(install):
         js_cm = ConfigManager()
 
         # Ensure directories exist
-        makedirs(server_cm.config_dir)
-        makedirs(js_cm.config_dir)
+        os.makedirs(server_cm.config_dir, exist_ok=True)
+        os.makedirs(js_cm.config_dir, exist_ok=True)
 
         print('Installing Python server extension')
         install.run(self)
