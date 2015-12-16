@@ -148,7 +148,6 @@ _test:
 
 release: POST_SDIST=register upload
 release: sdist
-		$(REPO) $(CMD)
 
 _system-test-local-setup:
 # Check if deps are installed when running locally
