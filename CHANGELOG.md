@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 (2015-12-15)
+
+* Fix errors on install when profiles don't exist
+* Fix styling leaking out of dashboard mode
+
 ## 0.2.0 (2015-12-01)
 
 * Default to showing code instead of blank cells in layout mode
