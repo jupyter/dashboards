@@ -202,11 +202,12 @@ define([
             help_index: '',
             handler: function() { toggleDashboardMode(STATE_DASHBOARD_VIEW); }
         };
-        IPython.keyboard_manager.actions.register(notebookView, 'notebook-view', 'urth');
-        IPython.keyboard_manager.actions.register(layoutView, 'layout-view', 'urth');
-        IPython.keyboard_manager.actions.register(dashboardView, 'dashboard-view', 'urth');
 
-        IPython.toolbar.add_buttons_group(['urth.notebook-view', 'urth.layout-view', 'urth.dashboard-view'],
+        var a = IPython.keyboard_manager.actions.register(notebookView, 'notebook-view', 'urth');
+        var b = IPython.keyboard_manager.actions.register(layoutView, 'layout-view', 'urth');
+        var c = IPython.keyboard_manager.actions.register(dashboardView, 'dashboard-view', 'urth');
+
+        IPython.toolbar.add_buttons_group([a,b,c],
                 'urth-dashboard-view-toolbar-buttons');
         $('#urth-dashboard-view-toolbar-buttons')
             .addClass('urth-dashboard-toolbar-buttons')
