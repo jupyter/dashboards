@@ -21,7 +21,7 @@ Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording
 ## Prerequisites
 
 * Jupyter Notebook 4.0.x running on Python 3.x or Python 2.7.x
-* Edge Chrome, Firefox, or Safari
+* Edge, Chrome, Firefox, or Safari
 
 Note: If you're running IPython Notebook 3.2.x, you can install the older 0.1.x version of the extension.
 
