@@ -27,17 +27,21 @@ define([
             Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.min.js'),
             lodash: require.toUrl('../bower_components/lodash/lodash.js'),
             text: require.toUrl('../bower_components/requirejs-text/text.js')
-            // jquery-ui is already loaded by Notebook, as 'jqueryui'
+            // jquery-ui is already loaded by Notebook, as 'jqueryui' in 4.0.x and 'jquery-ui' in 4.1.x
         },
         map: {
             // Gridstack uses jquery-ui 1.11 (supports AMD) while notebook uses 1.10 (non-amd).
             // Map Gridstack to the old non-AMD jquery-ui used by notebook.
+            // We can't just use the 'jqueryui' that is mapped back to 'jquery-ui' in notebook 4.1.x+
+            // because requirejs does not recursively apply maps and instead chooses the most
+            // specific rule. Here, that would be whatever we set for Gridstack vs whatever notebook
+            // set for '*'.
             Gridstack: {
-                'jquery-ui/core': 'jqueryui',
-                'jquery-ui/mouse': 'jqueryui',
-                'jquery-ui/widget': 'jqueryui',
-                'jquery-ui/resizable': 'jqueryui',
-                'jquery-ui/draggable': 'jqueryui'
+                'jquery-ui/core': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/mouse': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/widget': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/resizable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/draggable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui'
             }
         }
     });
