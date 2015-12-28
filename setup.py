@@ -2,6 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import os
+import errno
 from setuptools import setup
 from setuptools.command.install import install
 
@@ -20,20 +21,40 @@ with open(os.path.join(HERE, 'urth/dashboard/_version.py')) as f:
 EXT_DIR = os.path.join(HERE, 'urth_dash_js')
 SERVER_EXT_CONFIG = "c.NotebookApp.server_extensions.append('urth.dashboard.nbexts')"
 
+def makedirs(path):
+    '''
+    mkdir -p and ignore existence errors compatible with Py2/3.
+    '''
+    try:
+        os.makedirs(path)
+    except OSError as e:
+        if e.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
+
 class InstallCommand(install):
     def run(self):
-        print('Installing Python module')
+        js_cm = ConfigManager()
+        makedirs(js_cm.config_dir)
+
+        # TODO: replace when other extensions move to using JSON config
+        server_cm = jupyter_config_dir()
+        makedirs(server_cm)
+
+        print('Installing Python server extension')
         install.run(self)
         
-        print('Installing notebook extension')
+        print('Installing notebook JS extension')
         install_nbextension(EXT_DIR, overwrite=True, user=True)
-        cm = ConfigManager()
-        print('Enabling extension for notebook')
-        cm.update('notebook', {"load_extensions": {'urth_dash_js/notebook/main': True}})
+
+        print('Enabling notebook JS extension')
+        js_cm.update('notebook', {"load_extensions": {'urth_dash_js/notebook/main': True}})
 
         print('Installing notebook server extension')
-        fn = os.path.join(jupyter_config_dir(), 'jupyter_notebook_config.py')
-
+        
+        # TODO: replace when other extensions move to using JSON config
+        fn = os.path.join(server_cm, 'jupyter_notebook_config.py')
         if os.path.isfile(fn):
             with open(fn, 'r+') as fh:
                 lines = fh.read()
