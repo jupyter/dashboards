@@ -14,7 +14,7 @@ Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording
 
 ## Prerequisites
 
-* Jupyter Notebook 4.0.x running on Python 3.x or Python 2.7.x
+* Jupyter Notebook 4.1.x or 4.0.x running on Python 3.x or Python 2.7.x
 * Edge, Chrome, Firefox, or Safari
 
 Note: If you're running IPython Notebook 3.2.x, you can install the older 0.1.x version of the extension.
@@ -22,6 +22,8 @@ Note: If you're running IPython Notebook 3.2.x, you can install the older 0.1.x 
 ## Try It
 
 If you want to try the dashboard extension and demos without installing it yourself, visit the [jupyter-incubator/showcase binder](http://mybinder.org/repo/jupyter-incubator/showcase). If the binder site is full, try the tmpnb instance at [http://jupyter.cloudet.xyz](http://jupyter.cloudet.xyz).
+
+Note that both of these deployments tend to lag the latest stable release.
 
 ## Install It
 
@@ -52,7 +54,7 @@ Here is our near-term roadmap for improving the deployment options:
 All this said, if you'd like to try external deployment today for your **non-production use case**, run the following. Then see the [jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) README for details.
 
 ```bash
-pip install jupyter_cms>=0.3.0
+pip install 'jupyter_cms>=0.3.0'
 pip install jupyter_dashboards_bundlers
 ```
 

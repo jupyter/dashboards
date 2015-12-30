@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 (2015-12-30)
+
+* Make compatible with Jupyter Notebook 4.1.x
+* Remove all download and deployment related backend code in. Refer users to the separate `jupyter_cms` and `jupyter_dashboards_bundlers` packages for these features.
+* Keep compatible with Jupyter Notebook 4.0.x
+
 ## 0.2.2 (2015-12-15)
 
 * Revert to old jupyter\_notebook\_server.py config hack to remain compatible with jupyter\_declarativewidgets and jupyter\_cms (until they change too)
