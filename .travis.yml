@@ -14,8 +14,6 @@ addons:
 
 script:
 - make build
-- make test-python2
-- make test-python3
 - make sdist
 - make install-python2
 - make install-python3

@@ -8,7 +8,6 @@
   "devDependencies": {
     "autoprefixer": "^5.2.0",
     "bower": "^1.4.1",
-    "postcss-cli": "^1.5.0",
     "mocha" :"^2.0.0",
     "wd": "latest",
     "chai": "latest",
@@ -21,8 +20,6 @@
     "css_th_dir": "urth/dashboard/converter/static/urth"
   },
   "scripts": {
-    "test": "make test",
-    "css": "postcss --use autoprefixer $npm_package_config_css_nb_dir/*.css --dir $npm_package_config_css_nb_dir/ --config postcss-config.json && postcss --use autoprefixer $npm_package_config_css_th_dir/*.css --dir $npm_package_config_css_th_dir/ --config postcss-config.json",
     "bower": "bower --allow-root install",
     "system-test": "node_modules/mocha/bin/mocha system-test/**/*-test.js --timeout 300000 --reporter spec"
   },
