@@ -30,12 +30,21 @@ Note that both of these deployments tend to lag the latest stable release.
 To get the basic dashboard layout and preview features in Jupyter Notebook:
 
 ```bash
+# install the python package
 pip install jupyter_dashboards
+# register the notebook frontend extensions into ~/.local/jupyter
+# see jupyter cms install --help for other options
+jupyter dashboards install --user --symlink --overwrite
+# enable the JS and server extensions in your ~/.jupyter
+jupyter dashboards activate
+
+# deactivate it later with
+jupyter dashboards deactivate
 ```
 
 If you also want to download or deploy your dashboards as web applications, read the next section about *Deploying Dashboards*.
 
-## Deploy
+## Deploying Dashboards
 
 It's within the scope of this incubator project to allow users to both:
 
@@ -55,18 +64,27 @@ All this said, if you'd like to try external deployment today for your **non-pro
 
 ```bash
 pip install 'jupyter_cms>=0.3.0'
+jupyter cms install --user --symlink --overwrite
+jupyter cms activate
 pip install jupyter_dashboards_bundlers
+jupyter dashboards_bundlers activate
 ```
+
+## Uninstall It
+
+```bash
+jupyter dashboards deactivate
+pip uninstall jupyter_dashboards
+```
+
+Note that there is no Jupyter method for removing the installed JavaScript extension assets. You will need to clean them up manually from your chosen install location.
 
 ## Develop It
 
 This repository is setup for a Dockerized development environment. On a Mac, do this one-time setup if you don't have a local Docker environment yet.
 
-```
+```bash
 brew update
-
-# make sure we have node and npm for frontend preprocessing
-brew install npm node
 
 # make sure you're on Docker >= 1.7
 brew install docker-machine docker
@@ -76,7 +94,7 @@ eval "$(docker-machine env dev)"
 
 Clone this repository in a local directory that docker can volume mount:
 
-```
+```bash
 # make a directory under ~ to put source
 mkdir -p ~/projects
 cd !$
@@ -85,16 +103,22 @@ cd !$
 git clone https://github.com/jupyter-incubator/dashboards.git
 ```
 
-Pull a base Docker image and build a subimage from it that includes bower both as a dashboard dev dependency and as a prereq for example notebooks that use declarative widgets.
+Pull a base Docker image and build a subimage from it that includes `bower`, `nodejs`, and `npm` both as a dashboard dev dependency and as a prereq for example notebooks that use declarative widgets.
 
-```
+```bash
 cd dashboards
 make build
 ```
 
-Run the notebook server in a docker container:
+Install the necessary JS dependencies. Re-run this command any time your `bower.json` or `package.json` changes.
 
+```bash
+make js
 ```
+
+Run the notebook server in a docker container.
+
+```bash
 # run notebook server in container
 make dev
 ```
@@ -112,7 +136,7 @@ See the Makefile for other dev, test, build commands as well as options for each
 
 If you want [declarative widgets](https://github.com/jupyter-incubator/declarativewidgets) available in you development environment, do the following:
 
-```
+```bash
 # On your host, clone the widgets project as a peer of the dashboards folder
 git clone https://github.com/jupyter-incubator/declarativewidgets.git
 
@@ -134,15 +158,15 @@ To see the Jupyter instance with both extensions working:
 
 You can run a development environment against python 2.7 by adding an environment variable to your make calls.
 
-```
+```bash
 # Run a development environment against 2.7
-PYTHON=python2 make dev
+make dev-python2
 # Run a development environment, with declarative widgets, against 2.7
-PYTHON=python2 make dev-with-widgets
+make dev-with-widgets-python2
 # Run unit tests against 2.7
-PYTHON=python2 make test
+make test-python2
 ```
 
 ## Package
 
-The dashboard features are implemented as a Jupyter Notebook extension against the stock 4.0.x version of the notebook project, not a fork. With the dev setup above, if you run `make sdist` you should get a source tarball in the `dist/` directory of your clone. You should be able to install that tarball using `pip` anywhere you please.
+The dashboard features are implemented as a Jupyter Notebook extension against the stock 4.x version of the notebook project, not a fork. With the dev setup above, if you run `make sdist` you should get a source tarball in the `dist/` directory of your clone. You should be able to install that tarball using `pip` anywhere you please.

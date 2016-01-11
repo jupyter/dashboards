@@ -1,4 +1,4 @@
 {
-    "directory": "urth_dash_js/notebook/bower_components",
+    "directory": "jupyter_dashboards/nbextension/notebook/bower_components",
     "interactive": false
 }

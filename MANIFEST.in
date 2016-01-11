@@ -1,3 +1,1 @@
-recursive-include urth_dash_js *
-recursive-include urth/dashboard/converter *
-include VERSION
+recursive-include jupyter_dashboards *

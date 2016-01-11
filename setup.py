@@ -2,48 +2,15 @@
 # Distributed under the terms of the Modified BSD License.
 
 import os
-import errno
 from setuptools import setup
-from setuptools.command.install import install
-
-from notebook.nbextensions import install_nbextension
-from notebook.services.config import ConfigManager
 
 # Get location of this file at runtime
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 # Eval the version tuple and string from the source
 VERSION_NS = {}
-with open(os.path.join(HERE, 'urth/dashboard/_version.py')) as f:
+with open(os.path.join(HERE, 'jupyter_dashboards/_version.py')) as f:
     exec(f.read(), {}, VERSION_NS)
-
-EXT_DIR = os.path.join(HERE, 'urth_dash_js')
-
-def makedirs(path):
-    '''
-    mkdir -p and ignore existence errors compatible with Py2/3.
-    '''
-    try:
-        os.makedirs(path)
-    except OSError as e:
-        if e.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
-
-class InstallCommand(install):
-    def run(self):
-        js_cm = ConfigManager()
-        makedirs(js_cm.config_dir)
-
-        print('Installing Python server extension')
-        install.run(self)
-        
-        print('Installing notebook JS extension')
-        install_nbextension(EXT_DIR, overwrite=True, user=True)
-
-        print('Enabling notebook JS extension')
-        js_cm.update('notebook', {"load_extensions": {'urth_dash_js/notebook/main': True}})
 
 setup(
     name='jupyter_dashboards',
@@ -56,7 +23,6 @@ setup(
 * Dashboard layout mode for arranging notebook cell outputs in a grid-like fashion
 * Dashboard view mode for interacting with an assembled dashboard within the Jupyter Notebook
 * Ability to share notebooks with dashboard layout metadata in them with other Jupyter Notebook users
-* Ability to nbconvert a notebook to a separate dashboard web application
 
 See `the project README <https://github.com/jupyter-incubator/dashboards>`_
 for more information. 
@@ -66,14 +32,12 @@ for more information.
     license='BSD',
     platforms=['Jupyter Notebook 4.0.x'],
     packages=[
-        'urth', 
-        'urth.dashboard'
+        'jupyter_dashboards'
     ],
     include_package_data=True,
-    install_requires=[],
-    cmdclass={
-        'install': InstallCommand
-    },
+    scripts=[
+        'scripts/jupyter-dashboards'
+    ],
     classifiers=[
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
