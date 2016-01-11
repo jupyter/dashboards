@@ -45,7 +45,9 @@ clean:
 	@-find . -name __pycache__ -exec rm -fr {} \;
 
 js:
+# Run as root to appease travis
 	@docker run -it --rm \
+		--user root \
 		-v `pwd`:/src \
 		$(BOWER_REPO) bash -c 'cd /src && npm install && npm run bower'
 
@@ -112,7 +114,9 @@ _install:
 			$(CMD)'
 
 sdist: js
+# Run as root to appease travis
 	@docker run -it --rm \
+		--user root \
 		-v `pwd`:/src \
 		$(REPO) bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
