@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0 (2016-01-15)
+
+* Separate `pip install` from `jupyter dashboards [install | activate | deactivate]`
+* Match the Python package to the distribution name, `jupyter_dashboards`
+
 ## 0.3.0 (2015-12-30)
 
 * Make compatible with Jupyter Notebook 4.1.x
