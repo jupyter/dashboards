@@ -271,8 +271,8 @@ define([
         var dim = this._computeCellDimensions($cell, constraints);
 
         if (!dim.isEmpty) {
-            this.gridstack.add_widget($cell, 0, 0, dim.width, dim.height, true, false /* attach_node */);
             this._initVisibleCell($cell);
+            this.gridstack.add_widget($cell, 0, 0, dim.width, dim.height, true, false /* attach_node */);
         }
 
         $cell.css({ visibility: '', display: '' });
