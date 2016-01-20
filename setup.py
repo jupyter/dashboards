@@ -2,6 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import os
+import sys
 from setuptools import setup
 
 # Get location of this file at runtime
@@ -12,7 +13,7 @@ VERSION_NS = {}
 with open(os.path.join(HERE, 'jupyter_dashboards/_version.py')) as f:
     exec(f.read(), {}, VERSION_NS)
 
-setup(
+setup_args = dict(
     name='jupyter_dashboards',
     author='Jupyter Development Team',
     author_email='jupyter@googlegroups.com',
@@ -25,7 +26,7 @@ setup(
 * Ability to share notebooks with dashboard layout metadata in them with other Jupyter Notebook users
 
 See `the project README <https://github.com/jupyter-incubator/dashboards>`_
-for more information. 
+for more information.
 ''',
     url='https://github.com/jupyter-incubator/dashboards',
     version=VERSION_NS['__version__'],
@@ -50,3 +51,16 @@ for more information.
         'Programming Language :: Python :: 3.5'
     ]
 )
+
+if 'setuptools' in sys.modules:
+    # setupstools turns entrypoint scripts into executables on windows
+    setup_args['entry_points'] = {
+        'console_scripts': [
+            'jupyter-dashboards = jupyter_dashboards.extensionapp:main'
+        ]
+    }
+    # Don't bother installing the .py scripts if if we're using entrypoints
+    setup_args.pop('scripts', None)
+
+if __name__ == '__main__':
+    setup(**setup_args)
