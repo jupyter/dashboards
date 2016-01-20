@@ -4,9 +4,12 @@
   "directories": {
     "test": "test"
   },
-  "dependencies": {},
+  "dependencies": {
+    "jupyter-js-output-area": "^0.1.1",
+    "jupyter-js-services": "0.0.1"
+  },
   "devDependencies": {
-    "autoprefixer": "^5.2.0",
+    "browserify": "^12.0.1",
     "bower": "^1.4.1",
     "mocha" :"^2.0.0",
     "wd": "latest",
@@ -16,11 +19,14 @@
     "minimist": "latest"
   },
   "config": {
-    "css_nb_dir": "urth_dash_js/notebook/dashboard-view",
-    "css_th_dir": "urth/dashboard/converter/static/urth"
+    "js_out": "urth_dash_js/notebook/dashboard-lib/jupyter-js-output-area",
+    "js_serv": "urth_dash_js/notebook/dashboard-lib/jupyter-js-services"
   },
   "scripts": {
     "bower": "bower --allow-root install",
+    "build": "npm run bower && npm run build-jupyter-js-output-area && npm run build-jupyter-js-services",
+    "build-jupyter-js-output-area": "mkdir -p $npm_package_config_js_out && cp -r node_modules/jupyter-js-output-area/dist/* $npm_package_config_js_out",
+    "build-jupyter-js-services": "mkdir -p $npm_package_config_js_serv && browserify node_modules/jupyter-js-services/lib/index.js --outfile $npm_package_config_js_serv/jupyter-js-services.js --standalone JupyterJsServices",
     "system-test": "node_modules/mocha/bin/mocha system-test/**/*-test.js --timeout 300000 --reporter spec"
   },
   "repository": {

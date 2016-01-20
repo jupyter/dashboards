@@ -38,7 +38,7 @@ class InstallCommand(install):
 
         print('Installing Python server extension')
         install.run(self)
-        
+
         print('Installing notebook JS extension')
         install_nbextension(EXT_DIR, overwrite=True, user=True)
 
@@ -59,14 +59,14 @@ setup(
 * Ability to nbconvert a notebook to a separate dashboard web application
 
 See `the project README <https://github.com/jupyter-incubator/dashboards>`_
-for more information. 
+for more information.
 ''',
     url='https://github.com/jupyter-incubator/dashboards',
     version=VERSION_NS['__version__'],
     license='BSD',
     platforms=['Jupyter Notebook 4.0.x'],
     packages=[
-        'urth', 
+        'urth',
         'urth.dashboard'
     ],
     include_package_data=True,

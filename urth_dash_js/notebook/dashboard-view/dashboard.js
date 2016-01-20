@@ -22,14 +22,12 @@ define([
     'jquery',
     'lodash',
     'base/js/namespace',
-    'urth-common/error-log',
     '../link-css',
     'urth-common/gridstack-custom' // jquery plugin: return value not used
 ], function(
     $,
     _,
     IPython,
-    ErrorLog,
     linkCSS
 ) {
     'use strict';
@@ -52,8 +50,6 @@ define([
         this.$container = $(opts.container);
         this.opts = opts;
         this._loaded = $.Deferred();
-
-        ErrorLog.enable(IPython);
 
         var gridCssLoaded = cssLoaded;
         if (!cssLoaded) {
