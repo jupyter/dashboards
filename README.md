@@ -63,7 +63,7 @@ Here is our near-term roadmap for improving the deployment options:
 All this said, if you'd like to try external deployment today for your **non-production use case**, run the following. Then see the [jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) README for details.
 
 ```bash
-pip install 'jupyter_cms>=0.3.0'
+pip install 'jupyter_cms>=0.4.0'
 jupyter cms install --user --symlink --overwrite
 jupyter cms activate
 pip install jupyter_dashboards_bundlers
