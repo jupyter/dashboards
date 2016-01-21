@@ -26,7 +26,12 @@ define([
                 IPython.notebook.kernel.register_iopub_handler('error', function(msg) {
                     errorHandler(msg); // call old handler
 
-                    var data = msg.content.traceback.join('\n');
+                    try {
+                        var data = msg.content.traceback.join('\n');
+                    } catch(e) {
+                        console.error('error occured without a traceback');
+                        return;
+                    }
                     try {
                         // Try to pretty-print the error if IPython.utils are available
                         // print error to console (following code as seen in Notebook's OutputArea.append_text)
