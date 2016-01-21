@@ -7,7 +7,8 @@
 .urth-dashboard .celltoolbar,
 .urth-dashboard.view-only .grid-stack .cell.grid-stack-item > .input,
 .urth-dashboard .container .cell .prompt,
-.urth-dashboard .container .cell.grid-stack-item .output_stderr {
+.urth-dashboard .container .cell.grid-stack-item .output_stderr,
+.urth-dashboard .container .cell.grid-stack-item .output_error {
     display: none !important; /* Necessary to override inline style set by notebook */
 }
 
