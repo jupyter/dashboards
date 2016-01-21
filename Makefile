@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: build clean dev dev-with-widgets help install js sdist system-test-local system-test-remote test 
+.PHONY: build clean dev dev-with-widgets help install js sdist system-test-local system-test-remote test
 
 PYTHON?=python3
 
@@ -93,6 +93,8 @@ _dev-with-widgets:
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
 		$(BOWER_REPO) bash -c '$(LANG_SETUP_CMD) && $(EXT_DEV_SETUP) && \
 			pip install --no-binary :all: $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1) && \
+			jupyter declarativewidgets install --user && \
+			jupyter declarativewidgets activate && \
 			$(CMD)'
 
 install: install-$(PYTHON)
