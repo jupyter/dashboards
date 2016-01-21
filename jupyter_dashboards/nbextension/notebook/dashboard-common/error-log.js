@@ -26,15 +26,19 @@ define([
                 IPython.notebook.kernel.register_iopub_handler('error', function(msg) {
                     errorHandler(msg); // call old handler
 
+                    var data = msg.content.traceback.join('\n');
                     try {
+                        // Try to pretty-print the error if IPython.utils are available
                         // print error to console (following code as seen in Notebook's OutputArea.append_text)
-                        var data = msg.content.traceback.join('\n');
                         data = IPython.utils.fixConsole(data);
                         data = IPython.utils.fixCarriageReturn(data);
                         data = IPython.utils.autoLinkUrls(data);
                         // `data` is HTML, print out text-only
                         console.error($('<div/>').append(data).text());
-                    } catch(e) {}
+                    } catch(e) {
+                        // Otherwise print what we can: the raw data
+                        console.error(data);
+                    }
                 });
                 enabled = true;
             }
