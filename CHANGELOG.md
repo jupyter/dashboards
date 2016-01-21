@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 (2016-01-21)
+
+* Separate `pip install` from `jupyter dashboards [install | activate | deactivate]`
+* Match the Python package to the distribution name, `jupyter_dashboards`
+* Fix cell overlap when one cell has the minimum height
+* Prevent stderr and exception messages from displaying in dashboard modes
+* Update demo notebooks to stop using deprecated `UrthData.setItem` from declarative widgets.
+
 ## 0.3.0 (2015-12-30)
 
 * Make compatible with Jupyter Notebook 4.1.x
