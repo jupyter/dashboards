@@ -6,7 +6,6 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "autoprefixer": "^5.2.0",
     "bower": "^1.4.1",
     "mocha" :"^2.0.0",
     "wd": "latest",
@@ -14,10 +13,6 @@
     "chai-as-promised": "latest",
     "colors": "latest",
     "minimist": "latest"
-  },
-  "config": {
-    "css_nb_dir": "urth_dash_js/notebook/dashboard-view",
-    "css_th_dir": "urth/dashboard/converter/static/urth"
   },
   "scripts": {
     "bower": "bower --allow-root install",
@@ -30,7 +25,7 @@
   "keywords": [
     "ipython",
     "jupyter",
-    "urth"
+    "dashboards"
   ],
   "author": "Jupyter Community"
 }
