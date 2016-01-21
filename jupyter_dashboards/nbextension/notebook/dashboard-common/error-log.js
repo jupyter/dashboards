@@ -26,10 +26,11 @@ define([
                 IPython.notebook.kernel.register_iopub_handler('error', function(msg) {
                     errorHandler(msg); // call old handler
 
+                    var data;
                     try {
-                        var data = msg.content.traceback.join('\n');
+                        data = msg.content.traceback.join('\n');
                     } catch(e) {
-                        console.error('error occured without a traceback');
+                        console.error('A kernel error occured without a traceback');
                         return;
                     }
                     try {
