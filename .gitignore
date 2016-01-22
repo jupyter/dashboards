@@ -81,3 +81,6 @@ etc/notebook.json
 **/*/selenium.log
 **/*/selenium.jar
 **/*/selenium.pid
+
+# Mac stuff
+.DS_Store
