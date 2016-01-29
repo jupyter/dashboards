@@ -29,7 +29,7 @@ build:
 	@-docker rm -f bower-build
 	@docker run -it --user root --name bower-build \
 		$(REPO) bash -c 'apt-get update && \
-		apt-get install curl && \
+		apt-get install -y curl && \
 		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
 		apt-get install --yes nodejs && \
 		npm install -g bower'
