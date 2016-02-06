@@ -40,9 +40,11 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
 }
 
 /* Gridstack cells */
-.grid-stack .cell {
+.grid-stack .cell,
+.grid-stack .cell.selected {
     background: transparent;
     border: none;
+    padding: 0;
 
     /*
         computed by gridstack-custom:
