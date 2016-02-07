@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1 (2016-02-07)
+
+* Fix gridstack break with lodash>=4.0
+* Remove notebook 4.1 cell focus highlight in dashboard preview
+* Hide stderr and errors in dashboard preview, send them to the browser console
+
 ## 0.4.0 (2016-01-21)
 
 * Separate `pip install` from `jupyter dashboards [install | activate | deactivate]`
