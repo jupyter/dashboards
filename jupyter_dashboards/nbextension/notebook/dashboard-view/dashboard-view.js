@@ -24,9 +24,9 @@ define([
             { name: 'urth-common', location: require.toUrl('../dashboard-common').split('?')[0] }
         ],
         paths: {
-            Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.min.js'),
-            lodash: require.toUrl('../bower_components/lodash/lodash.js'),
-            text: require.toUrl('../bower_components/requirejs-text/text.js')
+            Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.min').split('?')[0],
+            lodash: require.toUrl('../bower_components/lodash/lodash').split('?')[0],
+            text: require.toUrl('../bower_components/requirejs-text/text').split('?')[0]
             // jquery-ui is already loaded by Notebook, as 'jqueryui' in 4.0.x and 'jquery-ui' in 4.1.x
         },
         map: {
