@@ -526,17 +526,25 @@ define([
             left: ''
         });
 
-        // notify contents that cell may have been resized
         var self = this;
+        var cellTransitionEnd = new $.Deferred();
+        var containerTransitionEnd = new $.Deferred();
+
+        // notify contents that cell may have been resized
         $cell.one('transitionend', function() {
             self._onResize($cell.get(0));
+            cellTransitionEnd.resolve();
         });
 
         if (this.$container.find('.cell:not(.grid-stack-item)').length === 0) {
             this.$hiddenHeader.addClass('hidden');
         }
-        // wait for Gridstack to finish resizing before recalculating positions of hidden cells
-        this.$container.one('transitionend', this._repositionHiddenCells.bind(this));
+        // wait for both Gridstack and added cell to finish resizing before recalculating
+        // positions of hidden cells.
+        this.$container.one('transitionend',
+            containerTransitionEnd.resolve.bind(containerTransitionEnd));
+        $.when(cellTransitionEnd, containerTransitionEnd)
+            .then(this._repositionHiddenCells.bind(this));
 
         // update metadata
         var grid = $cell.data('_gridstack_node');
