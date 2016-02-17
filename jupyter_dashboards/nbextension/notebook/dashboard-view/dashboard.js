@@ -37,9 +37,6 @@ define([
     var cssLoaded = false;
     var idCounter = 0;
 
-    // duration => the resize transition on gridstack and gridstack cells
-    var RESIZE_DURATION = 350;
-
     var HIDDEN_CELLS_MARGIN = 10;
     var HIDDEN_CELLS_BOTTOM_MARGIN = 20;
 
@@ -182,13 +179,8 @@ define([
         if (typeof this.opts.onResize === 'function') {
             var self = this;
             this.$container.on('dragstop resizestop', function(event, ui) {
-                // Gridstack fires this event before the resizing animation has finished
-                // (see https://github.com/troolee/gridstack.js/issues/159). Temporary workaround
-                // is to fire our callback after the resize transition has finished.
-                setTimeout(function() {
-                    self.opts.onResize(event.target);
-                    self._repositionHiddenCells();
-                }, RESIZE_DURATION);
+                self.opts.onResize(event.target);
+                self._repositionHiddenCells();
             });
         }
 
@@ -272,7 +264,12 @@ define([
 
         if (!dim.isEmpty) {
             this._initVisibleCell($cell);
-            this.gridstack.add_widget($cell, 0, 0, dim.width, dim.height, true, false /* attach_node */);
+            $cell.attr({
+                'data-gs-width': dim.width,
+                'data-gs-height': dim.height,
+                'data-gs-auto-position': '1',
+            });
+            this.gridstack.make_widget($cell);
         }
 
         $cell.css({ visibility: '', display: '' });
@@ -517,7 +514,12 @@ define([
         var dim = this._computeCellDimensions($cell, constraints);
 
         this._initVisibleCell($cell);
-        this.gridstack.add_widget($cell, 0, 0, dim.width, dim.height, true, false /* attach_node */);
+        $cell.attr({
+            'data-gs-width': dim.width,
+            'data-gs-height': dim.height,
+            'data-gs-auto-position': '1',
+        });
+        this.gridstack.make_widget($cell);
         // remove classes added by _hideCell()
         $cell.css({
             top: '',
