@@ -15,31 +15,6 @@ define(['jquery', 'Gridstack'], function($, Gridstack) {
     GridstackCustom.prototype = Object.create(Gridstack.prototype);
     GridstackCustom.prototype.constructor = GridstackCustom;
 
-    GridstackCustom.prototype.__add_widget = Gridstack.prototype.add_widget;
-    GridstackCustom.prototype.add_widget = function(el, x, y, width, height, auto_position, attach_node) {
-        attach_node = typeof attach_node === 'undefined' ? true : attach_node;
-
-        if (!attach_node) {
-            // Gridstack.add_widget() changes DOM position of element. Hack around it to make it
-            // a no-op if `attach_node` is false.
-            var $container = this.container;
-            var oldAppend = $.fn.append;
-            $.fn.append = function() {
-                if (!this.is($container)) {
-                    return oldAppend.apply(this, arguments);
-                }
-                return this;
-            };
-        }
-
-        var args = Array.prototype.slice.call(arguments, 0, -1); // remove last arg ('attach_node')
-        this.__add_widget.apply(this, args);
-
-        if (!attach_node) {
-            $.fn.append = oldAppend;
-        }
-    };
-
     GridstackCustom.prototype.__destroy = Gridstack.prototype.destroy;
     GridstackCustom.prototype.destroy = function(detach_node) {
         detach_node = typeof detach_node === 'undefined' ? true : detach_node;

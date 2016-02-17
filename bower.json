@@ -15,8 +15,7 @@
     "tests"
   ],
   "dependencies": {
-    "lodash": ">= 3.5.0 < 4.0.0",
-    "gridstack": "5bbd8d5f54edc48",
+    "gridstack": "0.2.4",
     "requirejs": "~2.1.20",
     "requirejs-text": "~2.0.14"
   }

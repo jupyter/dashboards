@@ -37,9 +37,6 @@ define([
     var cssLoaded = false;
     var idCounter = 0;
 
-    // duration => the resize transition on gridstack and gridstack cells
-    var RESIZE_DURATION = 350;
-
     var HIDDEN_CELLS_MARGIN = 10;
     var HIDDEN_CELLS_BOTTOM_MARGIN = 20;
 
@@ -182,13 +179,8 @@ define([
         if (typeof this.opts.onResize === 'function') {
             var self = this;
             this.$container.on('dragstop resizestop', function(event, ui) {
-                // Gridstack fires this event before the resizing animation has finished
-                // (see https://github.com/troolee/gridstack.js/issues/159). Temporary workaround
-                // is to fire our callback after the resize transition has finished.
-                setTimeout(function() {
-                    self.opts.onResize(event.target);
-                    self._repositionHiddenCells();
-                }, RESIZE_DURATION);
+                self.opts.onResize(event.target);
+                self._repositionHiddenCells();
             });
         }
 
@@ -272,7 +264,12 @@ define([
 
         if (!dim.isEmpty) {
             this._initVisibleCell($cell);
-            this.gridstack.add_widget($cell, 0, 0, dim.width, dim.height, true, false /* attach_node */);
+            $cell.attr({
+                'data-gs-width': dim.width,
+                'data-gs-height': dim.height,
+                'data-gs-auto-position': '1',
+            });
+            this.gridstack.make_widget($cell);
         }
 
         $cell.css({ visibility: '', display: '' });
@@ -517,24 +514,37 @@ define([
         var dim = this._computeCellDimensions($cell, constraints);
 
         this._initVisibleCell($cell);
-        this.gridstack.add_widget($cell, 0, 0, dim.width, dim.height, true, false /* attach_node */);
+        $cell.attr({
+            'data-gs-width': dim.width,
+            'data-gs-height': dim.height,
+            'data-gs-auto-position': '1',
+        });
+        this.gridstack.make_widget($cell);
         // remove classes added by _hideCell()
         $cell.css({
             top: '',
             left: ''
         });
 
-        // notify contents that cell may have been resized
         var self = this;
+        var cellTransitionEnd = new $.Deferred();
+        var containerTransitionEnd = new $.Deferred();
+
+        // notify contents that cell may have been resized
         $cell.one('transitionend', function() {
             self._onResize($cell.get(0));
+            cellTransitionEnd.resolve();
         });
 
         if (this.$container.find('.cell:not(.grid-stack-item)').length === 0) {
             this.$hiddenHeader.addClass('hidden');
         }
-        // wait for Gridstack to finish resizing before recalculating positions of hidden cells
-        this.$container.one('transitionend', this._repositionHiddenCells.bind(this));
+        // wait for both Gridstack and added cell to finish resizing before recalculating
+        // positions of hidden cells.
+        this.$container.one('transitionend',
+            containerTransitionEnd.resolve.bind(containerTransitionEnd));
+        $.when(cellTransitionEnd, containerTransitionEnd)
+            .then(this._repositionHiddenCells.bind(this));
 
         // update metadata
         var grid = $cell.data('_gridstack_node');
