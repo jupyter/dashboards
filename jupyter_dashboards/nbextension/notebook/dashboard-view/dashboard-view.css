@@ -56,12 +56,17 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
     height: 100%;
     padding: 0.5em 1em;
     overflow: hidden;
     opacity: 0;
     transition: opacity 0.3s;
+
+    /*
+        computed by gridstack-custom:
+
+        width: calc(100% - margin * 2);
+     */
 }
 .urth-dashboard:not(.view-only) .grid-stack:not(.hide-code):not(:hover) .cell.grid-stack-item > .input {
     /*display: none;*/
