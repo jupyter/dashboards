@@ -13,11 +13,11 @@
 }
 
 /* disable display of paragraph anchor text*/
-.urth-dashboard .container h1:hover .anchor-link,
-.urth-dashboard .container h2:hover .anchor-link,
-.urth-dashboard .container h3:hover .anchor-link,
-.urth-dashboard .container h4:hover .anchor-link,
-.urth-dashboard .container h5:hover .anchor-link,
-.urth-dashboard .container h6:hover .anchor-link {
+.urth-dashboard .container h1 .anchor-link,
+.urth-dashboard .container h2 .anchor-link,
+.urth-dashboard .container h3 .anchor-link,
+.urth-dashboard .container h4 .anchor-link,
+.urth-dashboard .container h5 .anchor-link,
+.urth-dashboard .container h6 .anchor-link {
     display: none;
 }
