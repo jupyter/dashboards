@@ -199,6 +199,12 @@ define([
                 rules: 'margin: 0 ' + halfMargin + 'px;'
             },
 
+            // reduce width of input to account for cell margin
+            {
+                selector: '.grid-stack .grid-stack-item.cell > .input',
+                rules: 'width: calc(100% - ' + (halfMargin * 2) + 'px);'
+            },
+
             // set placeholder size to match; pass "#notebook-container" to make this rule have precedence
             {
                 selector: '#notebook-container.grid-stack .grid-stack-placeholder > .placeholder-content',
