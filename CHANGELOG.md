@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.2 (2016-02-18)
+
+* Fix code cell overflow in layout mode
+* Fix scroll bars that appear within cells of a certain size
+* Fix hidden cells from being cut-off in layout mode
+* Fix failure to load extension JS in certain situations
+* Fix meetup streaming demo filter box
+* Update to Gridstack 0.2.4 to remove a workaround
+
 ## 0.4.1 (2016-02-07)
 
 * Fix gridstack break with lodash>=4.0
