@@ -8,18 +8,10 @@ Extension for Jupyter Notebook that enables the layout and presentation of grid-
 
 ## What It Gives You
 
-Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording](https://www.youtube.com/watch?v=SJiezXPhVv8).
-
 * Dashboard layout mode for arranging notebook cell outputs in a grid-like fashion
 * Dashboard view mode for interacting with an assembled dashboard within the Jupyter Notebook
 * Ability to share notebooks that have dashboard layout metadata in them with other Jupyter Notebook users for layout and viewing
-
-## Prerequisites
-
-* Jupyter Notebook 4.1.x or 4.0.x running on Python 3.x or Python 2.7.x
-* Edge, Chrome, Firefox, or Safari
-
-Note: If you're running IPython Notebook 3.2.x, you can install the older 0.1.x version of the extension.
+* Ability to deploy dashboards as standalone web applications when used in conjunction with the [dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) and [dashboards_server](https://github.com/jupyter-incubator/dashboards_server) projects
 
 ## Try It
 
@@ -28,6 +20,15 @@ If you want to try the dashboard extension and demos without installing it yours
 Note that both of these deployments tend to lag the latest stable release.
 
 ## Install It
+
+### Prerequisites
+
+* Jupyter Notebook 4.1.x or 4.0.x running on Python 3.x or Python 2.7.x
+* Edge, Chrome, Firefox, or Safari
+
+Note: If you're running IPython Notebook 3.2.x, you can install the older 0.1.x version of the extension.
+
+### Dashboard Layout and Preview
 
 To get the basic dashboard layout and preview features in Jupyter Notebook:
 
@@ -46,23 +47,16 @@ jupyter dashboards deactivate
 
 If you also want to download or deploy your dashboards as web applications, read the next section about *Deploying Dashboards*.
 
-## Deploying Dashboards
+### Dashboard Deployment
 
-It's within the scope of this incubator project to allow users to both:
+It's within the scope of the dashboard incubator projects to allow users to both:
 
-1. Create dashboard layouts within notebooks, persist the layout metadata within the notebook JSON, and share those dashboard-notebooks with other Jupyter users, and
-2. Convert and deploy dashboard-notebooks as standalone web applications.
+1. Create dashboard layouts within notebooks, persist the layout metadata within the notebook JSON, and share those dashboard-notebooks with other Jupyter users (this project).
+2. Convert and deploy dashboard-notebooks as standalone web applications (the [jupyter-incubator/dashboard_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) and [jupyter-incubator/dashboards_server](https://github.com/jupyter-incubator/dashboards_server) projects).
 
-At the moment, the second point is still very much a proof of concept. It currently relies on [thebe](https://github.com/oreillymedia/thebe) as a client for talking to a remote kernel, [tmpnb](https://github.com/jupyter/tmpnb) for provisioning remote kernels, and proper configuration of the kernel environment so that dashboard-launched kernels have access to the same data, libraries, etc. as the notebook authoring environment. Security is practically non-existent, scalability is limited, and compatibility is fixed with an older version of Jupyter.
+We consider the code which addresses the first use case stable for the time being. On the other hand, we are actively maturing support for the latter use case by following our [dashboard deployment roadmap](https://github.com/jupyter-incubator/dashboards/wiki/Deployment-Roadmap) which largely seeks to address the [threats identified](https://github.com/jupyter-incubator/dashboards/wiki/Deployed-Dashboard-Threat-Analysis) in our initial proof-of-concept deployment mechanisms.
 
-None of these are inherent flaws. Dashboards are simply a new use case that pushes the Jupyter dependencies beyond their current limits. It's wonderful, in fact, that we are able to show dashboard deployment using what exists in open source today.
-
-Here is our near-term roadmap for improving the deployment options:
-
-* [Deployment Roadmap](https://github.com/jupyter-incubator/dashboards/wiki/Deployment-Roadmap)
-* [Deployed Dashboard Threat Analysis](https://github.com/jupyter-incubator/dashboards/wiki/Deployed-Dashboard-Threat-Analysis) which the roadmap seeks to address
-
-All this said, if you'd like to try external deployment today for your **non-production use case**, run the following. Then see the [jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) README for details.
+If you'd like to try the **experimental** support for deploying dashboards as standalone web apps today, run the following. Then see the [jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) README for more details about the available bundlers.
 
 ```bash
 pip install 'jupyter_cms>=0.4.0'
@@ -169,6 +163,6 @@ make dev-with-widgets-python2
 make test-python2
 ```
 
-## Package
+## Package It
 
 The dashboard features are implemented as a Jupyter Notebook extension against the stock 4.x version of the notebook project, not a fork. With the dev setup above, if you run `make sdist` you should get a source tarball in the `dist/` directory of your clone. You should be able to install that tarball using `pip` anywhere you please.
