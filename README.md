@@ -4,6 +4,8 @@
 
 Extension for Jupyter Notebook that enables the layout and presentation of grid-based dashboards from notebooks.
 
+![Dashboard layout screenshot](etc/dashboards_intro.png)
+
 ## What It Gives You
 
 Watch from minute 41 to 51 of the [September 1st Jupyter meeting video recording](https://www.youtube.com/watch?v=SJiezXPhVv8).
