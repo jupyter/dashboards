@@ -6,6 +6,14 @@ Extension for Jupyter Notebook that enables the layout and presentation of grid-
 
 ![Dashboard layout screenshot](etc/dashboards_intro.png)
 
+This repository is a portion of the `jupyter-incubator/dashboards` effort which covers:
+
+* [Arranging](https://github.com/jupyter-incubator/dashboards) notebook outputs in a grid-layout (**this repo**)
+* [Bundling](https://github.com/jupyter-incubator/dashboards_bundlers) notebooks and associated assets for deployment as dashboards
+* [Serving](https://github.com/jupyter-incubator/dashboards_server) notebook-defined dashboards as standalone web apps
+
+It is also has close ties to [jupyter-incubator/declarativewidgets](https://github.com/jupyter-incubator/declarativewidgets) which provides one way (but not the only way) of enabling rich interactivity in notebook-defined dashboards.
+
 ## What It Gives You
 
 * Dashboard layout mode for arranging notebook cell outputs in a grid-like fashion
