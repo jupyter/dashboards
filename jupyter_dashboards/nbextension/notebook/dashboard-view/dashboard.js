@@ -21,13 +21,14 @@
 define([
     'jquery',
     'lodash',
+    'Gridstack',
     'base/js/namespace',
     'urth-common/error-log',
-    '../link-css',
-    'urth-common/gridstack-custom' // jquery plugin: return value not used
+    '../link-css'
 ], function(
     $,
     _,
+    Gridstack,
     IPython,
     ErrorLog,
     linkCSS
@@ -231,7 +232,36 @@ define([
                 rules: 'left: ' + (halfMargin+5) + 'px;'
             }
         ];
-        this.gridstack.generateStylesheet(styleRules);
+        this._generateStylesheet(styleRules);
+    };
+
+    /**
+     * Generates cell styles which depend on margin (which is a layout option).
+     * @param {Object[]} rules - list of style rules
+     * @param {string} rules[].selector - CSS style selector
+     * @param {string} rules[].rules - CSS style rules for given selector
+     */
+    Dashboard.prototype._generateStylesheet = function(rules) {
+        var Utils = Gridstack.Utils;
+
+        // init new style
+        this._styles_id_2 = 'gridstack-style-' + (Math.random() * 100000).toFixed();
+        this._styles_2 = Utils.create_stylesheet(this._styles_id_2);
+        var style = this._styles_2;
+
+        rules.forEach(function(item, i) {
+            Utils.insert_css_rule(style,
+                item.selector,
+                item.rules,
+                i
+            );
+        });
+    };
+
+    Dashboard.prototype._removeStylesheet = function() {
+        if (this._styles_id_2) {
+            Gridstack.Utils.remove_stylesheet(this._styles_id_2);
+        }
     };
 
     Dashboard.prototype._repositionHiddenCells = function() {
@@ -645,8 +675,8 @@ define([
     Dashboard.prototype.destroy = function() {
         $(window).off('resize.Dashboard keydown.Dashboard keyup.Dashboard');
 
-        this.gridstack.removeStylesheet();
-        this.gridstack.destroy(false /* detach_node */);
+        this._removeStylesheet();
+        this.gridstack.destroy(false /* detachGrid */);
         this.$container.removeData('gridstack'); // remove stored instance, so we can re-init
 
         // remove all 'data-gs-*' attributes from cells
