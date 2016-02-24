@@ -313,6 +313,7 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
     border-top: none;
     -webkit-transform: none;
             transform: none;
+    background-image: none;
 }
 #notebook-container.grid-stack > .grid-stack-item > .ui-resizable-se {
     /*
@@ -329,10 +330,6 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
         left: 5px + (margin/2)px;
     */
     border-right: none;
-}
-#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-se::before,
-#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-sw::before {
-    content: ""; /* remove the existing drag icons */
 }
 
 #notebook-container.grid-stack > .grid-stack-item > .ui-resizable-e,
