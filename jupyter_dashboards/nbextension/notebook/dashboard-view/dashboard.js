@@ -44,9 +44,12 @@ define([
     var STACKED_STRATEGY = 'stacked';
 
     var DRAG_HANDLE = '.drag-handle';
+    var SCROLL_EDGE_DISTANCE = 30;
+    var MAX_SCROLL_SPEED = 20;
 
     var Dashboard = function(opts) {
         this.$container = $(opts.container);
+        this.scrollContainer = $('#site').get(0);
         this.opts = opts;
         this._loaded = $.Deferred();
 
@@ -170,10 +173,24 @@ define([
                     handles: 'e, se, s, sw, w'
                 }
             })
-            .on('dragstop resizestop', this._saveGrid.bind(this)) // TODO: use `onchange` instead?
+            .on('dragstop resizestop', function() {
+                window.clearInterval(this.scrollInterval);
+                this._saveGrid();
+            }.bind(this))
             .on('dragstart dragstop', function(event) {
                 $('body').toggleClass('dragging', event.type === 'dragstart');
-            })
+                this.dragStartYOffset = event.clientY + this.scrollContainer.scrollTop -
+                    this.scrollContainer.offsetTop - this.$container.position().top -
+                    event.target.offsetTop;
+            }.bind(this))
+            .on('drag', function(event, ui) {
+                // always force the y-position relative to the mouse cursor
+                // because edge scrolling breaks the positioning
+                ui.position.top = event.clientY + this.scrollContainer.scrollTop -
+                    this.scrollContainer.offsetTop - this.$container.position().top -
+                    this.dragStartYOffset;
+                this._scrollOnEdgeDrag(event.clientY, event.target);
+            }.bind(this))
             .data('gridstack');
 
         if (typeof this.opts.onResize === 'function') {
@@ -232,6 +249,45 @@ define([
             }
         ];
         this.gridstack.generateStylesheet(styleRules);
+    };
+
+    Dashboard.prototype._scrollOnEdgeDrag = function(yPos, dragTarget) {
+        dragTarget = $(dragTarget);
+        var distanceFromTop = yPos - this.scrollContainer.offsetTop;
+        var distanceFromBottom = this.scrollContainer.offsetTop + this.scrollContainer.offsetHeight - yPos;
+
+        // Step 1: enable/disable scrolling
+        if ((distanceFromTop <= SCROLL_EDGE_DISTANCE ||
+                distanceFromBottom <= SCROLL_EDGE_DISTANCE) &&
+                !this.isScrolling) {
+            // activate scrolling
+            this.isScrolling = true;
+            this.scrollAmount = 0;
+            console.log('STARTING INTERVAL');
+            this.scrollInterval = window.setInterval(function() {
+                this.scrollContainer.scrollTop += this.scrollAmount;
+                dragTarget.css('top', parseInt(dragTarget.css('top')) + this.scrollAmount + 'px');
+            }.bind(this), 16);
+        } else if (distanceFromTop > SCROLL_EDGE_DISTANCE &&
+                distanceFromBottom > SCROLL_EDGE_DISTANCE &&
+                this.isScrolling) {
+            // deactivate scrolling
+            this.isScrolling = false;
+            window.clearInterval(this.scrollInterval);
+            delete this.scrollInterval;
+            this.scrollAmount = 0;
+        }
+
+        // Step 2: set scrolling speed
+        if (this.isScrolling) {
+            // scrolling is happening so compute the scroll speed
+            var direction = 1; // default to scroll down
+            if (distanceFromTop <= SCROLL_EDGE_DISTANCE) {
+                direction = -1; // scroll up
+            }
+            var distance = Math.min(distanceFromTop, distanceFromBottom);
+            this.scrollAmount = direction * Math.min(1, (1 - distance / SCROLL_EDGE_DISTANCE)) * MAX_SCROLL_SPEED;
+        }
     };
 
     Dashboard.prototype._repositionHiddenCells = function() {
