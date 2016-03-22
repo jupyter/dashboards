@@ -263,7 +263,6 @@ define([
             // activate scrolling
             this.isScrolling = true;
             this.scrollAmount = 0;
-            console.log('STARTING INTERVAL');
             this.scrollInterval = window.setInterval(function() {
                 this.scrollContainer.scrollTop += this.scrollAmount;
                 dragTarget.css('top', parseInt(dragTarget.css('top')) + this.scrollAmount + 'px');
