@@ -49,7 +49,7 @@ define([
 
     var Dashboard = function(opts) {
         this.$container = $(opts.container);
-        this.scrollContainer = $('#site').get(0);
+        this.scrollContainer = $(opts.scrollContainer).get(0);
         this.opts = opts;
         this._loaded = $.Deferred();
 
@@ -166,8 +166,7 @@ define([
                 // `setInteractive`).
                 animate: false,
                 draggable: {
-                    handle: DRAG_HANDLE,
-                    scroll: true
+                    handle: DRAG_HANDLE
                 },
                 resizable: {
                     handles: 'e, se, s, sw, w'
@@ -390,7 +389,30 @@ define([
         '</div>' +
         '<div class="grid-control-container grid-control-ne">' +
             '<i class="grid-control close-btn fa fa-close fa-fw"></i>' +
-            '<i class="grid-control add-btn fa fa-plus fa-fw"></i>' +
+            '<span class="grid-control add-btn add-btn-relative fa-fw" title="Add to dashboard in notebook cell order">' +
+                '<span class="bar-container">' +
+                    '<span class="bar bar-lighter"></span>' +
+                    '<span class="bar"></span>' +
+                    '<span class="bar bar-lighter"></span>' +
+                '</span>' +
+                '<i class="fa fa-plus"></i>' +
+            '</span>' +
+            '<span class="grid-control add-btn add-btn-top fa-fw" title="Add to top of dashboard">' +
+                '<span class="bar-container">' +
+                    '<span class="bar"></span>' +
+                    '<span class="bar bar-lighter"></span>' +
+                    '<span class="bar bar-lighter"></span>' +
+                '</span>' +
+                '<i class="fa fa-plus"></i>' +
+            '</span>' +
+            '<span class="grid-control add-btn add-btn-bottom fa-fw" title="Add to bottom of dashboard">' +
+                '<span class="bar-container">' +
+                    '<span class="bar bar-lighter"></span>' +
+                    '<span class="bar bar-lighter"></span>' +
+                    '<span class="bar"></span>' +
+                '</span>' +
+                '<i class="fa fa-plus"></i>' +
+            '</span>' +
         '</div>';
 
     Dashboard.prototype._addGridControls = function($cell) {
@@ -400,9 +422,22 @@ define([
             gc.find('.close-btn').click(function() {
                     self._hideCell(self._getParentCell(this));
                 });
-            gc.find('.add-btn').click(function() {
-                    // show a single cell at full width
+            gc.find('.add-btn-bottom').click(function() {
+                    // show a cell full width on bottom of dashboard
                     self._showCell(self._getParentCell(this), { width: self.opts.numCols });
+                });
+            gc.find('.add-btn-top').click(function() {
+                    // show a cell full width on top of dashboard
+                    self._showCell(self._getParentCell(this), { width: self.opts.numCols }, 0);
+                });
+            gc.find('.add-btn-relative').click(function() {
+                    // show a cell full width relative to notebook position
+                    var $cell = self._getParentCell(this);
+                    var $prevCell = $cell.prevAll('.grid-stack-item').first();
+                    var prevCellY = Number($prevCell.attr('data-gs-y'));
+                    var prevCellHeight = Number($prevCell.attr('data-gs-height'));
+                    var insertRow = (prevCellY + prevCellHeight) || 0; // use 0 if NaN
+                    self._showCell($cell, { width: self.opts.numCols }, insertRow);
                 });
             gc.find('.edit-btn').click(function() {
                     var $cell = self._getParentCell(this);
@@ -420,10 +455,6 @@ define([
                     $cell.addClass('edit-select'); // commence highlight animation
                 });
         }
-    };
-
-    Dashboard.prototype._removeGridControls = function($cell) {
-        $cell.find('.grid-control-nw').remove();
     };
 
     Dashboard.prototype._initVisibleCell = function($cell, layout) {
@@ -493,21 +524,21 @@ define([
      */
     Dashboard.prototype._computeCellDimensions = function($cell, constraints) {
         constraints = typeof constraints === 'undefined' ? {} : constraints;
-        var x = constraints.width || this.opts.defaultCellWidth;
-        var y = constraints.height || this.opts.defaultCellHeight;
+        var w = constraints.width || this.opts.defaultCellWidth;
+        var h = constraints.height || this.opts.defaultCellHeight;
         $cell.css({
-            width: x * (this._cellMinWidthPX + this.opts.gridMargin) - this.opts.gridMargin,
-            height: y * (this.opts.rowHeight + this.opts.gridMargin) - this.opts.gridMargin,
+            width: w * (this._cellMinWidthPX + this.opts.gridMargin) - this.opts.gridMargin,
+            height: h * (this.opts.rowHeight + this.opts.gridMargin) - this.opts.gridMargin,
             transition: 'none', // disable transitions to allow proper width/height calculations
             display: 'block' // override `display:flex` set by Notebook CSS to allow proper calcs
         });
 
-        var dim = this._compute_cell_dim($cell, x, y);
+        var dim = this._compute_cell_dim($cell, w, h);
 
         // for text cells, if they are taller than the default, recalculate with max width
-        if ($cell.hasClass('text_cell') && dim.height > y) {
+        if ($cell.hasClass('text_cell') && dim.height > h) {
             $cell.css({ width: this.opts.numCols * this._cellMinWidthPX });
-            dim = this._compute_cell_dim($cell, this.opts.numCols, y);
+            dim = this._compute_cell_dim($cell, this.opts.numCols, h);
         }
 
         $cell.css({ width: '', height: '', transition: '', display: '' });
@@ -570,22 +601,28 @@ define([
     };
 
     // move cell from hidden table to main grid
-    Dashboard.prototype._showCell = function($cell, constraints) {
+    Dashboard.prototype._showCell = function($cell, constraints, row) {
         // compute correct dimensions (taking into account any given `constraints`)
         var dim = this._computeCellDimensions($cell, constraints);
 
         this._initVisibleCell($cell);
-        $cell.attr({
+        var attrs = {
             'data-gs-width': dim.width,
             'data-gs-height': dim.height,
-            'data-gs-auto-position': '1',
-        });
+        };
+        // set y-position based on row, default to auto if row not specified
+        if (row !== undefined && row >= 0) {
+            attrs['data-gs-x'] = 0;
+            attrs['data-gs-y'] = Number(row);
+            attrs['data-gs-auto-position'] = null;
+        } else {
+            attrs['data-gs-auto-position'] = 1;
+        }
+        $cell.attr(attrs);
+
         this.gridstack.make_widget($cell);
         // remove classes added by _hideCell()
-        $cell.css({
-            top: '',
-            left: ''
-        });
+        $cell.css({ top: '', left: '' });
 
         var self = this;
         var cellTransitionEnd = new $.Deferred();

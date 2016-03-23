@@ -156,6 +156,7 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
 }
 .urth-dashboard .cell .grid-control-container.grid-control-ne {
     border-right: none;
+    display: flex;
 
     /*
         computed by gridstack-custom:
@@ -184,6 +185,40 @@ body.dragging,
 body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hover {
     cursor: -webkit-grabbing !important;
     cursor: grabbing !important;
+}
+
+/* Grid cell controls: add in various places */
+.urth-dashboard .cell .grid-control.add-btn {
+    display: inline-block;
+    overflow: hidden;
+    position: relative;
+    width: 2.3em;
+}
+.urth-dashboard .cell .grid-control.add-btn > .bar-container {
+    display: flex;
+    flex-direction: column;
+}
+.urth-dashboard .cell .grid-control.add-btn > .bar-container > .bar {
+    width: 1em;
+    height: 3px;
+    background-color: #b2b2b2;
+    display: inline-block;
+    margin-bottom: 2px;
+}
+.urth-dashboard .cell .grid-control.add-btn > .bar-container > .bar.bar-lighter {
+    background-color: #dadada;
+}
+.urth-dashboard .cell .grid-control.add-btn:hover > .bar-container > .bar {
+    background-color: #306c9e;
+}
+.urth-dashboard .cell .grid-control.add-btn:hover > .bar-container > .bar.bar-lighter {
+    background-color: #A6D3F9;
+}
+.urth-dashboard .cell .grid-control.add-btn > .fa-plus {
+    position: absolute;
+    bottom: 0.4em;
+    right: 0.3em;
+    font-size: 0.8em;
 }
 
 /* Grid cell controls: hover behavior */
