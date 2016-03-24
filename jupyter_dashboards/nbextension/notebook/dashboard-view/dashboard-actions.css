@@ -18,15 +18,48 @@
     display: -webkit-inline-flex;
     display: -ms-inline-flexbox;
     display: inline-flex;
-    -webkit-align-items: baseline;
-        -ms-flex-align: baseline;
-            align-items: baseline;
+    -webkit-align-items: center;
+         -ms-flex-align: center;
+            align-items: center;
 }
 #maintoolbar .urth-dashboard-toolbar-buttons .navbar-text {
     margin: 0 5px;
 }
 
+/* Dashboard authoring button with embedded layout dropdown */
 #urth-dashboard-view-toolbar-buttons > button:first-of-type {
     border-top-left-radius: 2px;
     border-bottom-left-radius: 2px;
+}
+#urth-dashboard-view-toolbar-buttons > .dashboard-authoring-btn-container {
+    display: -webkit-inline-flex;
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+    border-width: 0;
+    padding: 0;
+}
+#urth-dashboard-view-toolbar-buttons > .dashboard-authoring-btn-container .dashboard-authoring-btn,
+#urth-dashboard-view-toolbar-buttons > .dashboard-authoring-btn-container .db-embedded-dropdown-toggle {
+    border-radius: 0;
+    border-color: inherit;
+}
+#urth-dashboard-view-toolbar-buttons > .dashboard-authoring-btn-container .dashboard-authoring-btn {
+    border-right: none;
+    background-color: transparent;
+}
+#urth-dashboard-view-toolbar-buttons > .dashboard-authoring-btn-container .db-embedded-dropdown-toggle {
+    border-left: none;
+    background-color: transparent;
+}
+#urth-dashboard-view-toolbar-buttons .dashboard-layout-menu-item {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+}
+#urth-dashboard-view-toolbar-buttons .dashboard-layout-menu-item a {
+    flex-grow: 1;
+    padding-left: 10px;
+}
+#urth-dashboard-view-toolbar-buttons .dashboard-layout-menu-item a i {
+    margin-right: 8px;
 }

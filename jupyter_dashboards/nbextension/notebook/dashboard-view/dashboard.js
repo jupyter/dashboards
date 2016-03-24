@@ -3,34 +3,23 @@
  * Distributed under the terms of the Modified BSD License.
  */
 
-/*************
-  Urth dashboard metadata structure:
-    "metadata": {
-         "urth": {
-             "dashboard": {
-                 "layout": {
-                     "col":
-                     ...
-                 },
-                 "hidden": false
-             }
-         }
-    }
- **************/
-
 define([
     'jquery',
     'lodash',
     'base/js/namespace',
     'urth-common/error-log',
     '../link-css',
+    './dashboard-metadata',
+    'text!./grid-controls.html',
     'urth-common/gridstack-custom' // jquery plugin: return value not used
 ], function(
     $,
     _,
     IPython,
     ErrorLog,
-    linkCSS
+    linkCSS,
+    Metadata,
+    gridControlsTemplate
 ) {
     'use strict';
 
@@ -39,9 +28,6 @@ define([
 
     var HIDDEN_CELLS_MARGIN = 10;
     var HIDDEN_CELLS_BOTTOM_MARGIN = 20;
-
-    var PACKED_STRATEGY = 'packed';
-    var STACKED_STRATEGY = 'stacked';
 
     var DRAG_HANDLE = '.drag-handle';
     var SCROLL_EDGE_DISTANCE = 30;
@@ -55,20 +41,19 @@ define([
 
         ErrorLog.enable(IPython);
 
-        var gridCssLoaded = cssLoaded;
         if (!cssLoaded) {
-            gridCssLoaded = linkCSS('./bower_components/gridstack/dist/gridstack.css');
-            linkCSS('./dashboard-common/gridstack-overrides.css');
-            linkCSS('./dashboard-common/dashboard-common.css');
-            linkCSS('./dashboard-view/dashboard-view.css');
-            cssLoaded = true;
+            cssLoaded = [
+                linkCSS('./bower_components/gridstack/dist/gridstack.css'),
+                linkCSS('./dashboard-common/gridstack-overrides.css'),
+                linkCSS('./dashboard-common/dashboard-common.css'),
+                linkCSS('./dashboard-view/dashboard-view.css')
+            ];
         }
 
         // Must wait for CSS to be evaluated before we generate the grid. Otherwise, positioning
         // is calculated incorrectly.
-        $.when(gridCssLoaded).then(function() {
+        $.when.apply(null, cssLoaded).then(function() {
             $('body').addClass('urth-dashboard');
-            this._initGridMetadata();
             var nolayout = this._addMetadataToDom(); // returns cells that don't have metadata
 
             var self = this;
@@ -76,15 +61,16 @@ define([
                 self._addGridControls($(this));
             });
 
+            this._createHiddenHeader();
             this._enableGridstack();
             this._calcCellWidth(); // now that Gridstack has been enabled
 
-            nolayout.forEach(this._addNotebookCellToDashboard.bind(this)); // handle cells without grid layout metadata
-            this._createhiddenHeader(); // create a container to hold hidden cells
+            // add the cells without grid layout to Gridstack
+            Promise.all(nolayout.map(this._addNotebookCellToDashboard.bind(this)))
+                .then(this._showHiddenArea.bind(this));
 
-            if (nolayout.length > 0) {
-                this._saveGrid(); // save notebook if any new layout metadata was created
-            }
+            // save to update any metadata changes made by grid constraints
+            Metadata.save();
 
             $(window).on('resize.Dashboard', _.debounce(function() {
                 self._calcCellWidth();
@@ -93,36 +79,11 @@ define([
 
             this._loaded.resolve();
         }.bind(this));
-
     };
 
     Dashboard.prototype._calcCellWidth = function() {
         this._cellMinWidthPX =
             Math.floor(this.$container.width() / this.opts.numCols) - this.opts.gridMargin;
-    };
-
-    // creates empty dashboard metadata (if necessary)
-    Dashboard.prototype._initGridMetadata = function() {
-        function _urthMetdata(metadata) {
-            var urth = metadata.urth = metadata.urth || {};
-            urth.dashboard = urth.dashboard || {};
-            return urth;
-        }
-
-        // init notebook metadata
-        _urthMetdata(IPython.notebook.metadata);
-        IPython.notebook.metadata.urth.dashboard = $.extend({
-            defaultCellHeight: this.opts.rowHeight,
-            cellMargin: this.opts.gridMargin,
-            maxColumns: this.opts.numCols,
-            layoutStrategy: this.opts.layoutStrategy
-        }, IPython.notebook.metadata.urth.dashboard);
-
-        // init cell metadata
-        var self = this;
-        this.$container.find('.cell').each(function(idx) {
-            _urthMetdata(self._getCellMetadata($(this)));
-        });
     };
 
     // Adds cell metadata to DOM. Returns DOM nodes for which there is no metadata.
@@ -141,13 +102,12 @@ define([
                 el.prepend('<div class="dashboard-item-background"/><div class="dashboard-item-border"><i class="fa fa-arrows"/></div>');
             }
 
-            var metadata = self._getCellMetadata(el);
-            if (!metadata.urth.dashboard.hidden) {
-                if (metadata.urth.dashboard.layout) {
-                    var layout = metadata.urth.dashboard.layout;
+            var layout = Metadata.getCellLayout(el);
+            if (Metadata.isCellVisible(el)) {
+                if (layout) {
                     self._initVisibleCell(el, layout);
                 } else {
-                    nolayout.push(this); // cell doesn't have layout info; save for later
+                    nolayout.push($(this)); // cell doesn't have layout info; save for later
                 }
             }
         });
@@ -155,6 +115,7 @@ define([
     };
 
     Dashboard.prototype._enableGridstack = function() {
+        var handles = this.opts.reportLayout ? 's' : 'e, se, s, sw, w';
         this.gridstack = this.$container.gridstack({
                 vertical_margin: this.opts.gridMargin,
                 cell_height: this.opts.rowHeight,
@@ -169,12 +130,12 @@ define([
                     handle: DRAG_HANDLE
                 },
                 resizable: {
-                    handles: 'e, se, s, sw, w'
+                    handles: handles
                 }
             })
             .on('dragstop resizestop', function() {
                 window.clearInterval(this.scrollInterval);
-                this._saveGrid();
+                Metadata.save();
             }.bind(this))
             .on('dragstart dragstop', function(event) {
                 $('body').toggleClass('dragging', event.type === 'dragstart');
@@ -289,9 +250,10 @@ define([
     };
 
     Dashboard.prototype._repositionHiddenCells = function() {
-        if (!this.interactive) {
+        if (!this.interactive || this.$hiddenHeader.is('.hidden')) {
             return;
         }
+        console.log('REPOSITION HIDDEN CELLS');
 
         var offsetpx = $('#dashboard-hidden-header').outerHeight();
 
@@ -312,66 +274,20 @@ define([
         $('#notebook').css('height', newHeight);
     };
 
-    // computes metadata for a cell that doesn't have grid layout metadata
-    Dashboard.prototype._addNotebookCellToDashboard = function(cell) {
-        var $cell = $(cell).css({ visibility: 'hidden', display: 'block' });
-
-        var constraints = {};
-        if(IPython.notebook.metadata.urth.dashboard.layoutStrategy === STACKED_STRATEGY) {
-          constraints = { width : this.opts.numCols};
+    Dashboard.prototype._showHiddenArea = function() {
+        // show hidden cells if appropriate
+        if (this.$container.find('.cell:not(.grid-stack-item)').length > 0) {
+            this.$hiddenHeader.removeClass('hidden');
+            this._repositionHiddenCells();
         }
-        var dim = this._computeCellDimensions($cell, constraints);
-
-        if (!dim.isEmpty) {
-            this._initVisibleCell($cell);
-            $cell.attr({
-                'data-gs-width': dim.width,
-                'data-gs-height': dim.height,
-                'data-gs-auto-position': '1',
-            });
-            this.gridstack.make_widget($cell);
-        }
-
-        $cell.css({ visibility: '', display: '' });
     };
 
-    Dashboard.prototype._createhiddenHeader = function() {
+    Dashboard.prototype._createHiddenHeader = function() {
         this.$hiddenHeader = $('<div id="dashboard-hidden-header" class="container hidden"/>');
         var $header = $('<div class="header"/>')
             .appendTo(this.$hiddenHeader)
             .append('<h2 class="title">Hidden Cells</h2>');
         this.$hiddenHeader.insertAfter(this.$container); // add to DOM
-
-        var self = this;
-        setTimeout(function() {
-            if (self.$container.find('.cell:not(.grid-stack-item)').length > 0) {
-                self.$hiddenHeader.removeClass('hidden');
-            }
-            self._repositionHiddenCells(); // show hidden cells
-        }, 0);
-    };
-
-    Dashboard.prototype._getCellMetadata = function($elem) {
-        if ($elem.is('.cell')) {
-            return $elem.data('cell').metadata; // pull cell metadata from element data
-        }
-        var $cell = this._getParentCell($elem);
-        if ($cell.length) {
-            return this._getCellMetadata($cell);
-        }
-    };
-
-    // Update cell's metadata.
-    Dashboard.prototype._updateCellMetadata = function($cell, layout) {
-        var metadata = this._getCellMetadata($cell);
-        if (layout) {
-            metadata.urth.dashboard.layout = layout;
-            delete metadata.urth.dashboard.hidden;
-        } else {
-            delete metadata.urth.dashboard.layout;
-            metadata.urth.dashboard.hidden = true;
-        }
-        IPython.notebook.set_dirty(true);
     };
 
     // For a given DOM element, return the Notebook cell which contains it. Works with both
@@ -382,43 +298,10 @@ define([
         return $parent;
     };
 
-    var gridControlsTpl =
-        '<div class="grid-control-container grid-control-nw">' +
-            '<i class="grid-control drag-handle fa fa-arrows fa-fw"></i>' +
-            '<i class="grid-control edit-btn fa fa-pencil fa-fw"></i>' +
-        '</div>' +
-        '<div class="grid-control-container grid-control-ne">' +
-            '<span class="grid-control add-btn add-btn-relative fa-fw" title="Add to dashboard in notebook cell order">' +
-                '<span class="bar-container">' +
-                    '<span class="bar bar-lighter"></span>' +
-                    '<span class="bar"></span>' +
-                    '<span class="bar bar-lighter"></span>' +
-                '</span>' +
-                '<i class="fa fa-plus"></i>' +
-            '</span>' +
-            '<span class="grid-control add-btn add-btn-top fa-fw" title="Move to top of dashboard">' +
-                '<span class="bar-container">' +
-                    '<span class="bar"></span>' +
-                    '<span class="bar bar-lighter"></span>' +
-                    '<span class="bar bar-lighter"></span>' +
-                '</span>' +
-                '<i class="fa fa-plus"></i>' +
-            '</span>' +
-            '<span class="grid-control add-btn add-btn-bottom fa-fw" title="Move to bottom of dashboard">' +
-                '<span class="bar-container">' +
-                    '<span class="bar bar-lighter"></span>' +
-                    '<span class="bar bar-lighter"></span>' +
-                    '<span class="bar"></span>' +
-                '</span>' +
-                '<i class="fa fa-plus"></i>' +
-            '</span>' +
-            '<i class="grid-control close-btn fa fa-close fa-fw"></i>' +
-        '</div>';
-
     Dashboard.prototype._addGridControls = function($cell) {
         var self = this;
         if ($cell.find('.grid-control-nw').length === 0) {
-            var gc = $(gridControlsTpl).appendTo($cell);
+            var gc = $(gridControlsTemplate).appendTo($cell);
             gc.find('.close-btn').click(function() {
                     self._hideCell(self._getParentCell(this));
                 });
@@ -466,11 +349,19 @@ define([
             var width = layout.width || computedLayout.width;
             var height = layout.height || computedLayout.height;
 
-            $cell
-                .attr('data-gs-x', layout.col)
-                .attr('data-gs-y', layout.row)
-                .attr('data-gs-width', width)
-                .attr('data-gs-height', height);
+            $cell.attr('data-gs-width', width)
+                 .attr('data-gs-height', height);
+
+            if (layout.hasOwnProperty('col') && layout.hasOwnProperty('row')) {
+                $cell.attr('data-gs-x', layout.col)
+                     .attr('data-gs-y', layout.row);
+            } else {
+                // use cell index to cause Gridstack's auto position to use notebook order
+                var index = $cell.index();
+                $cell.attr('data-gs-x', index)
+                     .attr('data-gs-y', index)
+                     .attr('data-gs-auto-position', '1');
+            }
         }
         $cell
             .addClass('grid-stack-item')
@@ -545,28 +436,6 @@ define([
         return dim;
     };
 
-    Dashboard.prototype._saveGrid = function() {
-        // save each cell's metadata
-        var widgetData = _.map($('.grid-stack .cell.grid-stack-item:visible'), function (el) {
-            el = $(el);
-            var node = el.data('_gridstack_node');
-            return {
-                col: node.x,
-                row: node.y,
-                width: node.width,
-                height: node.height
-            };
-        });
-
-        var self = this;
-        $('.cell.grid-stack-item').each(function(idx) {
-            var layout = $.extend({}, widgetData[idx]);  // clone `data` object
-            self._updateCellMetadata($(this), layout);
-        });
-
-        IPython.notebook.set_dirty(true);
-    };
-
     Dashboard.prototype._onResize = function(node) {
         if (typeof this.opts.onResize === 'function') {
             this.opts.onResize(node);
@@ -578,7 +447,7 @@ define([
         this.$container.one('change', function() {
             $cell.resizable('destroy');
             $cell.draggable('destroy');
-            self._updateCellMetadata($cell, null);
+            Metadata.hideCell($cell);
             // Temporarily set 'top' *before* removing 'grid-stack-item' class. This makes it so
             // cell animates when moving from dashboard to hidden cells area.
             $cell.css({
@@ -600,24 +469,29 @@ define([
         this.gridstack.remove_widget($cell, false /* don't detach node */);
     };
 
+    // computes metadata for a cell that doesn't have grid layout metadata
+    Dashboard.prototype._addNotebookCellToDashboard = function($cell) {
+        var dim = this._computeCellDimensions($cell);
+        return dim.isEmpty ? Promise.resolve() : this._showCell($cell);
+    };
+
     // move cell from hidden table to main grid
     Dashboard.prototype._showCell = function($cell, constraints, row) {
-        // compute correct dimensions (taking into account any given `constraints`)
-        var dim = this._computeCellDimensions($cell, constraints);
-
         // determine if the cell is hidden
         var isHidden = !$cell.is('.grid-stack-item');
-
+        var self = this;
         this._initVisibleCell($cell);
-        $cell.attr({
-            'data-gs-width': dim.width,
-            'data-gs-height': dim.height,
-        });
 
+        var cellAddedPromise = $.Deferred();
         if (isHidden) {
+            // compute correct dimensions (taking into account any given `constraints`)
+            var dim = this._computeCellDimensions($cell, constraints);
             // if hidden, add the cell to the grid and position it
             // set y-position based on row, default to auto if row not specified
-            var attrs = {};
+            var attrs = {
+                'data-gs-width': dim.width,
+                'data-gs-height': dim.height,
+            };
             if (row >= 0) {
                 attrs['data-gs-x'] = 0;
                 attrs['data-gs-y'] = Number(row);
@@ -627,7 +501,20 @@ define([
             }
             $cell.attr(attrs);
 
+            // add widget to Gridstack, reject if it takes too long
+            var rejectTimeout = window.setTimeout(function() {
+                cellAddedPromise.reject('Timeout waiting for Gridstack to add widget', $cell);
+            }, 10000);
+            var onChange = function(event, elements) {
+                if (elements.some(function(el) { return el.el.is($cell); })) {
+                    cellAddedPromise.resolve($cell);
+                    window.clearTimeout(rejectTimeout);
+                    self.gridstack.container.off('change', onChange);
+                }
+            };
+            this.gridstack.container.on('change', onChange);
             this.gridstack.make_widget($cell);
+
             $cell.css({ top: '', left: '' }); // remove classes added by _hideCell()
             if (this.$container.find('.cell:not(.grid-stack-item)').length === 0) {
                 this.$hiddenHeader.addClass('hidden');
@@ -642,9 +529,9 @@ define([
                 }));
             }
             this.gridstack.move($cell, null, y);
+            cellAddedPromise.resolve($cell);
         }
 
-        var self = this;
         var cellTransitionEnd = new $.Deferred();
         var containerTransitionEnd = new $.Deferred();
 
@@ -654,18 +541,21 @@ define([
             cellTransitionEnd.resolve();
         });
 
-        // wait for both Gridstack and added cell to finish resizing before recalculating
-        // positions of hidden cells.
+        // wait for both Gridstack and added cell to finish resizing before
+        // recalculating positions of hidden cells.
         this.$container.one('transitionend',
             containerTransitionEnd.resolve.bind(containerTransitionEnd));
-        $.when(cellTransitionEnd, containerTransitionEnd)
+        $.when(cellTransitionEnd, containerTransitionEnd, cellAddedPromise)
             .then(this._repositionHiddenCells.bind(this));
 
-        // update all cells' metadata since placement may have displaced some cells
-        this._saveGrid();
+        // update all cell metadata as placement may have displaced some cells
+        Metadata.showCell($cell);
+        Metadata.save();
+
+        return cellAddedPromise;
     };
 
-    Dashboard.prototype._showAllCells = function(layoutStrategy, constraints) {
+    Dashboard.prototype._showAllCells = function(constraints) {
         var self = this;
         this.hideAllCells();
         this.$container
@@ -673,7 +563,6 @@ define([
             .each(function() {
                 self._showCell($(this), constraints);
             });
-        IPython.notebook.metadata.urth.dashboard.layoutStrategy = layoutStrategy;
         IPython.notebook.set_dirty(true);
     };
 
@@ -681,14 +570,14 @@ define([
      * Move all cells into the dashboard view in a packed layout
      */
     Dashboard.prototype.showAllCellsPacked = function() {
-        this._showAllCells(PACKED_STRATEGY);
+        this._showAllCells();
     };
 
     /**
      * Move all cells into the dashboard view in a stacked layout
      */
     Dashboard.prototype.showAllCellsStacked = function() {
-        this._showAllCells(STACKED_STRATEGY, { 'width' : this.opts.numCols});
+        this._showAllCells({ width : this.opts.numCols });
     };
 
     /**
@@ -696,9 +585,7 @@ define([
      */
     Dashboard.prototype.hideAllCells = function() {
         var self = this;
-        this.$container
-            .find('.cell.grid-stack-item')
-            .each(function() {
+        this.$container.find('.cell.grid-stack-item').each(function() {
                 self._hideCell($(this));
             });
         IPython.notebook.set_dirty(true);
@@ -725,8 +612,7 @@ define([
             }
 
             if (typeof args.complete === 'function') {
-                // call `complete` asynchronously, since we need to let Gridstack to finish
-                // fully rendering
+                // call `complete` async to let Gridstack finish rendering
                 setTimeout(args.complete, 0);
             }
         }.bind(this));

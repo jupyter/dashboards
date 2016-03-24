@@ -54,26 +54,52 @@ define([
     PolymerSupport.init();
 
     // dashboard-actions depends on requirejs text plugin
-    require(['./dashboard-actions'], function(DashboardActions) {
+    require(['./dashboard-actions', './dashboard-metadata'], function(DashboardActions, Metadata) {
         var dbActions = new DashboardActions({
-            enterDashboardMode: function(doEnableGrid) {
+            enterDashboardMode: function(doEnableGrid, reportLayout) {
+
+                // set the proper dashboard layout class
+                $('body').toggleClass('db-report-layout', reportLayout);
+                $('body').toggleClass('db-grid-layout', !reportLayout);
+
+                // create the dashboard
                 require(['./dashboard', 'text!./help.html'], function(Dashboard, helpTemplate) {
-                    if (!dashboard) {
-                        dashboard = Dashboard.create({
-                            container: $('#notebook-container'),
-                            scrollContainer: $('#site'),
+
+                    function createDashboard() {
+                        var opts = {
+                            // DEFAULT OPTIONS - will be overridden by saved notebook metadata
+                            dashboardLayout: Metadata.DASHBOARD_LAYOUT.GRID,
+                            gridMargin: 10,
                             numCols: 12,
                             rowHeight: 20,
-                            gridMargin: 10,
-                            defaultCellWidth: 4,
+                            // END DEFAULT OPTIONS
+
+                            container: $('#notebook-container'),
+                            scrollContainer: $('#site'),
                             defaultCellHeight: 4,
+                            defaultCellWidth: 4,
                             minCellHeight: 2,
-                            layoutStrategy: 'packed',
                             onResize: PolymerSupport.onResize,
                             exit: function() {
                                 dbActions.switchToNotebook();
-                            }
-                        });
+                            },
+                            reportLayout: reportLayout
+                        };
+                        Metadata.initialize(opts);
+                        if (reportLayout) {
+                            Metadata.updateCellLayout({
+                                width: 12
+                            });
+                            Metadata.stackCells();
+                        }
+                        return Dashboard.create(opts);
+                    }
+
+                    if (dashboard) {
+                        dashboard.destroy();
+                        dashboard = createDashboard();
+                    } else {
+                        dashboard = createDashboard();
                         $helpArea = $(helpTemplate).prependTo($('#notebook_panel'));
                     }
                     dashboard.setInteractive({

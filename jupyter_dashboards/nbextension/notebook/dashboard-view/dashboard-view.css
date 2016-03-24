@@ -40,6 +40,9 @@ body:not(.view-only) .grid-stack#notebook-container:hover {
 }
 
 /* Gridstack cells */
+.db-report-layout .grid-stack .grid-stack-item {
+    width: 100%;
+}
 .grid-stack .cell,
 .grid-stack .cell.selected {
     background: transparent;
@@ -237,11 +240,15 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
 }
 
 /* Hide specific grid controls based on hidden state */
+.urth-dashboard.db-report-layout .cell.grid-stack-item .grid-control.add-btn,
 .urth-dashboard .cell.grid-stack-item .grid-control.add-btn-relative,
 .urth-dashboard .cell.grid-stack-item .grid-control .fa-plus,
+.urth-dashboard.db-report-layout .cell.grid-stack-item .grid-control.drag-handle,
 .urth-dashboard .cell:not(.grid-stack-item) .grid-control.drag-handle,
 .urth-dashboard .cell:not(.grid-stack-item) .grid-control.close-btn,
-.urth-dashboard .cell:not(.grid-stack-item) .gs-resize-handle {
+.urth-dashboard .cell:not(.grid-stack-item) .gs-resize-handle,
+.urth-dashboard.db-report-layout .cell:not(.grid-stack-item) .grid-control.add-btn-top,
+.urth-dashboard.db-report-layout .cell:not(.grid-stack-item) .grid-control.add-btn-bottom {
     display: none;
 }
 
