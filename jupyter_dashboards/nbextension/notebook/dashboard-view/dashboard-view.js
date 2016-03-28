@@ -61,6 +61,7 @@ define([
                     if (!dashboard) {
                         dashboard = Dashboard.create({
                             container: $('#notebook-container'),
+                            scrollContainer: $('#site'),
                             numCols: 12,
                             rowHeight: 20,
                             gridMargin: 10,
