@@ -388,7 +388,6 @@ define([
             '<i class="grid-control edit-btn fa fa-pencil fa-fw"></i>' +
         '</div>' +
         '<div class="grid-control-container grid-control-ne">' +
-            '<i class="grid-control close-btn fa fa-close fa-fw"></i>' +
             '<span class="grid-control add-btn add-btn-relative fa-fw" title="Add to dashboard in notebook cell order">' +
                 '<span class="bar-container">' +
                     '<span class="bar bar-lighter"></span>' +
@@ -397,7 +396,7 @@ define([
                 '</span>' +
                 '<i class="fa fa-plus"></i>' +
             '</span>' +
-            '<span class="grid-control add-btn add-btn-top fa-fw" title="Add to top of dashboard">' +
+            '<span class="grid-control add-btn add-btn-top fa-fw" title="Move to top of dashboard">' +
                 '<span class="bar-container">' +
                     '<span class="bar"></span>' +
                     '<span class="bar bar-lighter"></span>' +
@@ -405,7 +404,7 @@ define([
                 '</span>' +
                 '<i class="fa fa-plus"></i>' +
             '</span>' +
-            '<span class="grid-control add-btn add-btn-bottom fa-fw" title="Add to bottom of dashboard">' +
+            '<span class="grid-control add-btn add-btn-bottom fa-fw" title="Move to bottom of dashboard">' +
                 '<span class="bar-container">' +
                     '<span class="bar bar-lighter"></span>' +
                     '<span class="bar bar-lighter"></span>' +
@@ -413,6 +412,7 @@ define([
                 '</span>' +
                 '<i class="fa fa-plus"></i>' +
             '</span>' +
+            '<i class="grid-control close-btn fa fa-close fa-fw"></i>' +
         '</div>';
 
     Dashboard.prototype._addGridControls = function($cell) {
@@ -605,24 +605,44 @@ define([
         // compute correct dimensions (taking into account any given `constraints`)
         var dim = this._computeCellDimensions($cell, constraints);
 
+        // determine if the cell is hidden
+        var isHidden = !$cell.is('.grid-stack-item');
+
         this._initVisibleCell($cell);
-        var attrs = {
+        $cell.attr({
             'data-gs-width': dim.width,
             'data-gs-height': dim.height,
-        };
-        // set y-position based on row, default to auto if row not specified
-        if (row !== undefined && row >= 0) {
-            attrs['data-gs-x'] = 0;
-            attrs['data-gs-y'] = Number(row);
-            attrs['data-gs-auto-position'] = null;
-        } else {
-            attrs['data-gs-auto-position'] = 1;
-        }
-        $cell.attr(attrs);
+        });
 
-        this.gridstack.make_widget($cell);
-        // remove classes added by _hideCell()
-        $cell.css({ top: '', left: '' });
+        if (isHidden) {
+            // if hidden, add the cell to the grid and position it
+            // set y-position based on row, default to auto if row not specified
+            var attrs = {};
+            if (row >= 0) {
+                attrs['data-gs-x'] = 0;
+                attrs['data-gs-y'] = Number(row);
+                attrs['data-gs-auto-position'] = null;
+            } else {
+                attrs['data-gs-auto-position'] = 1;
+            }
+            $cell.attr(attrs);
+
+            this.gridstack.make_widget($cell);
+            $cell.css({ top: '', left: '' }); // remove classes added by _hideCell()
+            if (this.$container.find('.cell:not(.grid-stack-item)').length === 0) {
+                this.$hiddenHeader.addClass('hidden');
+            }
+        } else {
+            // if already visible, move it to the desired position
+            var y = row;
+            if (row < 0 || row === undefined) {
+                y = Math.max.apply(null, $('.grid-stack-item').map(function(i, el) {
+                    return Number($(el).attr('data-gs-height')) +
+                           Number($(el).attr('data-gs-y'));
+                }));
+            }
+            this.gridstack.move($cell, null, y);
+        }
 
         var self = this;
         var cellTransitionEnd = new $.Deferred();
@@ -634,9 +654,6 @@ define([
             cellTransitionEnd.resolve();
         });
 
-        if (this.$container.find('.cell:not(.grid-stack-item)').length === 0) {
-            this.$hiddenHeader.addClass('hidden');
-        }
         // wait for both Gridstack and added cell to finish resizing before recalculating
         // positions of hidden cells.
         this.$container.one('transitionend',
@@ -644,15 +661,8 @@ define([
         $.when(cellTransitionEnd, containerTransitionEnd)
             .then(this._repositionHiddenCells.bind(this));
 
-        // update metadata
-        var grid = $cell.data('_gridstack_node');
-        var layout = {
-            col: grid.x,
-            row: grid.y,
-            width: grid.width,
-            height: grid.height
-        };
-        this._updateCellMetadata($cell, layout);
+        // update all cells' metadata since placement may have displaced some cells
+        this._saveGrid();
     };
 
     Dashboard.prototype._showAllCells = function(layoutStrategy, constraints) {
