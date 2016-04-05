@@ -5,8 +5,8 @@
 
 PYTHON?=python3
 
-REPO:=jupyter/pyspark-notebook:2988869079e6
-BOWER_REPO:=jupyter/pyspark-notebook-bower:2988869079e6
+REPO:=jupyter/pyspark-notebook:0017b56d93c9
+BOWER_REPO:=jupyter/pyspark-notebook-bower:0017b56d93c9
 PYTHON2_SETUP:=source activate python2
 
 define EXT_DEV_SETUP
