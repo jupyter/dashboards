@@ -189,12 +189,17 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
 
 /* Grid cell controls: add in various places */
 .urth-dashboard .cell .grid-control.add-btn {
-    display: inline-block;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
     overflow: hidden;
     position: relative;
-    width: 2.3em;
+    min-width: 25px;
+    width: auto;
 }
 .urth-dashboard .cell .grid-control.add-btn > .bar-container {
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
     flex-direction: column;
 }
@@ -215,9 +220,8 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
     background-color: #A6D3F9;
 }
 .urth-dashboard .cell .grid-control.add-btn > .fa-plus {
-    position: absolute;
-    bottom: 0.4em;
-    right: 0.3em;
+    margin-left: 2px;
+    margin-top: 4px;
     font-size: 0.8em;
 }
 
@@ -233,7 +237,8 @@ body.dragging.urth-dashboard .ui-draggable-dragging.cell:hover .drag-handle:hove
 }
 
 /* Hide specific grid controls based on hidden state */
-.urth-dashboard .cell.grid-stack-item .grid-control.add-btn,
+.urth-dashboard .cell.grid-stack-item .grid-control.add-btn-relative,
+.urth-dashboard .cell.grid-stack-item .grid-control .fa-plus,
 .urth-dashboard .cell:not(.grid-stack-item) .grid-control.drag-handle,
 .urth-dashboard .cell:not(.grid-stack-item) .grid-control.close-btn,
 .urth-dashboard .cell:not(.grid-stack-item) .gs-resize-handle {
