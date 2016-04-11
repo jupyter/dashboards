@@ -1,0 +1,84 @@
+/**
+ * Copyright (c) Jupyter Development Team.
+ * Distributed under the terms of the Modified BSD License.
+ */
+
+/* Dashboard container */
+.urth-dashboard[data-dashboard-layout="report"] #notebook-container {
+    padding-left: 0;
+    padding-right: 0;
+    transition: background-color 0.75s,
+                box-shadow 0.75s;
+}
+.urth-dashboard[data-dashboard-layout="report"]:not(.view-only) #notebook-container:hover {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+/* Dashboard cell */
+.urth-dashboard[data-dashboard-layout="report"] .cell {
+    background-color: white;
+    margin-bottom: 1em;
+    position: relative;
+}
+.urth-dashboard[data-dashboard-layout="report"]:not(.view-only) .cell {
+    min-height: 5em;
+}
+.urth-dashboard[data-dashboard-layout="report"] .cell.dashboard-hidden {
+    height: 5em;
+    overflow: hidden;
+}
+
+/* Hidden cells */
+.urth-dashboard[data-dashboard-layout="report"] .dashboard-report-collapse-btn {
+    background-color: #f8f8f8;
+    color: #b2b2b2;
+    cursor: pointer;
+    font-variant: small-caps;
+    height: 2em;
+    line-height: 1.8em;
+    margin-bottom: 1em;
+    text-align: center;
+}
+.urth-dashboard[data-dashboard-layout="report"] .dashboard-report-collapse-btn:hover {
+    background-color: #f6f6f6;
+}
+.urth-dashboard[data-dashboard-layout="report"] .dashboard-report-collapse-btn .dashboard-report-hidden-count {
+    font-size: smaller;
+}
+.urth-dashboard[data-dashboard-layout="report"] .cell.dashboard-hidden {
+    border-top: 1px solid #eee;
+}
+.urth-dashboard[data-dashboard-layout="report"] .dashboard-report-collapse-btn:not(.dashboard-collapsed) .dashboard-report-expand-label,
+.urth-dashboard[data-dashboard-layout="report"] .dashboard-report-collapse-btn.dashboard-collapsed .dashboard-report-collapse-label,
+.urth-dashboard[data-dashboard-layout="report"] .dashboard-report-collapse-btn .dashboard-report-collapse-text[data-cell-count="1"] .plural-s,
+.urth-dashboard[data-dashboard-layout="report"].view-only .dashboard-report-collapse-btn,
+.urth-dashboard[data-dashboard-layout="report"].view-only .cell.dashboard-hidden {
+    display: none;
+}
+.urth-dashboard[data-dashboard-layout="report"] .cell.dashboard-collapsed {
+    display: none;
+}
+.urth-dashboard[data-dashboard-layout="report"] .dashboard-report-collapse-btn:not(.dashboard-collapsed),
+.urth-dashboard[data-dashboard-layout="report"] .cell.dashboard-hidden {
+    margin-bottom: 0;
+}
+.urth-dashboard[data-dashboard-layout="report"] .cell.dashboard-hidden,
+.urth-dashboard[data-dashboard-layout="report"] .cell.dashboard-hidden .cell-control-container {
+    background-color: #f8f8f8;
+}
+.urth-dashboard[data-dashboard-layout="report"] .cell.dashboard-hidden:not(.dashboard-collapsed) + .cell:not(.dashboard-hidden) {
+    margin-top: 1em;
+}
+.urth-dashboard[data-dashboard-layout="report"] .cell .cell-control-se {
+    border: none;
+    padding-right: 1em;
+    visibility: visible;
+}
+
+ /* Hide specific cell controls based on hidden state */
+.urth-dashboard[data-dashboard-layout="report"] .cell:not(.dashboard-hidden) .cell-control.add-btn,
+.urth-dashboard[data-dashboard-layout="report"] .cell.dashboard-hidden .cell-control.hide-btn,
+.urth-dashboard[data-dashboard-layout="report"] .cell:not(.dashboard-hidden) .cell-control-se {
+    display: none;
+}

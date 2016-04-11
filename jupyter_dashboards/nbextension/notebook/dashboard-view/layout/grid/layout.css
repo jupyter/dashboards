@@ -1,0 +1,240 @@
+/**
+ * Copyright (c) Jupyter Development Team.
+ * Distributed under the terms of the Modified BSD License.
+ */
+
+/* Gridstack container */
+.urth-dashboard .grid-stack#notebook-container {
+    padding-left: 0;
+    padding-right: 0;
+    transition: background-color 0.75s,
+                box-shadow 0.75s,
+                height 0.3s;
+}
+.urth-dashboard:not(.view-only) .grid-stack#notebook-container:hover {
+    background-color: transparent;
+    box-shadow: none;
+}
+.grid-stack#notebook-container .grid-stack-placeholder {
+    transition-duration: 0.25s;
+}
+.grid-stack#notebook-container .grid-stack-placeholder > .placeholder-content {
+    border: 2px dashed #5bc0de;
+    background-color: transparent;
+
+    /*
+        computed by gridstack-custom:
+
+        left:  (margin/2)px;
+        right: (margin/2)px;
+     */
+}
+
+/* Gridstack cells */
+.grid-stack .dashboard-item-background,
+.grid-stack .dashboard-item-border {
+    position: absolute;
+    background-color: white;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
+    transition: box-shadow 0.75s;
+
+    /*
+        computed by gridstack-custom:
+
+        left: (margin/2)px;
+        right: (margin/2)px;
+     */
+}
+.grid-stack .dashboard-item-border {
+    background-color: transparent;
+    color: transparent;
+    z-index: 10;
+    pointer-events: none; /* "pass through" mouse events */
+    transition: background-color 0.2s,
+                color 0.2s,
+                box-shadow 0.75s;
+}
+.grid-stack .cell:not(.grid-stack-item) .dashboard-item-background,
+.grid-stack .cell:not(.grid-stack-item) .dashboard-item-border {
+    left: 0;
+    right: 0;
+}
+.grid-stack:hover .grid-stack-item .dashboard-item-border,
+.grid-stack .cell:not(.grid-stack-item) {
+    box-shadow: 0 1px 5px 1px rgba(87,87,87,0.2);
+}
+.urth-dashboard .grid-stack .ui-draggable-dragging.cell,
+.urth-dashboard .grid-stack .ui-resizable-resizing.cell {
+    opacity: 0.75;
+}
+.grid-stack .cell > :not(.dashboard-item-background):not(.dashboard-item-border):not(.ui-resizable-handle) {
+    /*
+        computed by gridstack-custom:
+
+        margin-left: (margin/2)px;
+        margin-right: (margin/2)px;
+     */
+}
+
+/* Dashboard cell controls: drag */
+.urth-dashboard .grid-stack .cell .drag-handle:hover {
+    color: #306c9e;
+    cursor: move; /* for old IE */
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+body.dragging,
+body.dragging.urth-dashboard .grid-stack .ui-draggable-dragging.cell:hover .drag-handle:hover {
+    cursor: -webkit-grabbing !important;
+    cursor: grabbing !important;
+}
+
+/* drag/drop cell overlay*/
+.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .dashboard-item-border {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-justify-content: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-align-items: center;
+        -ms-flex-align: center;
+            align-items: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #b2b2b2;
+    font-size: 50px;
+    pointer-events: auto;
+}
+.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .dashboard-item-border:hover {
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .cell-control-container,
+.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .ui-resizable-handle {
+    display: none !important; /* important needed to override inline style set by gridstack */
+}
+.urth-dashboard:not(.all_cell_drag):not(.view-only) .grid-stack .dashboard-item-border i,
+.urth-dashboard .grid-stack > .cell:not(.grid-stack-item) .dashboard-item-border i {
+    display: none;
+}
+
+/* Cell controls: add buttons */
+.urth-dashboard .grid-stack .cell .cell-control.add-btn {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    min-width: 25px;
+    width: auto;
+}
+.urth-dashboard .grid-stack .cell .cell-control.add-btn > .bar-container {
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    flex-direction: column;
+}
+.urth-dashboard .grid-stack .cell .cell-control.add-btn > .bar-container > .bar {
+    width: 1em;
+    height: 3px;
+    background-color: #b2b2b2;
+    display: inline-block;
+    margin-bottom: 2px;
+}
+.urth-dashboard .grid-stack .cell .cell-control.add-btn > .bar-container > .bar.bar-lighter {
+    background-color: #dadada;
+}
+.urth-dashboard .grid-stack .cell .cell-control.add-btn:hover > .bar-container > .bar {
+    background-color: #306c9e;
+}
+.urth-dashboard .grid-stack .cell .cell-control.add-btn:hover > .bar-container > .bar.bar-lighter {
+    background-color: #A6D3F9;
+}
+.urth-dashboard .grid-stack .cell .cell-control.add-btn > .fa-plus {
+    margin-left: 2px;
+    margin-top: 4px;
+    font-size: 0.8em;
+}
+
+/* Hide specific grid controls based on hidden state */
+.urth-dashboard .grid-stack .cell.grid-stack-item .cell-control.add-btn-relative,
+.urth-dashboard .grid-stack .cell.grid-stack-item .cell-control .fa-plus,
+.urth-dashboard .grid-stack .cell:not(.grid-stack-item) .cell-control.drag-handle,
+.urth-dashboard .grid-stack .cell:not(.grid-stack-item) .cell-control.hide-btn,
+.urth-dashboard .grid-stack .cell:not(.grid-stack-item) .gs-resize-handle {
+    display: none;
+}
+
+/* static view */
+.urth-dashboard.view-only .grid-stack-static .cell.ui-state-disabled {
+    /* override disabled state set by jquery-ui */
+    opacity: 1;
+    -webkit-filter: none;
+    filter: none;
+}
+.urth-dashboard.view-only .grid-stack .cell:not(.grid-stack-item),
+.urth-dashboard.view-only .grid-stack .dashboard-item-background,
+.urth-dashboard.view-only .grid-stack .dashboard-item-border {
+    display: none;
+}
+
+/* Hidden cells */
+.grid-stack .cell:not(.grid-stack-item) {
+    position: absolute;
+    min-height: 100px;
+    transition: left 0.3s, top 0.3s, height 0.3s, width 0.3s;
+}
+.grid-stack .cell.code_cell:not(.grid-stack-item) .input_area {
+    max-height: 200px;
+    overflow: scroll;
+}
+
+/* Gridstack Overrides */
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-se,
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-sw {
+    width:  8px;
+    height: 8px;
+    bottom: 5px;
+    border: 2px solid rgb(178, 178, 178);
+    border-top: none;
+    -webkit-transform: none;
+            transform: none;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-se {
+    /*
+        computed in gridstack-custom:
+
+        right: 5px + (margin/2)px;
+    */
+    border-left: none;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-sw {
+    /*
+        computed in gridstack-custom:
+
+        left: 5px + (margin/2)px;
+    */
+    border-right: none;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-se::before,
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-sw::before {
+    content: ""; /* remove the existing drag icons */
+}
+
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-e,
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-w {
+    top: 25px;
+    bottom: 25px;
+    height: auto;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-e {
+    right: 0;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-w {
+    left: 0;
+}
+#notebook-container.grid-stack > .grid-stack-item > .ui-resizable-s {
+    width: auto;
+}

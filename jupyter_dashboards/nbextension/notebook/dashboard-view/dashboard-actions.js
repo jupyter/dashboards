@@ -9,7 +9,7 @@ define([
     'jquery',
     'base/js/namespace',
     './dashboard-metadata',
-    'text!./layout-toolbar-buttons.html',
+    'text!./view-toolbar-buttons.html',
     'text!./sub-menu.html',
     'text!./view-menu.html'
 ], function(
@@ -22,7 +22,8 @@ define([
 ) {
     'use strict';
 
-    // DASHBOARD_AUTH_* states are saved in notebook metadata
+    // These states are used in html templates as data-dashboard-state
+    // DASHBOARD_AUTH_* states are saved in notebook metadata as layout
     var STATE = {
         NOTEBOOK: 'notebook',
         DASHBOARD_AUTH_GRID: 'grid',
@@ -35,10 +36,7 @@ define([
     var opts, scrollToBottom;
 
     function enterDashboardMode(newState) {
-        opts.enterDbModeCallback(
-            newState !== STATE.DASHBOARD_PREVIEW, // doEnableGrid
-            newState === STATE.DASHBOARD_AUTH_REPORT
-        );
+        opts.enterDbModeCallback(newState);
         // disable scroll to bottom of notebook
         scrollToBottom = IPython.Notebook.prototype.scroll_to_bottom;
         IPython.Notebook.prototype.scroll_to_bottom = function() {};
@@ -168,7 +166,12 @@ define([
         $('#view_menu').append('<li class="divider"/>', viewMenuTemplate)
             .find('[data-dashboard-state]')
                 .click(function() {
-                    setDashboardState($(this).attr('data-dashboard-state'));
+                    var $el = $(this);
+                    var state = $el.attr('data-dashboard-state');
+                    if ($el.parents('#urth-dashboard-layout-menu').length) {
+                        Metadata.dashboardLayout = state;
+                    }
+                    setDashboardState(state);
                 })
                 .filter(function() {
                     return $(this).attr('data-dashboard-state') === currentState;

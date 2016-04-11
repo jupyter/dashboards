@@ -29,6 +29,8 @@ define([
     'use strict';
 
     var CELL_PROPERTIES = ['col','row','width','height'];
+
+    // must match `dashboard-actions` auth states
     var DASHBOARD_LAYOUT = {
         GRID: 'grid',
         REPORT: 'report'
@@ -44,10 +46,25 @@ define([
         }
     }
 
-    function _createEmptyUrthMetadata(metadata) {
-        metadata.urth = metadata.urth || {};
-        metadata.urth.dashboard = metadata.urth.dashboard || {};
+    function _createEmptyUrthMetadata(metadata, preserveExistingMetadata) {
+        if (preserveExistingMetadata) {
+            metadata.urth = metadata.urth || {};
+            metadata.urth.dashboard = metadata.urth.dashboard || {};
+        } else {
+            metadata.urth = {
+                dashboard: {}
+            };
+        }
         return metadata;
+    }
+
+    function _getDashboardLayout() {
+        var metadata = _getDashboardMetadata();
+        var layout = DASHBOARD_LAYOUT.GRID;
+        if (metadata && metadata.layout) {
+            layout = metadata.layout;
+        }
+        return layout;
     }
 
     function _getDashboardMetadata() {
@@ -58,22 +75,32 @@ define([
         }
     }
 
+    /**
+     * Sets default values in the metadata if not set.
+     * @param  {Object} values - values to set
+     */
+    function _setDefaultValues(values) {
+        if (typeof values === 'object') {
+            var metadata = _getDashboardMetadata();
+            var valuesCopy = $.extend({}, values); // make a copy since we will modify
+            $.extend(valuesCopy, metadata); // lay existing on top of default values
+        } else {
+            throw new Error('Metadata values must be an object:', values);
+        }
+    }
+
     // creates empty dashboard metadata if necessary
     function _initMetadata(opts) {
-        // create empty notebook metadata if it doesn't exist
-        _createEmptyUrthMetadata(IPython.notebook.metadata);
+        // create empty notebook metadata (will wipe out any existing metadata)
+        var preserveExistingMetadata = _getDashboardLayout() === opts.dashboardLayout;
+        _createEmptyUrthMetadata(IPython.notebook.metadata, preserveExistingMetadata);
 
-        // add default notebook metadata values that are not set
-        IPython.notebook.metadata.urth.dashboard = $.extend({
-            defaultCellHeight: opts.rowHeight,
-            cellMargin: opts.gridMargin,
-            maxColumns: opts.numCols,
-            layout: opts.dashboardLayout
-        }, IPython.notebook.metadata.urth.dashboard);
+        // add default notebook metadata values
+        _setDefaultValues(opts);
 
         // create empty cell metadata if it doesn't exist
-        $('.cell').each(function(idx) {
-            _createEmptyUrthMetadata(_getCellMetadata($(this)));
+        $('.cell').each(function() {
+            _createEmptyUrthMetadata(_getCellMetadata($(this)), preserveExistingMetadata);
         });
     }
 
@@ -159,17 +186,20 @@ define([
          * @param {string} layout - desired dashboard layout
          */
         get dashboardLayout() {
-            var metadata = _getDashboardMetadata();
-            var layout = DASHBOARD_LAYOUT.GRID;
-            if (metadata && metadata.layout) {
-                layout = metadata.layout;
-            }
-            return layout;
+            return _getDashboardLayout();
         },
         set dashboardLayout(dbLayout) {
             if (_validValue(DASHBOARD_LAYOUT, dbLayout)) {
-                _createEmptyUrthMetadata(IPython.notebook.metadata)
+                var preserveExistingMetadata = _getDashboardLayout() === dbLayout;
+                _createEmptyUrthMetadata(IPython.notebook.metadata, preserveExistingMetadata)
                     .urth.dashboard.layout = dbLayout;
+
+                if (!preserveExistingMetadata) {
+                    // clear out cell metadata
+                    $('.cell').each(function() {
+                        _createEmptyUrthMetadata(_getCellMetadata($(this)));
+                    });
+                }
             } else {
                 throw new Error('Invalid dashboard layout:', dbLayout);
             }

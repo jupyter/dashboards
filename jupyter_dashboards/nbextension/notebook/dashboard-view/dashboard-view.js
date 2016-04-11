@@ -8,10 +8,12 @@
  * This module extends the notebook to allow dashboard creation and viewing.
  */
 define([
+    'jquery',
     'require',
     './polymer-support',
     '../link-css'
 ], function(
+    $,
     require,
     PolymerSupport,
     linkCSS
@@ -47,63 +49,85 @@ define([
     });
 
     linkCSS('./dashboard-view/dashboard-actions.css');
+    linkCSS('./dashboard-common/dashboard-common.css');
+    linkCSS('./dashboard-view/dashboard-view.css');
 
     var dashboard;
     var $helpArea;
+    var GRID_COLS = 12;
+    function getLayout(dbActions, module, opts) {
+        return {
+            module: module,
+            opts: $.extend({
+                exit: function() {
+                    dbActions.switchToNotebook();
+                }
+            }, opts)
+        };
+    }
 
     PolymerSupport.init();
 
     // dashboard-actions depends on requirejs text plugin
-    require(['./dashboard-actions', './dashboard-metadata'], function(DashboardActions, Metadata) {
+    require([
+        './dashboard-actions',
+        './dashboard-metadata'
+    ], function(
+        DashboardActions,
+        Metadata
+    ) {
         var dbActions = new DashboardActions({
-            enterDashboardMode: function(doEnableGrid, reportLayout) {
+            enterDashboardMode: function(actionState) {
+                $('body').addClass('urth-dashboard');
+                require([
+                    './layout/grid/layout',
+                    './layout/report/layout',
+                    'text!./help.html'
+                ], function(
+                    GridLayout,
+                    ReportLayout,
+                    helpTemplate
+                ) {
+                    var LAYOUT = {};
+                    LAYOUT[Metadata.DASHBOARD_LAYOUT.GRID] = getLayout(dbActions, GridLayout, {
+                        onResize: PolymerSupport.onResize,
+                        numCols: GRID_COLS
+                    });
+                    LAYOUT[Metadata.DASHBOARD_LAYOUT.REPORT] = getLayout(dbActions, ReportLayout);
+                    LAYOUT.preview = LAYOUT[Metadata.dashboardLayout];
 
-                // set the proper dashboard layout class
-                $('body').toggleClass('db-report-layout', reportLayout);
-                $('body').toggleClass('db-grid-layout', !reportLayout);
-
-                // create the dashboard
-                require(['./dashboard', 'text!./help.html'], function(Dashboard, helpTemplate) {
-
-                    function createDashboard() {
-                        var opts = {
-                            // DEFAULT OPTIONS - will be overridden by saved notebook metadata
-                            dashboardLayout: Metadata.DASHBOARD_LAYOUT.GRID,
-                            gridMargin: 10,
-                            numCols: 12,
-                            rowHeight: 20,
-                            // END DEFAULT OPTIONS
-
-                            container: $('#notebook-container'),
-                            scrollContainer: $('#site'),
-                            defaultCellHeight: 4,
-                            defaultCellWidth: 4,
-                            minCellHeight: 2,
-                            onResize: PolymerSupport.onResize,
-                            exit: function() {
-                                dbActions.switchToNotebook();
-                            },
-                            reportLayout: reportLayout
-                        };
-                        Metadata.initialize(opts);
-                        if (reportLayout) {
-                            Metadata.updateCellLayout({
-                                width: 12
-                            });
-                            Metadata.stackCells();
-                        }
-                        return Dashboard.create(opts);
-                    }
+                    var layout = LAYOUT[actionState];
+                    $('body').attr('data-dashboard-layout', Metadata.dashboardLayout);
 
                     if (dashboard) {
+                        // when switching between two layouts, destroy the old one
                         dashboard.destroy();
-                        dashboard = createDashboard();
-                    } else {
-                        dashboard = createDashboard();
-                        $helpArea = $(helpTemplate).prependTo($('#notebook_panel'));
                     }
+                    // create help area
+                    if ($helpArea) {
+                        // remove if it exists since layout-specific help text will be inserted
+                        $helpArea.remove();
+                    }
+                    $helpArea = $(helpTemplate).prependTo($('#notebook_panel'));
+                    var layoutHelpText = layout.module.helpText;
+                    if (layoutHelpText) {
+                        // insert layout-specific help text
+                        if (layoutHelpText.snippet) {
+                            $helpArea.find('.help-snippet-text').text(layoutHelpText.snippet);
+                        }
+                        var layoutHelpDetails = layoutHelpText.details;
+                        if (layoutHelpDetails) {
+                            var $firstDetail = $helpArea.find('.help-details-list').children().first();
+                            Object.keys(layoutHelpDetails).forEach(function(key, i) {
+                                $firstDetail.before($('<li>').append(layoutHelpDetails[key]));
+                            });
+                        }
+                    }
+
+                    // instantiate the dashboard
+                    dashboard = layout.module.create(layout.opts);
                     dashboard.setInteractive({
-                        enable: doEnableGrid,
+                        enable: actionState !== 'preview',
                         complete: function() {
                             PolymerSupport.notifyResizeAll();
                         }
@@ -111,16 +135,17 @@ define([
                 });
             },
             exitDashboardMode: function() {
+                $('body').removeClass('urth-dashboard');
                 dashboard.destroy();
                 dashboard = null;
                 PolymerSupport.notifyResizeAll();
                 $helpArea.remove();
             },
             showAll: function() {
-                dashboard.showAllCellsPacked();
+                dashboard.showAllCells();
             },
             showAllStacked: function() {
-                dashboard.showAllCellsStacked();
+                dashboard.showAllCells({ width : GRID_COLS });
             },
             hideAll: function() {
                 dashboard.hideAllCells();
