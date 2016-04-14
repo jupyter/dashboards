@@ -7,15 +7,15 @@ define([
     '../../../link-css',
     '../../dashboard-metadata',
     '../../notebook-util',
-    'text!./cell-controls.html',
-    'text!./collapse-button.html'
+    'template!./cell-controls.html',
+    'template!./collapse-button.html'
 ], function(
     $,
     linkCSS,
     Metadata,
     nbUtil,
-    cellControlsTemplate,
-    collapseButtonTemplate
+    $cellControlsTemplate,
+    $collapseButtonTemplate
 ) {
     'use strict';
 
@@ -59,7 +59,7 @@ define([
     ReportLayout.prototype._addCellControls = function($cell) {
         var self = this;
         if ($cell.find('.cell-control-nw').length === 0) {
-            var gc = $(cellControlsTemplate).appendTo($cell);
+            var gc = $cellControlsTemplate.clone().appendTo($cell);
             gc.find('.add-btn').click(function() {
                 self._setCellVisibility(nbUtil.getParentCell(this), true);
             });
@@ -88,7 +88,7 @@ define([
         // insert collapse button between adjacent visible and hidden cells
         $CONTAINER.find('.cell:not(.dashboard-hidden) + .cell.dashboard-hidden, .cell.dashboard-hidden:first-child')
             .each(function() {
-                var $collapseBtn = $(collapseButtonTemplate).click(function() {
+                var $collapseBtn = $collapseButtonTemplate.clone().click(function() {
                     var $btn = $(this);
                     $btn.toggleClass('dashboard-collapsed');
                     $btn.nextUntil('.dashboard-report-collapse-btn', '.cell.dashboard-hidden')

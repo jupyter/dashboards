@@ -11,7 +11,7 @@ define([
     '../../../link-css',
     '../../dashboard-metadata',
     '../../notebook-util',
-    'text!./cell-controls.html',
+    'template!./cell-controls.html',
     'urth-common/gridstack-custom' // jquery plugin: return value not used
 ], function(
     $,
@@ -21,7 +21,7 @@ define([
     linkCSS,
     Metadata,
     nbUtil,
-    gridControlsTemplate
+    $cellControlsTemplate
 ) {
     'use strict';
 
@@ -310,7 +310,7 @@ define([
     GridLayout.prototype._addGridControls = function($cell) {
         var self = this;
         if ($cell.find('.cell-control-nw').length === 0) {
-            var gc = $(gridControlsTemplate).appendTo($cell);
+            var gc = $cellControlsTemplate.clone().appendTo($cell);
             gc.find('.hide-btn').click(function() {
                     self._hideCell(nbUtil.getParentCell(this));
                 });

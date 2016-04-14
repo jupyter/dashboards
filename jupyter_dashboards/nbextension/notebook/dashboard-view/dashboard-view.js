@@ -28,7 +28,8 @@ define([
         paths: {
             Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.min').split('?')[0],
             lodash: require.toUrl('../bower_components/lodash/lodash').split('?')[0],
-            text: require.toUrl('../bower_components/requirejs-text/text').split('?')[0]
+            text: require.toUrl('../bower_components/requirejs-text/text').split('?')[0],
+            template: require.toUrl('./template-loader').split('?')[0]
             // jquery-ui is already loaded by Notebook, as 'jqueryui' in 4.0.x and 'jquery-ui' in 4.1.x
         },
         map: {
@@ -82,11 +83,11 @@ define([
                 require([
                     './layout/grid/layout',
                     './layout/report/layout',
-                    'text!./help.html'
+                    'template!./help.html'
                 ], function(
                     GridLayout,
                     ReportLayout,
-                    helpTemplate
+                    $helpTemplate
                 ) {
                     var LAYOUT = {};
                     LAYOUT[Metadata.DASHBOARD_LAYOUT.GRID] = getLayout(dbActions, GridLayout, {
@@ -108,7 +109,7 @@ define([
                         // remove if it exists since layout-specific help text will be inserted
                         $helpArea.remove();
                     }
-                    $helpArea = $(helpTemplate).prependTo($('#notebook_panel'));
+                    $helpArea = $helpTemplate.clone().prependTo($('#notebook_panel'));
                     var layoutHelpText = layout.module.helpText;
                     if (layoutHelpText) {
                         // insert layout-specific help text

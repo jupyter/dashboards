@@ -9,16 +9,16 @@ define([
     'jquery',
     'base/js/namespace',
     './dashboard-metadata',
-    'text!./view-toolbar-buttons.html',
-    'text!./sub-menu.html',
-    'text!./view-menu.html'
+    'template!./view-toolbar-buttons.html',
+    'template!./sub-menu.html',
+    'template!./view-menu.html'
 ], function(
     $,
     IPython,
     Metadata,
-    layoutToolbarBtnsTemplate,
-    subMenuTemplate,
-    viewMenuTemplate
+    $viewToolbarBtnsTemplate,
+    $subMenuTemplate,
+    $viewMenuTemplate
 ) {
     'use strict';
 
@@ -163,7 +163,7 @@ define([
 
     DashboardActions.prototype.addMenuItems = function() {
         // Add view menu items and hook up click handlers to set state
-        $('#view_menu').append('<li class="divider"/>', viewMenuTemplate)
+        $('#view_menu').append('<li class="divider"/>', $viewMenuTemplate.clone())
             .find('[data-dashboard-state]')
                 .click(function() {
                     var $el = $(this);
@@ -178,7 +178,7 @@ define([
                 }).addClass('selected'); // initial selected view menu item
 
         // Cell menu items to show/hide cells
-        $('#cell_menu').append('<li class="divider"/>', subMenuTemplate);
+        $('#cell_menu').append('<li class="divider"/>', $subMenuTemplate.clone());
         $('#urth-dashboard-show-all').click(opts.showAllCallback);
         $('#urth-dashboard-show-all-stacked').click(opts.showAllStackedCallback);
         $('#urth-dashboard-hide-all').click(opts.hideAllCallback);
@@ -186,7 +186,7 @@ define([
 
     DashboardActions.prototype.addToolbarItems = function() {
         // add toolbar buttons from template and add click handlers
-        $(IPython.toolbar.selector).append(layoutToolbarBtnsTemplate);
+        $(IPython.toolbar.selector).append($viewToolbarBtnsTemplate.clone());
         $(toolbarBtnsSelector + ' [data-dashboard-state]').click(function() {
             var el = $(this);
             var state = el.attr('data-dashboard-state');
