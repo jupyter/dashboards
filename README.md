@@ -31,26 +31,35 @@ Note that both of these deployments tend to lag the latest stable release.
 
 ### Prerequisites
 
-* Jupyter Notebook 4.1.x or 4.0.x running on Python 3.x or Python 2.7.x
+* Jupyter Notebook 4.2.x, 4.1.x, or 4.0.x running on Python 3.x or Python 2.7.x
 * Edge, Chrome, Firefox, or Safari
 
 Note: If you're running IPython Notebook 3.2.x, you can install the older 0.1.x version of the extension.
 
 ### Dashboard Layout and Preview
 
-To get the basic dashboard layout and preview features in Jupyter Notebook:
+In Jupyter Notebook 4.2, you install and activate the dashboard layout and preview features using the `jupyter` command line like so:
+
+```bash
+# install the python package
+pip install jupyter_dashboards
+
+# install and enable the extension in the system prefix by default
+# or see jupyter nbextension enable --help for other options (e.g., --user)
+jupyter nbextension install --py jupyter_dashboards --sys-prefix
+jupyter nbextension enable --py jupyter_dashboards --sys-prefix
+```
+
+In Jupyter Notebook 4.1 and 4.0, you install and activate the extension like so:
 
 ```bash
 # install the python package
 pip install jupyter_dashboards
 # register the notebook frontend extensions into ~/.local/jupyter
-# see jupyter cms install --help for other options
+# see jupyter dashboards install --help for other options (e.g., --sys-prefix)
 jupyter dashboards install --user --symlink --overwrite
 # enable the JS and server extensions in your ~/.jupyter
 jupyter dashboards activate
-
-# deactivate it later with
-jupyter dashboards deactivate
 ```
 
 If you also want to download or deploy your dashboards as web applications, read the next section about *Deploying Dashboards*.
@@ -64,24 +73,30 @@ It's within the scope of the dashboard incubator projects to allow users to both
 
 We consider the code which addresses the first use case stable for the time being. On the other hand, we are actively maturing support for the latter use case by following our [dashboard deployment roadmap](https://github.com/jupyter-incubator/dashboards/wiki/Deployment-Roadmap) which largely seeks to address the [threats identified](https://github.com/jupyter-incubator/dashboards/wiki/Deployed-Dashboard-Threat-Analysis) in our initial proof-of-concept deployment mechanisms.
 
-If you'd like to try the **experimental** support for deploying dashboards as standalone web apps today, run the following. Then see the [jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) README for more details about the available bundlers.
-
-```bash
-pip install 'jupyter_cms>=0.4.0'
-jupyter cms install --user --symlink --overwrite
-jupyter cms activate
-pip install jupyter_dashboards_bundlers
-jupyter dashboards_bundlers activate
-```
+If you'd like to try the **experimental** support for deploying dashboards as standalone web apps today, see the [jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) README for details.
 
 ## Uninstall It
 
+In Jupyter Notebook 4.2:
+
 ```bash
-jupyter dashboards deactivate
+# disable extensions and remove frontend files
+jupyter nbextension disable --py jupyter_dashboards --sys-prefix
+jupyter nbextension uninstall --py jupyter_dashboards --sys-prefix
+
+# remove the python package
 pip uninstall jupyter_dashboards
 ```
 
-Note that there is no Jupyter method for removing the installed JavaScript extension assets. You will need to clean them up manually from your chosen install location.
+In Jupyter Notebook 4.0 and 4.1:
+
+```bash
+# disable extensions, but no way to remove frontend assets in this version
+jupyter dashboards deactivate
+
+# remove the python package
+pip uninstall jupyter_dashboards
+```
 
 ## Develop It
 
