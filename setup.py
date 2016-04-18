@@ -31,7 +31,7 @@ for more information.
     url='https://github.com/jupyter-incubator/dashboards',
     version=VERSION_NS['__version__'],
     license='BSD',
-    platforms=['Jupyter Notebook 4.0.x'],
+    platforms=['Jupyter Notebook 4.0.x', 'Jupyter Notebook 4.1.x', 'Jupyter Notebook 4.2.x'],
     packages=[
         'jupyter_dashboards'
     ],
