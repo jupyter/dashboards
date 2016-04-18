@@ -6,6 +6,6 @@ def _jupyter_nbextension_paths():
     return [{
         'section': 'notebook',
         'src': 'nbextension',
-        'dest': 'jupyter_cms',
+        'dest': 'jupyter_dashboards',
         'require': 'jupyter_dashboards/notebook/main'
     }]
