@@ -95,7 +95,13 @@ define([
                         numCols: GRID_COLS
                     });
                     LAYOUT[Metadata.DASHBOARD_LAYOUT.REPORT] = getLayout(dbActions, ReportLayout);
-                    LAYOUT.preview = LAYOUT[Metadata.dashboardLayout];
+
+                    if (actionState !== DashboardActions.STATE.NOTEBOOK &&
+                        !Metadata.dashboardLayout) {
+                        // set to grid by default if layout not set
+                        Metadata.dashboardLayout = Metadata.DASHBOARD_LAYOUT.GRID;
+                    }
+                    LAYOUT[DashboardActions.STATE.DASHBOARD_PREVIEW] = LAYOUT[Metadata.dashboardLayout];
 
                     var layout = LAYOUT[actionState];
                     $('body').attr('data-dashboard-layout', Metadata.dashboardLayout);

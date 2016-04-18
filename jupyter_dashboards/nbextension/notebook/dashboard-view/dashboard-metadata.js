@@ -31,10 +31,10 @@ define([
     var CELL_PROPERTIES = ['col','row','width','height'];
 
     // must match `dashboard-actions` auth states
-    var DASHBOARD_LAYOUT = {
+    var DASHBOARD_LAYOUT = Object.freeze({
         GRID: 'grid',
         REPORT: 'report'
-    };
+    });
 
     // pull cell metadata from element data
     function _getCellMetadata($elem) {
@@ -60,7 +60,7 @@ define([
 
     function _getDashboardLayout() {
         var metadata = _getDashboardMetadata();
-        var layout = DASHBOARD_LAYOUT.GRID;
+        var layout = null;
         if (metadata && metadata.layout) {
             layout = metadata.layout;
         }
@@ -190,7 +190,10 @@ define([
         },
         set dashboardLayout(dbLayout) {
             if (_validValue(DASHBOARD_LAYOUT, dbLayout)) {
-                var preserveExistingMetadata = _getDashboardLayout() === dbLayout;
+                var currentLayout = _getDashboardLayout();
+                var preserveExistingMetadata = currentLayout === dbLayout ||
+                                               currentLayout === null;
+
                 _createEmptyUrthMetadata(IPython.notebook.metadata, preserveExistingMetadata)
                     .urth.dashboard.layout = dbLayout;
 

@@ -24,12 +24,12 @@ define([
 
     // These states are used in html templates as data-dashboard-state
     // DASHBOARD_AUTH_* states are saved in notebook metadata as layout
-    var STATE = {
+    var STATE = Object.freeze({
         NOTEBOOK: 'notebook',
         DASHBOARD_AUTH_GRID: 'grid',
         DASHBOARD_AUTH_REPORT: 'report',
         DASHBOARD_PREVIEW: 'preview'
-    };
+    });
     var currentState = STATE.NOTEBOOK;
     var toolbarBtnsSelector = '#urth-dashboard-view-toolbar-buttons';
     var isHeaderVisible = true, isToolbarVisible = true;
@@ -56,7 +56,8 @@ define([
     }
 
     function updateAuthoringBtn(state) {
-        if (state !== STATE.NOTEBOOK &&
+        if (state &&
+            state !== STATE.NOTEBOOK &&
             state !== STATE.DASHBOARD_PREVIEW) {
             var $btns = $(toolbarBtnsSelector);
             var icon = getFaIconClass($btns.find(
@@ -160,6 +161,11 @@ define([
         };
         setStateFromQueryString();
     };
+
+    Object.defineProperty(DashboardActions, 'STATE', {
+        value: STATE,
+        writable: false
+    });
 
     DashboardActions.prototype.addMenuItems = function() {
         // Add view menu items and hook up click handlers to set state
