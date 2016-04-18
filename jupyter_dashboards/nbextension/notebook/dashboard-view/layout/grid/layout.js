@@ -36,20 +36,18 @@ define([
     var MAX_SCROLL_SPEED = 20;
 
     // grid parameters
+    var _NUM_COLS = 12;
     var GRID_MARGIN = 10;
-    var NUM_COLS = 12;
     var ROW_HEIGHT = 20;
-    var $CONTAINER = $('#notebook-container');
-    var SCROLL_CONTAINER = $('#site').get(0);
     var DEFAULT_CELL_HEIGHT = 4;
     var DEFAULT_CELL_WIDTH = 4;
     var MIN_CELL_HEIGHT = 2;
 
     function GridLayout(opts) {
         this.opts = opts;
-        if (opts.hasOwnProperty('numCols')) {
-            NUM_COLS = opts.numCols;
-        }
+        this.$container = opts.$container;
+        this.scrollContainer = opts.scrollContainer;
+        this.numCols = opts.hasOwnProperty('numCols') ? opts.numCols : _NUM_COLS;
 
         this._loaded = $.Deferred();
         ErrorLog.enable(IPython);
@@ -57,7 +55,7 @@ define([
         Metadata.initialize({
             dashboardLayout: Metadata.DASHBOARD_LAYOUT.GRID,
             gridMargin: GRID_MARGIN,
-            numCols: NUM_COLS,
+            numCols: this.numCols,
             rowHeight: ROW_HEIGHT
         });
 
@@ -75,7 +73,7 @@ define([
             var nolayout = this._addMetadataToDom(); // returns cells that don't have metadata
 
             var self = this;
-            $CONTAINER.children().each(function() {
+            this.$container.children().each(function() {
                 self._addGridControls($(this));
             });
 
@@ -101,15 +99,15 @@ define([
 
     GridLayout.prototype._calcCellWidth = function() {
         this._cellMinWidthPX =
-            Math.floor($CONTAINER.width() / NUM_COLS) - GRID_MARGIN;
+            Math.floor(this.$container.width() / this.numCols) - GRID_MARGIN;
     };
 
     // Adds cell metadata to DOM. Returns DOM nodes for which there is no metadata.
     GridLayout.prototype._addMetadataToDom = function() {
         var nolayout = [];
-        $CONTAINER.addClass('grid-stack');
+        this.$container.addClass('grid-stack');
         var self = this;
-        $CONTAINER.find('.cell').each(function(idx) {
+        this.$container.find('.cell').each(function(idx) {
             // Gridstack expects horizontal margins to be handled within the cell. To accomplish
             // that, we need to wrap the cell contents in an element.
             // Also, we add a separate div to show the border, since we want to show that above
@@ -134,10 +132,10 @@ define([
 
     GridLayout.prototype._enableGridstack = function() {
         var handles = 'e, se, s, sw, w';
-        this.gridstack = $CONTAINER.gridstack({
+        this.gridstack = this.$container.gridstack({
                 vertical_margin: GRID_MARGIN,
                 cell_height: ROW_HEIGHT,
-                width: NUM_COLS,
+                width: this.numCols,
                 // disables single-column mode (which reorders DOM nodes)
                 min_width: 0,
                 // Disable animation when first creating Gridstack so it doesn't do a resize
@@ -157,15 +155,15 @@ define([
             }.bind(this))
             .on('dragstart dragstop', function(event) {
                 $('body').toggleClass('dragging', event.type === 'dragstart');
-                this.dragStartYOffset = event.clientY + SCROLL_CONTAINER.scrollTop -
-                    SCROLL_CONTAINER.offsetTop - $CONTAINER.position().top -
+                this.dragStartYOffset = event.clientY + this.scrollContainer.scrollTop -
+                    this.scrollContainer.offsetTop - this.$container.position().top -
                     event.target.offsetTop;
             }.bind(this))
             .on('drag', function(event, ui) {
                 // always force the y-position relative to the mouse cursor
                 // because edge scrolling breaks the positioning
-                ui.position.top = event.clientY + SCROLL_CONTAINER.scrollTop -
-                    SCROLL_CONTAINER.offsetTop - $CONTAINER.position().top -
+                ui.position.top = event.clientY + this.scrollContainer.scrollTop -
+                    this.scrollContainer.offsetTop - this.$container.position().top -
                     this.dragStartYOffset;
                 this._scrollOnEdgeDrag(event.clientY, event.target);
             }.bind(this))
@@ -173,7 +171,7 @@ define([
 
         if (typeof this.opts.onResize === 'function') {
             var self = this;
-            $CONTAINER.on('dragstop resizestop', function(event, ui) {
+            this.$container.on('dragstop resizestop', function(event, ui) {
                 self.opts.onResize(event.target);
                 self._repositionHiddenCells();
             });
@@ -231,8 +229,8 @@ define([
 
     GridLayout.prototype._scrollOnEdgeDrag = function(yPos, dragTarget) {
         dragTarget = $(dragTarget);
-        var distanceFromTop = yPos - SCROLL_CONTAINER.offsetTop;
-        var distanceFromBottom = SCROLL_CONTAINER.offsetTop + SCROLL_CONTAINER.offsetHeight - yPos;
+        var distanceFromTop = yPos - this.scrollContainer.offsetTop;
+        var distanceFromBottom = this.scrollContainer.offsetTop + this.scrollContainer.offsetHeight - yPos;
 
         // Step 1: enable/disable scrolling
         if ((distanceFromTop <= SCROLL_EDGE_DISTANCE ||
@@ -242,7 +240,7 @@ define([
             this.isScrolling = true;
             this.scrollAmount = 0;
             this.scrollInterval = window.setInterval(function() {
-                SCROLL_CONTAINER.scrollTop += this.scrollAmount;
+                this.scrollContainer.scrollTop += this.scrollAmount;
                 dragTarget.css('top', parseInt(dragTarget.css('top')) + this.scrollAmount + 'px');
             }.bind(this), 16);
         } else if (distanceFromTop > SCROLL_EDGE_DISTANCE &&
@@ -275,7 +273,7 @@ define([
         var offsetpx = $('#dashboard-hidden-header').outerHeight();
 
         // recalculate hidden cells offsets
-        $CONTAINER
+        this.$container
             .find('> :not(.grid-stack-item)')
             .each(function() {
                 var $cell = $(this);
@@ -293,7 +291,7 @@ define([
 
     GridLayout.prototype._showHiddenArea = function() {
         // show hidden cells if appropriate
-        if ($CONTAINER.find('.cell:not(.grid-stack-item)').length > 0) {
+        if (this.$container.find('.cell:not(.grid-stack-item)').length > 0) {
             this.$hiddenHeader.removeClass('hidden');
             this._repositionHiddenCells();
         }
@@ -304,7 +302,7 @@ define([
         var $header = $('<div class="header"/>')
             .appendTo(this.$hiddenHeader)
             .append('<h2 class="title">Hidden Cells</h2>');
-        this.$hiddenHeader.insertAfter($CONTAINER); // add to DOM
+        this.$hiddenHeader.insertAfter(this.$container); // add to DOM
     };
 
     GridLayout.prototype._addGridControls = function($cell) {
@@ -316,11 +314,11 @@ define([
                 });
             gc.find('.add-btn-bottom').click(function() {
                     // show a cell full width on bottom of dashboard
-                    self._showCell(nbUtil.getParentCell(this), { width: NUM_COLS });
+                    self._showCell(nbUtil.getParentCell(this), { width: self.numCols });
                 });
             gc.find('.add-btn-top').click(function() {
                     // show a cell full width on top of dashboard
-                    self._showCell(nbUtil.getParentCell(this), { width: NUM_COLS }, 0);
+                    self._showCell(nbUtil.getParentCell(this), { width: self.numCols }, 0);
                 });
             gc.find('.add-btn-relative').click(function() {
                     // show a cell full width relative to notebook position
@@ -329,7 +327,7 @@ define([
                     var prevCellY = Number($prevCell.attr('data-gs-y'));
                     var prevCellHeight = Number($prevCell.attr('data-gs-height'));
                     var insertRow = (prevCellY + prevCellHeight) || 0; // use 0 if NaN
-                    self._showCell($cell, { width: NUM_COLS }, insertRow);
+                    self._showCell($cell, { width: self.numCols }, insertRow);
                 });
             gc.find('.edit-btn').click(function() {
                     var $cell = nbUtil.getParentCell(this);
@@ -427,8 +425,8 @@ define([
 
         // for text cells, if they are taller than the default, recalculate with max width
         if ($cell.hasClass('text_cell') && dim.height > h) {
-            $cell.css({ width: NUM_COLS * this._cellMinWidthPX });
-            dim = this._compute_cell_dim($cell, NUM_COLS, h);
+            $cell.css({ width: this.numCols * this._cellMinWidthPX });
+            dim = this._compute_cell_dim($cell, this.numCols, h);
         }
 
         $cell.css({ width: '', height: '', transition: '', display: '' });
@@ -443,7 +441,7 @@ define([
 
     GridLayout.prototype._hideCell = function($cell) {
         var self = this;
-        $CONTAINER.one('change', function() {
+        this.$container.one('change', function() {
             $cell.resizable('destroy');
             $cell.draggable('destroy');
             Metadata.hideCell($cell);
@@ -471,7 +469,7 @@ define([
     // computes metadata for a cell that doesn't have grid layout metadata
     GridLayout.prototype._addNotebookCellToDashboard = function($cell) {
         var dim = this._computeCellDimensions($cell);
-        return dim.isEmpty ? Promise.resolve() : this._showCell($cell);
+        return dim.isEmpty ? Promise.resolve($cell) : this._showCell($cell);
     };
 
     // move cell from hidden table to main grid
@@ -500,12 +498,19 @@ define([
             }
             $cell.attr(attrs);
 
-            // add widget to Gridstack, reject if it takes too long
+            // Add widget to Gridstack. Wait for change event to fire before
+            // resolving the promise so height calculations will work after
+            // showing a cell. Reject if the change event takes too long.
             var rejectTimeout = window.setTimeout(function() {
                 cellAddedPromise.reject('Timeout waiting for Gridstack to add widget', $cell);
             }, 10000);
+            var anyElementIsCell = function(changedElements, cell) {
+                return changedElements.some(function(el) {
+                    return el.el.is(cell);
+                });
+            };
             var onChange = function(event, elements) {
-                if (elements.some(function(el) { return el.el.is($cell); })) {
+                if (anyElementIsCell(elements, $cell)) {
                     cellAddedPromise.resolve($cell);
                     window.clearTimeout(rejectTimeout);
                     self.gridstack.container.off('change', onChange);
@@ -515,7 +520,7 @@ define([
             this.gridstack.make_widget($cell);
 
             $cell.css({ top: '', left: '' }); // remove classes added by _hideCell()
-            if ($CONTAINER.find('.cell:not(.grid-stack-item)').length === 0) {
+            if (this.$container.find('.cell:not(.grid-stack-item)').length === 0) {
                 this.$hiddenHeader.addClass('hidden');
             }
         } else {
@@ -542,7 +547,7 @@ define([
 
         // wait for both Gridstack and added cell to finish resizing before
         // recalculating positions of hidden cells.
-        $CONTAINER.one('transitionend',
+        this.$container.one('transitionend',
             containerTransitionEnd.resolve.bind(containerTransitionEnd));
         $.when(cellTransitionEnd, containerTransitionEnd, cellAddedPromise)
             .then(this._repositionHiddenCells.bind(this));
@@ -562,7 +567,7 @@ define([
     GridLayout.prototype.showAllCells = function(constraints) {
         var self = this;
         this.hideAllCells();
-        $CONTAINER
+        this.$container
             .find('.cell:not(.grid-stack-item)')
             .each(function() {
                 self._showCell($(this), constraints);
@@ -575,7 +580,7 @@ define([
      */
     GridLayout.prototype.hideAllCells = function() {
         var self = this;
-        $CONTAINER.find('.cell.grid-stack-item').each(function() {
+        this.$container.find('.cell.grid-stack-item').each(function() {
                 self._hideCell($(this));
             });
         IPython.notebook.set_dirty(true);
@@ -614,7 +619,7 @@ define([
         $(document.body).toggleClass('all_cell_drag', allCellDragEnable);
         // set draggable area to either full cell or the smaller drag handle
         var handle = allCellDragEnable ? '.dashboard-item-border' : DRAG_HANDLE;
-        $CONTAINER.find('> .grid-stack-item').draggable('option', 'handle', handle);
+        this.$container.find('> .grid-stack-item').draggable('option', 'handle', handle);
     };
 
     /**
@@ -625,10 +630,10 @@ define([
 
         this.gridstack.removeStylesheet();
         this.gridstack.destroy(false /* detach_node */);
-        $CONTAINER.removeData('gridstack'); // remove stored instance, so we can re-init
+        this.$container.removeData('gridstack'); // remove stored instance, so we can re-init
 
         // remove all 'data-gs-*' attributes from cells
-        $CONTAINER.find('> .cell').each(function() {
+        this.$container.find('> .cell').each(function() {
             var attrs = this.attributes;
             var toRemove = [];
             for (var attr in attrs) {
@@ -644,7 +649,7 @@ define([
         });
 
         // remove all 'grid-stack-*' class names from container
-        $CONTAINER.attr('class', function(idx, className) {
+        this.$container.attr('class', function(idx, className) {
             return className.split(' ')
                 .filter(function(val) {
                     return !/^grid-stack-/.test(val);
@@ -685,6 +690,8 @@ define([
         /**
          * Instantiate the grid layout.
          * @param {Object} opts - layout options
+         * @param {jQuery} $container - notebook container
+         * @param {DOM Element} scrollContainer - container that scrolls the notebook
          * @param {Function} opts.onResize - executed when a grid cell is resized or moved
          * @param {Function} opts.exit callback which is invoked when the Dashboard
          *                             initiates exiting from Dashboard Mode (for

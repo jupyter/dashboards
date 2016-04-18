@@ -105,8 +105,9 @@ define([
     }
 
     function updateUIState(state) {
-        updateUrlState(state === STATE.DASHBOARD_PREVIEW);
-        setHeaderVisibility(state !== STATE.DASHBOARD_PREVIEW);
+        var isDashboardPreview = state === STATE.DASHBOARD_PREVIEW;
+        updateUrlState(isDashboardPreview);
+        setHeaderVisibility(isDashboardPreview);
         updateAuthoringBtn(state);
 
         // set view-only class if previewing the dashboard

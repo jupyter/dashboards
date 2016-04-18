@@ -20,11 +20,10 @@ define([
     'use strict';
 
     var cssLoaded = false;
-    var $CONTAINER = $('#notebook-container');
-    var SCROLL_CONTAINER = $('#site').get(0);
 
     function ReportLayout(opts) {
         this.opts = opts;
+        this.$container = opts.$container;
 
         if (!cssLoaded) {
             cssLoaded = [
@@ -34,7 +33,7 @@ define([
 
         // setup cells for report layout
         var self = this;
-        $CONTAINER.find('.cell').each(function() {
+        this.$container.find('.cell').each(function() {
             var $cell = $(this);
 
             // hide cell if empty
@@ -86,7 +85,7 @@ define([
 
     ReportLayout.prototype._updateCollapseBtns = function() {
         // insert collapse button between adjacent visible and hidden cells
-        $CONTAINER.find('.cell:not(.dashboard-hidden) + .cell.dashboard-hidden, .cell.dashboard-hidden:first-child')
+        this.$container.find('.cell:not(.dashboard-hidden) + .cell.dashboard-hidden, .cell.dashboard-hidden:first-child')
             .each(function() {
                 var $collapseBtn = $collapseButtonTemplate.clone().click(function() {
                     var $btn = $(this);
@@ -100,13 +99,13 @@ define([
             });
 
         // remove out of place collapse buttons
-        $CONTAINER.find('.dashboard-report-collapse-btn + .cell:not(.dashboard-hidden)')
+        this.$container.find('.dashboard-report-collapse-btn + .cell:not(.dashboard-hidden)')
             .prev().remove();
-        $CONTAINER.find('.cell.dashboard-hidden + .dashboard-report-collapse-btn')
+        this.$container.find('.cell.dashboard-hidden + .dashboard-report-collapse-btn')
             .remove();
 
         // update collapse button groups
-        $CONTAINER.find('.dashboard-report-collapse-btn').each(function() {
+        this.$container.find('.dashboard-report-collapse-btn').each(function() {
             var $btn = $(this);
             var $collapseGroup = $btn.nextUntil('.dashboard-report-collapse-btn',
                 '.cell.dashboard-hidden');
@@ -123,12 +122,12 @@ define([
     /* PUBLIC API */
 
     ReportLayout.prototype.destroy = function() {
-        $CONTAINER.find('.cell').removeClass('dashboard-hidden');
-        $CONTAINER.find('.cell-control-container').remove();
-        $CONTAINER.find('.dashboard-report-collapse-btn').remove();
+        this.$container.find('.cell').removeClass('dashboard-hidden');
+        this.$container.find('.cell-control-container').remove();
+        this.$container.find('.dashboard-report-collapse-btn').remove();
     };
     ReportLayout.prototype.hideAllCells = function() {
-        $CONTAINER.find('.cell').addClass('dashboard-hidden').each(function() {
+        this.$container.find('.cell').addClass('dashboard-hidden').each(function() {
             Metadata.hideCell($(this));
         });
         this._updateCollapseBtns();
@@ -137,7 +136,7 @@ define([
         // no-op since report interactivity can be done using CSS
     };
     ReportLayout.prototype.showAllCells = function() {
-        $CONTAINER.find('.cell').removeClass('dashboard-hidden').each(function() {
+        this.$container.find('.cell').removeClass('dashboard-hidden').each(function() {
             Metadata.showCell($(this));
         });
         this._updateCollapseBtns();
@@ -156,6 +155,7 @@ define([
         /**
          * Instantiate the report layout.
          * @param {Object} opts - layout options
+         * @param {jQuery} opts.$container - notebook container
          * @param {Function} opts.exit callback which is invoked when the Dashboard
          *                             initiates exiting from Dashboard Mode (for
          *                             example, if user clicks on cell edit button to

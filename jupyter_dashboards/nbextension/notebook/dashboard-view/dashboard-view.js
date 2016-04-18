@@ -60,6 +60,8 @@ define([
         return {
             module: module,
             opts: $.extend({
+                $container: $('#notebook-container'),
+                scrollContainer: $('#site').get(0),
                 exit: function() {
                     dbActions.switchToNotebook();
                 }
