@@ -38,27 +38,30 @@ Note: If you're running IPython Notebook 3.2.x, you can install the older 0.1.x 
 
 ### Dashboard Layout and Preview
 
-In Jupyter Notebook 4.2, you install and activate the dashboard layout and preview features using the `jupyter` command line like so:
+In Jupyter Notebook 4.2, you install and activate the dashboard layout and preview features in two commands like so:
 
 ```bash
 # install the python package
 pip install jupyter_dashboards
 
-# install and enable the extension in the system prefix by default
-# or see jupyter nbextension enable --help for other options (e.g., --user)
-jupyter nbextension install --py jupyter_dashboards --sys-prefix
-jupyter nbextension enable --py jupyter_dashboards --sys-prefix
+# Install all parts of the extension to the active conda / venv / python env
+# and enable all parts of it in the jupyter profile in that environment
+# See jupyter dashboards quick-setup --help for other options (e.g., --user)
+jupyter dashboards quick-setup --sys-prefix
+# The above command is equivalent to this sequence of commands:
+# jupyter nbextension install --py jupyter_dashboards --sys-prefix
+# jupyter nbextension enable --py jupyter_dashboards --sys-prefix
 ```
 
 In Jupyter Notebook 4.1 and 4.0, you install and activate the extension like so:
 
 ```bash
-# install the python package
+# Install the python package
 pip install jupyter_dashboards
-# register the notebook frontend extensions into ~/.local/jupyter
-# see jupyter dashboards install --help for other options (e.g., --sys-prefix)
+# Register the notebook frontend extensions into ~/.local/jupyter
+# See jupyter dashboards install --help for other options (e.g., --sys-prefix)
 jupyter dashboards install --user --symlink --overwrite
-# enable the JS and server extensions in your ~/.jupyter
+# Enable the JS and server extensions in your ~/.jupyter
 jupyter dashboards activate
 ```
 
@@ -80,21 +83,24 @@ If you'd like to try the **experimental** support for deploying dashboards as st
 In Jupyter Notebook 4.2:
 
 ```bash
-# disable extensions and remove frontend files
-jupyter nbextension disable --py jupyter_dashboards --sys-prefix
-jupyter nbextension uninstall --py jupyter_dashboards --sys-prefix
+# Remove all parts of the extension from the active conda / venv / python env
+# See jupyter dashboards quick-remove --help for other options (e.g., --user)
+jupyter dashboards quick-remove --sys-prefix
+# The above command is equivalent to this sequence of commands:
+# jupyter nbextension disable --py jupyter_dashboards --sys-prefix
+# jupyter nbextension uninstall --py jupyter_dashboards --sys-prefix
 
-# remove the python package
+# Remove the python package
 pip uninstall jupyter_dashboards
 ```
 
 In Jupyter Notebook 4.0 and 4.1:
 
 ```bash
-# disable extensions, but no way to remove frontend assets in this version
+# Disable extensions, but no way to remove frontend assets in this version
 jupyter dashboards deactivate
 
-# remove the python package
+# Remove the python package
 pip uninstall jupyter_dashboards
 ```
 
