@@ -3,8 +3,18 @@
 import os.path
 import sys
 
+from ._version import __version__
+
 from notebook.nbextensions import (InstallNBExtensionApp, EnableNBExtensionApp, 
     DisableNBExtensionApp, flags, aliases)
+    
+try:
+    from notebook.nbextensions import BaseNBExtensionApp
+    _new_extensions = True
+except ImportError:
+    BaseNBExtensionApp = object
+    _new_extensions = False
+    
 from traitlets import Unicode
 from traitlets.config.application import catch_config_error
 from traitlets.config.application import Application
@@ -89,26 +99,73 @@ class ExtensionDeactivateApp(DisableNBExtensionApp):
         self.disable_nbextension("jupyter_dashboards/notebook/main")
         self.log.info("Done.")
 
+class ExtensionQuickSetupApp(BaseNBExtensionApp):
+    """Installs and enables all parts of this extension"""
+    name = "jupyter dashboards quick-setup"
+    version = __version__
+    description = "Installs and enables all features of the jupyter_dashboards extension"
+
+    def start(self):
+        self.argv.extend(['--py', 'jupyter_dashboards'])
+        
+        from notebook import nbextensions
+        install = nbextensions.InstallNBExtensionApp()
+        install.initialize(self.argv)
+        install.start()
+        enable = nbextensions.EnableNBExtensionApp()
+        enable.initialize(self.argv)
+        enable.start()
+
+class ExtensionQuickRemovalApp(BaseNBExtensionApp):
+    """Disables and uninstalls all parts of this extension"""
+    name = "jupyter dashboards quick-remove"
+    version = __version__
+    description = "Disables and removes all features of the jupyter_dashboards extension"
+
+    def start(self):
+        self.argv.extend(['--py', 'jupyter_dashboards'])
+
+        from notebook import nbextensions
+        enable = nbextensions.DisableNBExtensionApp()
+        enable.initialize(self.argv)
+        enable.start()
+        install = nbextensions.UninstallNBExtensionApp()
+        install.initialize(self.argv)
+        install.start()
+
 class ExtensionApp(Application):
     '''CLI for extension management.'''
     name = u'jupyter_dashboards extension'
     description = u'Utilities for managing the jupyter_dashboards extension'
     examples = ""
 
-    subcommands = dict(
-        install=(
-            ExtensionInstallApp,
-            "Install the extension."
-        ),
-        activate=(
-            ExtensionActivateApp,
-            "Activate the extension."
-        ),
-        deactivate=(
-            ExtensionDeactivateApp,
-            "Deactivate the extension."
-        )
-    )
+    subcommands = {}
+    if _new_extensions:
+        subcommands.update({
+            "quick-setup": (
+                ExtensionQuickSetupApp,
+                "Install and enable everything in the package (notebook>=4.2)"
+            ),
+            "quick-remove": (
+                ExtensionQuickRemovalApp,
+                "Disable and uninstall everything in the package (notebook>=4.2)"
+            )
+        })
+    else:
+        subcommands.update(dict(
+            install=(
+                ExtensionInstallApp,
+                "Install the extension."
+            ),
+            activate=(
+                ExtensionActivateApp,
+                "Activate the extension."
+            ),
+            deactivate=(
+                ExtensionDeactivateApp,
+                "Deactivate the extension."
+            )
+        ))
 
     def _classes_default(self):
         classes = super(ExtensionApp, self)._classes_default()
