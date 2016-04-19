@@ -55,7 +55,6 @@ define([
 
     var dashboard;
     var $helpArea;
-    var GRID_COLS = 12;
     function getLayout(dbActions, module, opts) {
         return {
             module: module,
@@ -93,8 +92,7 @@ define([
                 ) {
                     var LAYOUT = {};
                     LAYOUT[Metadata.DASHBOARD_LAYOUT.GRID] = getLayout(dbActions, GridLayout, {
-                        onResize: PolymerSupport.onResize,
-                        numCols: GRID_COLS
+                        onResize: PolymerSupport.onResize
                     });
                     LAYOUT[Metadata.DASHBOARD_LAYOUT.REPORT] = getLayout(dbActions, ReportLayout);
 
@@ -104,9 +102,7 @@ define([
                         Metadata.dashboardLayout = Metadata.DASHBOARD_LAYOUT.GRID;
                     }
                     LAYOUT[DashboardActions.STATE.DASHBOARD_PREVIEW] = LAYOUT[Metadata.dashboardLayout];
-
                     var layout = LAYOUT[actionState];
-                    $('body').attr('data-dashboard-layout', Metadata.dashboardLayout);
 
                     if (dashboard) {
                         // when switching between two layouts, destroy the old one
@@ -141,10 +137,13 @@ define([
                             PolymerSupport.notifyResizeAll();
                         }
                     });
+                    // Metadata.dashboardLayout gets set by the layout module
+                    $('body').attr('data-dashboard-layout', Metadata.dashboardLayout);
                 });
             },
             exitDashboardMode: function() {
-                $('body').removeClass('urth-dashboard');
+                $('body').removeClass('urth-dashboard')
+                         .attr('data-dashboard-layout', '');
                 dashboard.destroy();
                 dashboard = null;
                 PolymerSupport.notifyResizeAll();
@@ -154,7 +153,8 @@ define([
                 dashboard.showAllCells();
             },
             showAllStacked: function() {
-                dashboard.showAllCells({ width : GRID_COLS });
+                // ok if width is undefined, only grid layout takes an argument
+                dashboard.showAllCells({ width : dashboard.numCols });
             },
             hideAll: function() {
                 dashboard.hideAllCells();

@@ -87,25 +87,28 @@ define([
      * @param  {Object} values - values to set
      */
     function _setDefaultValues(values) {
+        values = values || {};
         if (typeof values === 'object') {
             var metadata = _getDashboardMetadata();
-            var valuesCopy = $.extend({}, values); // make a copy since we will modify
-            $.extend(valuesCopy, metadata); // lay existing on top of default values
+            Object.keys(values).forEach(function(key) {
+                // only copy values that are not already set in metadata
+                if (!metadata.hasOwnProperty(key)) {
+                    metadata[key] = values[key];
+                }
+            });
         } else {
             throw new Error('Metadata values must be an object:', values);
         }
     }
 
-    // creates empty dashboard metadata if necessary
-    function _initMetadata(opts) {
-        // create empty notebook metadata (will wipe out any existing metadata)
-        var preserveExistingMetadata = _getDashboardLayout() === opts.dashboardLayout;
+    // Ensures dashboard metadata exists and sets default notebook-level values.
+    // Will clear out existing metadata if preserveExistingMetadata == true.
+    function _initMetadata(opts, preserveExistingMetadata) {
+        if (arguments.length < 2) {
+            preserveExistingMetadata = true;
+        }
         _createEmptyUrthMetadata(null, preserveExistingMetadata);
-
-        // add default notebook metadata values
         _setDefaultValues(opts);
-
-        // create empty cell metadata if it doesn't exist
         $('.cell').each(function() {
             _createEmptyUrthMetadata(this, preserveExistingMetadata);
         });
@@ -200,19 +203,18 @@ define([
                 var currentLayout = _getDashboardLayout();
                 var preserveExistingMetadata = currentLayout === dbLayout ||
                                                currentLayout === null;
-
-                _createEmptyUrthMetadata(null, preserveExistingMetadata)
-                    .urth.dashboard.layout = dbLayout;
-
-                if (!preserveExistingMetadata) {
-                    // clear out cell metadata
-                    $('.cell').each(function() {
-                        _createEmptyUrthMetadata(this);
-                    });
-                }
+                _initMetadata({}, preserveExistingMetadata);
+                _getDashboardMetadata().layout = dbLayout;
             } else {
                 throw new Error('Invalid dashboard layout:', dbLayout);
             }
+        },
+
+        /**
+         * @return {Object} top-level dashboard metadata values
+         */
+        get dashboardMetadata() {
+            return _getDashboardMetadata();
         },
 
         /**

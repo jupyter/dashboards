@@ -70,7 +70,7 @@ define([
                     })
                     .addClass(icon);
         }
-        
+
         // enable the correct button group and menu state items
         var activeBtn = $(toolbarBtnsSelector + ' button:not(.dropdown-toggle)[data-dashboard-state="' + state + '"]');
         if (activeBtn.is('.dashboard-authoring-btn')) {
@@ -195,15 +195,9 @@ define([
         // add toolbar buttons from template and add click handlers
         $(IPython.toolbar.selector).append($viewToolbarBtnsTemplate.clone());
         $(toolbarBtnsSelector + ' [data-dashboard-state]').click(function() {
-            var el = $(this);
-            var state = el.attr('data-dashboard-state');
-            if (el.is('.dashboard-layout-menu-item')) {
-                Metadata.dashboardLayout = state;
-            }
-            setDashboardState(state);
+            setDashboardState($(this).attr('data-dashboard-state'));
         });
-
-        // update the authoring element based on current state, NOT the entire UI
+        // update the authoring element based on current state
         updateAuthoringOptions(currentState);
     };
 

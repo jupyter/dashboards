@@ -12,6 +12,9 @@
 }
 
 /* Dashboard cell */
+.urth-dashboard .cell {
+    position: relative;
+}
 .urth-dashboard .cell,
 .urth-dashboard .cell.selected {
     background: transparent;

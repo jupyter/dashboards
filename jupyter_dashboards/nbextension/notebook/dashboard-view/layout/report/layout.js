@@ -31,9 +31,7 @@ define([
             ];
         }
 
-        Metadata.initialize({
-            dashboardLayout: Metadata.DASHBOARD_LAYOUT.REPORT
-        });
+        Metadata.dashboardLayout = Metadata.DASHBOARD_LAYOUT.REPORT;
 
         // setup cells for report layout
         var self = this;
