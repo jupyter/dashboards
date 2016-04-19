@@ -55,7 +55,7 @@ define([
         })[0];
     }
 
-    function updateAuthoringBtn(state) {
+    function updateAuthoringOptions(state) {
         if (state &&
             state !== STATE.NOTEBOOK &&
             state !== STATE.DASHBOARD_PREVIEW) {
@@ -70,6 +70,20 @@ define([
                     })
                     .addClass(icon);
         }
+        
+        // enable the correct button group and menu state items
+        var activeBtn = $(toolbarBtnsSelector + ' button:not(.dropdown-toggle)[data-dashboard-state="' + state + '"]');
+        if (activeBtn.is('.dashboard-authoring-btn')) {
+            activeBtn = activeBtn.parent();
+        }
+        activeBtn.addClass('active').siblings().removeClass('active');
+        $('#view_menu [data-dashboard-state]').each(function() {
+            $(this).toggleClass('selected', state === $(this).attr('data-dashboard-state'));
+        });
+
+        // disable show/hide menu items when in preview state
+        $('.dashboard-submenu-item').toggleClass('disabled', state === STATE.NOTEBOOK || state === STATE.DASHBOARD_PREVIEW);
+        $('#urth-dashboard-show-all').toggleClass('disabled', state === STATE.NOTEBOOK || state === STATE.DASHBOARD_PREVIEW || state === STATE.DASHBOARD_AUTH_REPORT);
     }
 
     function setDashboardState(newState) {
@@ -107,25 +121,11 @@ define([
     function updateUIState(state) {
         var isDashboardPreview = state === STATE.DASHBOARD_PREVIEW;
         updateUrlState(isDashboardPreview);
-        setHeaderVisibility(isDashboardPreview);
-        updateAuthoringBtn(state);
+        setHeaderVisibility(!isDashboardPreview);
+        updateAuthoringOptions(state);
 
         // set view-only class if previewing the dashboard
         $('body').toggleClass('view-only', state === STATE.DASHBOARD_PREVIEW);
-
-        // enable the correct button group and menu state items
-        var activeBtn = $(toolbarBtnsSelector + ' button:not(.dropdown-toggle)[data-dashboard-state="' + state + '"]');
-        if (activeBtn.is('.dashboard-authoring-btn')) {
-            activeBtn = activeBtn.parent();
-        }
-        activeBtn.addClass('active').siblings().removeClass('active');
-        $('#view_menu [data-dashboard-state]').each(function() {
-            $(this).toggleClass('selected', state === $(this).attr('data-dashboard-state'));
-        });
-
-        // disable show/hide menu items when in preview state
-        $('.dashboard-submenu-item').toggleClass('disabled', state === STATE.NOTEBOOK || state === STATE.DASHBOARD_PREVIEW);
-        $('#urth-dashboard-show-all').toggleClass('disabled', state === STATE.NOTEBOOK || state === STATE.DASHBOARD_PREVIEW || state === STATE.DASHBOARD_AUTH_REPORT);
 
         // disable code editing when in a dashboard view
         $('.CodeMirror').each(function() {
@@ -203,9 +203,8 @@ define([
             setDashboardState(state);
         });
 
-        // update the UI based on initial state
-        updateAuthoringBtn(Metadata.dashboardLayout);
-        updateUIState(currentState);
+        // update the authoring element based on current state, NOT the entire UI
+        updateAuthoringOptions(currentState);
     };
 
     DashboardActions.prototype.switchToNotebook = function() {
