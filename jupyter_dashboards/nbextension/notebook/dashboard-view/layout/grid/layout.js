@@ -70,8 +70,8 @@ define([
             ];
         }
 
-        // Must wait for CSS to be evaluated before we generate the grid. Otherwise, positioning
-        // is calculated incorrectly.
+        // Must wait for CSS to be evaluated before we generate the grid.
+        // Otherwise, positioning is calculated incorrectly.
         $.when.apply(null, cssLoaded).then(function() {
             var nolayout = this._addMetadataToDom(); // returns cells that don't have metadata
 
