@@ -28,3 +28,4 @@ notifications:
 branches:
   only:
     - master
+    - fix-selenium
