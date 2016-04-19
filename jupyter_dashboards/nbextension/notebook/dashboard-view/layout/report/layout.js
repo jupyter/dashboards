@@ -26,33 +26,36 @@ define([
         this.$container = opts.$container;
 
         if (!cssLoaded) {
-            cssLoaded = [
-                linkCSS('./dashboard-view/layout/report/layout.css')
-            ];
+            cssLoaded = linkCSS('./dashboard-view/layout/report/layout.css');
         }
 
         Metadata.initialize({
             dashboardLayout: Metadata.DASHBOARD_LAYOUT.REPORT
         });
 
-        // setup cells for report layout
-        var self = this;
-        this.$container.find('.cell').each(function() {
-            var $cell = $(this);
+        $.when(cssLoaded).then(function() {
+            // setup cells for report layout
+            var self = this;
+            this.$container.find('.cell')
+                .css('min-height', '0px') // we detect empty cells by height
+                .each(function() {
+                    var $cell = $(this);
 
-            // hide cell if empty
-            if ($cell.height() === 0 && !Metadata.getCellLayout($cell)) {
-                Metadata.hideCell($cell);
-            }
+                    // hide cell if empty
+                    if ($cell.height() === 0 && !Metadata.getCellLayout($cell)) {
+                        Metadata.hideCell($cell);
+                    }
 
-            // set hidden state
-            $cell.toggleClass('dashboard-hidden dashboard-collapsed', !Metadata.isCellVisible($cell));
+                    // set hidden state
+                    $cell.toggleClass('dashboard-hidden dashboard-collapsed', !Metadata.isCellVisible($cell));
 
-            // add controle for hide, add, edit
-            self._addCellControls($cell);
+                    // add controle for hide, add, edit
+                    self._addCellControls($cell);
 
-            self._updateCollapseBtns();
-        });
+                    self._updateCollapseBtns();
+                })
+                .css('min-height','');
+        }.bind(this));
     }
 
     ReportLayout.prototype._addCellControls = function($cell) {
