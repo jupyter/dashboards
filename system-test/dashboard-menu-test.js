@@ -14,13 +14,13 @@ describe('Dashboard View Menu Buttons', function() {
     dashboard.assertInLayoutView();
     dashboard.done(done);
   });
-
+  
   it('clicking "Notebook" should switch to notebook view', function(done) {
     dashboard.clickNotebookViewMenuButton();
     dashboard.assertInNotebookView();
     dashboard.done(done);
   });
-
+  
   it('clicking "View Dashboard" should switch to dashboard view', function(done) {
     dashboard.clickDashboardViewMenuButton();
     dashboard.assertInDashboardView();

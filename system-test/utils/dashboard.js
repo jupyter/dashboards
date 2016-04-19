@@ -14,13 +14,14 @@ var Dashboard = function(wd, browser) {
 //  Represents different UI elements in the notebook/dashboard UI
 var DashboardElements = {
   "notebookViewButton": "#urth-dashboard-view-toolbar-buttons > button:nth-of-type(1)",
-  "layoutViewButton": "#urth-dashboard-view-toolbar-buttons > button:nth-of-type(2)",
-  "dashboardViewButton": "#urth-dashboard-view-toolbar-buttons > button:nth-of-type(3)",
+  "layoutViewButton": "#urth-dashboard-view-toolbar-buttons > .dashboard-authoring-btn-container > button:nth-of-type(1)",
+  "dashboardViewButton": "#urth-dashboard-view-toolbar-buttons > button:nth-of-type(2)",
   "layoutViewHelpArea" : "#notebook_panel > .help-area",
   "jupyterHeaderContainer": "#header-container",
   "viewMenuButton" : "ul.nav > li:nth-child(3)",
   "notebookViewMenuButton" : "#urth-notebook-view",
-  "layoutViewMenuButton" : "#urth-dashboard-auth",
+  "layoutViewMenuButton" : "#urth-dashboard-layout-menu",
+  "layoutViewGridMenuButton" : "#urth-dashboard-auth-grid",
   "dashboardViewMenuButton" : "#urth-dashboard-view"
 };
 //  Represents expressions run in the browser for verification
@@ -99,15 +100,20 @@ Dashboard.prototype.clickNotebookViewMenuButton = function(){
   */
 Dashboard.prototype.clickLayoutViewMenuButton = function(){
    this.lastCommand = this.lastCommand
-     .waitForElementByCssSelector(
+    .waitForElementByCssSelector(
        DashboardElements.viewMenuButton, this.wd.asserters.isDisplayed, timeout,
        logError.bind(undefined,'Could not find "View" menu button'))
-     .elementByCssSelector(DashboardElements.viewMenuButton)
-     .click()
+    .elementByCssSelector(DashboardElements.viewMenuButton)
+    .click()
     .waitForElementByCssSelector(
       DashboardElements.layoutViewMenuButton,this.wd.asserters.isDisplayed, timeout,
       logError.bind(undefined,'Could not find layout view menu button'))
     .elementByCssSelector(DashboardElements.layoutViewMenuButton)
+    .moveTo()
+    .waitForElementByCssSelector(
+      DashboardElements.layoutViewGridMenuButton,this.wd.asserters.isDisplayed, timeout,
+      logError.bind(undefined,'Could not find layout view grid menu button'))
+    .elementByCssSelector(DashboardElements.layoutViewGridMenuButton)
     .click();
     return this;
 };
@@ -166,6 +172,9 @@ Dashboard.prototype.assertInDashboardView = function(){
 };
 
 Dashboard.prototype.done = function(done) {
-  this.lastCommand.nodeify(done);
+    this.lastCommand
+        .execute('Jupyter.notebook.dirty = false;')
+        .nodeify(done);
+    return this;
 };
 module.exports = Dashboard;

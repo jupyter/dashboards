@@ -21,7 +21,7 @@ describe('Dashboard View Buttons', function() {
     dashboard.assertInNotebookView();
     dashboard.done(done);
   });
-
+  
   it('clicking dashboard view should switch to dashboard view', function(done) {
     dashboard.clickDashboardViewButton();
     dashboard.assertInDashboardView();
