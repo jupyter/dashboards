@@ -19,7 +19,6 @@
 .urth-dashboard[data-dashboard-layout="report"] .cell {
     background-color: white;
     margin-bottom: 1em;
-    position: relative;
 }
 .urth-dashboard[data-dashboard-layout="report"]:not(.view-only) .cell {
     min-height: 5em;

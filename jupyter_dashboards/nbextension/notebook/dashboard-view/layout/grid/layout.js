@@ -36,9 +36,6 @@ define([
     var MAX_SCROLL_SPEED = 20;
 
     // grid parameters
-    var _NUM_COLS = 12;
-    var GRID_MARGIN = 10;
-    var ROW_HEIGHT = 20;
     var DEFAULT_CELL_HEIGHT = 4;
     var DEFAULT_CELL_WIDTH = 4;
     var MIN_CELL_HEIGHT = 2;
@@ -47,16 +44,22 @@ define([
         this.opts = opts;
         this.$container = opts.$container;
         this.scrollContainer = opts.scrollContainer;
-        this.numCols = opts.hasOwnProperty('numCols') ? opts.numCols : _NUM_COLS;
 
         this._loaded = $.Deferred();
         ErrorLog.enable(IPython);
 
+        Metadata.dashboardLayout = Metadata.DASHBOARD_LAYOUT.GRID;
+
+        // read configurable values from dashboard metadata
+        var dm = Metadata.dashboardMetadata;
+        this.gridMargin = dm.cellMargin >= 0 ? dm.cellMargin : 10;
+        this.numCols = dm.maxColumns >= 0 ? dm.maxColumns : 12;
+        this.rowHeight = dm.defaultCellHeight >= 0 ? dm.defaultCellHeight : 20;
+
         Metadata.initialize({
-            dashboardLayout: Metadata.DASHBOARD_LAYOUT.GRID,
-            gridMargin: GRID_MARGIN,
-            numCols: this.numCols,
-            rowHeight: ROW_HEIGHT
+            cellMargin: this.gridMargin,
+            maxColumns: this.numCols,
+            defaultCellHeight: this.rowHeight
         });
 
         if (!cssLoaded) {
@@ -99,7 +102,7 @@ define([
 
     GridLayout.prototype._calcCellWidth = function() {
         this._cellMinWidthPX =
-            Math.floor(this.$container.width() / this.numCols) - GRID_MARGIN;
+            Math.floor(this.$container.width() / this.numCols) - this.gridMargin;
     };
 
     // Adds cell metadata to DOM. Returns DOM nodes for which there is no metadata.
@@ -133,8 +136,8 @@ define([
     GridLayout.prototype._enableGridstack = function() {
         var handles = 'e, se, s, sw, w';
         this.gridstack = this.$container.gridstack({
-                vertical_margin: GRID_MARGIN,
-                cell_height: ROW_HEIGHT,
+                vertical_margin: this.gridMargin,
+                cell_height: this.rowHeight,
                 width: this.numCols,
                 // disables single-column mode (which reorders DOM nodes)
                 min_width: 0,
@@ -178,7 +181,7 @@ define([
         }
 
         // setup dynamic style rules which depend on margin size
-        var halfMargin = GRID_MARGIN / 2;
+        var halfMargin = this.gridMargin / 2;
         var styleRules = [
             // position background across cell, with margins on sides
             {
@@ -372,7 +375,7 @@ define([
                 var elem = $cell.find(selector).get(0);
                 var outerHeight = elem ? elem.offsetHeight : 0; //$cell.find(selector).outerHeight();
                 return outerHeight ?
-                    Math.ceil((outerHeight + GRID_MARGIN) / (ROW_HEIGHT + GRID_MARGIN)) : 0;
+                    Math.ceil((outerHeight + self.gridMargin) / (self.rowHeight + self.gridMargin)) : 0;
             })
             .reduce(function(prev, y) {
                 return prev + y;
@@ -383,7 +386,7 @@ define([
                 var maxWidth = $cell.find(selector + ' *').toArray().reduce(function(prev, elem) {
                     return Math.max(prev, elem.offsetWidth);
                 }, 0);
-                return Math.ceil((maxWidth + GRID_MARGIN) / (self._cellMinWidthPX + GRID_MARGIN));
+                return Math.ceil((maxWidth + self.gridMargin) / (self._cellMinWidthPX + self.gridMargin));
             })
             .reduce(function(prev, x) {
                 return Math.max(prev, x);
@@ -415,8 +418,8 @@ define([
         var w = constraints.width || DEFAULT_CELL_WIDTH;
         var h = constraints.height || DEFAULT_CELL_HEIGHT;
         $cell.css({
-            width: w * (this._cellMinWidthPX + GRID_MARGIN) - GRID_MARGIN,
-            height: h * (ROW_HEIGHT + GRID_MARGIN) - GRID_MARGIN,
+            width: w * (this._cellMinWidthPX + this.gridMargin) - this.gridMargin,
+            height: h * (this.rowHeight + this.gridMargin) - this.gridMargin,
             transition: 'none', // disable transitions to allow proper width/height calculations
             display: 'block' // override `display:flex` set by Notebook CSS to allow proper calcs
         });
