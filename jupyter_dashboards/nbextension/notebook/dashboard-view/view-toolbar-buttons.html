@@ -1,0 +1,41 @@
+<!-- Copyright (c) Jupyter Development Team.
+    Distributed under the terms of the Modified BSD License. -->
+<!-- Button group to select dashboard layout view -->
+<div class="btn-group urth-dashboard-toolbar-buttons" id="urth-dashboard-view-toolbar-buttons">
+    <span class="navbar-text">Dashboard View:</span>
+
+    <!-- Notebook View button -->
+    <button class="btn btn-default" data-dashboard-state="notebook"
+            title="Notebook view. Edit the code">
+        <i class="fa fa-code"></i>
+    </button>
+
+    <!-- Dashboard Authoring View button-->
+    <!-- Contains a dropdown to choose a dashboard layout -->
+    <span class="btn btn-default dashboard-authoring-btn-container"
+            title="Dashboard authoring view.">
+        <button class="btn btn-default dashboard-authoring-btn" data-dashboard-state="grid">
+            <i class="fa fa-th-large dashboard-authoring-icon"></i>
+        </button>
+        <button class="btn btn-default dropdown-toggle db-embedded-dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Layout Dropdown</span>
+        </button>
+        <ul class="dropdown-menu">
+            <li class="dashboard-layout-menu-item" data-dashboard-state="grid"
+                    title="Dashboard Grid Layout. Size and position dashboard cells in a grid.">
+                <a href="#"><i class="fa fa-th-large"></i>Grid Layout</a>
+            </li>
+            <li class="dashboard-layout-menu-item" data-dashboard-state="report"
+                    title="Dashboard Report Layout. Display dashboard cells in a list.">
+                <a href="#"><i class="fa fa-bars"></i>Report Layout</a>
+            </li>
+        </ul>
+    </span>
+
+    <!-- Dashboard Preview View button -->
+    <button class="btn btn-default" data-dashboard-state="preview"
+            title="Dashboard Preview. Preview the dashboard.">
+        <i class="fa fa-dashboard"></i>
+    </button>
+</div>

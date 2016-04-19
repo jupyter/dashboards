@@ -8,10 +8,12 @@
  * This module extends the notebook to allow dashboard creation and viewing.
  */
 define([
+    'jquery',
     'require',
     './polymer-support',
     '../link-css'
 ], function(
+    $,
     require,
     PolymerSupport,
     linkCSS
@@ -26,7 +28,8 @@ define([
         paths: {
             Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.min').split('?')[0],
             lodash: require.toUrl('../bower_components/lodash/lodash').split('?')[0],
-            text: require.toUrl('../bower_components/requirejs-text/text').split('?')[0]
+            text: require.toUrl('../bower_components/requirejs-text/text').split('?')[0],
+            template: require.toUrl('./template-loader').split('?')[0]
             // jquery-ui is already loaded by Notebook, as 'jqueryui' in 4.0.x and 'jquery-ui' in 4.1.x
         },
         map: {
@@ -47,37 +50,93 @@ define([
     });
 
     linkCSS('./dashboard-view/dashboard-actions.css');
+    linkCSS('./dashboard-common/dashboard-common.css');
+    linkCSS('./dashboard-view/dashboard-view.css');
 
     var dashboard;
     var $helpArea;
+    var GRID_COLS = 12;
+    function getLayout(dbActions, module, opts) {
+        return {
+            module: module,
+            opts: $.extend({
+                $container: $('#notebook-container'),
+                scrollContainer: $('#site').get(0),
+                exit: function() {
+                    dbActions.switchToNotebook();
+                }
+            }, opts)
+        };
+    }
 
     PolymerSupport.init();
 
     // dashboard-actions depends on requirejs text plugin
-    require(['./dashboard-actions'], function(DashboardActions) {
+    require([
+        './dashboard-actions',
+        './dashboard-metadata'
+    ], function(
+        DashboardActions,
+        Metadata
+    ) {
         var dbActions = new DashboardActions({
-            enterDashboardMode: function(doEnableGrid) {
-                require(['./dashboard', 'text!./help.html'], function(Dashboard, helpTemplate) {
-                    if (!dashboard) {
-                        dashboard = Dashboard.create({
-                            container: $('#notebook-container'),
-                            scrollContainer: $('#site'),
-                            numCols: 12,
-                            rowHeight: 20,
-                            gridMargin: 10,
-                            defaultCellWidth: 4,
-                            defaultCellHeight: 4,
-                            minCellHeight: 2,
-                            layoutStrategy: 'packed',
-                            onResize: PolymerSupport.onResize,
-                            exit: function() {
-                                dbActions.switchToNotebook();
-                            }
-                        });
-                        $helpArea = $(helpTemplate).prependTo($('#notebook_panel'));
+            enterDashboardMode: function(actionState) {
+                $('body').addClass('urth-dashboard');
+                require([
+                    './layout/grid/layout',
+                    './layout/report/layout',
+                    'template!./help.html'
+                ], function(
+                    GridLayout,
+                    ReportLayout,
+                    $helpTemplate
+                ) {
+                    var LAYOUT = {};
+                    LAYOUT[Metadata.DASHBOARD_LAYOUT.GRID] = getLayout(dbActions, GridLayout, {
+                        onResize: PolymerSupport.onResize,
+                        numCols: GRID_COLS
+                    });
+                    LAYOUT[Metadata.DASHBOARD_LAYOUT.REPORT] = getLayout(dbActions, ReportLayout);
+
+                    if (actionState !== DashboardActions.STATE.NOTEBOOK &&
+                        !Metadata.dashboardLayout) {
+                        // set to grid by default if layout not set
+                        Metadata.dashboardLayout = Metadata.DASHBOARD_LAYOUT.GRID;
                     }
+                    LAYOUT[DashboardActions.STATE.DASHBOARD_PREVIEW] = LAYOUT[Metadata.dashboardLayout];
+
+                    var layout = LAYOUT[actionState];
+                    $('body').attr('data-dashboard-layout', Metadata.dashboardLayout);
+
+                    if (dashboard) {
+                        // when switching between two layouts, destroy the old one
+                        dashboard.destroy();
+                    }
+                    // create help area
+                    if ($helpArea) {
+                        // remove if it exists since layout-specific help text will be inserted
+                        $helpArea.remove();
+                    }
+                    $helpArea = $helpTemplate.clone().prependTo($('#notebook_panel'));
+                    var layoutHelpText = layout.module.helpText;
+                    if (layoutHelpText) {
+                        // insert layout-specific help text
+                        if (layoutHelpText.snippet) {
+                            $helpArea.find('.help-snippet-text').text(layoutHelpText.snippet);
+                        }
+                        var layoutHelpDetails = layoutHelpText.details;
+                        if (layoutHelpDetails) {
+                            var $firstDetail = $helpArea.find('.help-details-list').children().first();
+                            Object.keys(layoutHelpDetails).forEach(function(key, i) {
+                                $firstDetail.before($('<li>').append(layoutHelpDetails[key]));
+                            });
+                        }
+                    }
+
+                    // instantiate the dashboard
+                    dashboard = layout.module.create(layout.opts);
                     dashboard.setInteractive({
-                        enable: doEnableGrid,
+                        enable: actionState !== 'preview',
                         complete: function() {
                             PolymerSupport.notifyResizeAll();
                         }
@@ -85,16 +144,17 @@ define([
                 });
             },
             exitDashboardMode: function() {
+                $('body').removeClass('urth-dashboard');
                 dashboard.destroy();
                 dashboard = null;
                 PolymerSupport.notifyResizeAll();
                 $helpArea.remove();
             },
             showAll: function() {
-                dashboard.showAllCellsPacked();
+                dashboard.showAllCells();
             },
             showAllStacked: function() {
-                dashboard.showAllCellsStacked();
+                dashboard.showAllCells({ width : GRID_COLS });
             },
             hideAll: function() {
                 dashboard.hideAllCells();

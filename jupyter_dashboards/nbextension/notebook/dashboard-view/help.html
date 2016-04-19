@@ -1,3 +1,5 @@
+<!-- Copyright (c) Jupyter Development Team.
+     Distributed under the terms of the Modified BSD License. -->
 <style>
     .help-area {
         position: relative;
@@ -27,20 +29,19 @@
     .help-area:not(.show-more) .alert-info {
         display: none;
     }
-    .help-area ul {
+    .help-area .help-details-list {
         list-style-type: none;
         padding: 0;
     }
 </style>
 <div class="help-area container">
     <div class="help-snippet">
-        Arrange and size cells to create your dashboard. <a class="more-info-link" href="#">more info</a>
+        <span class="help-snippet-text">Dashboard authoring: create your dashboard.</span>
+        <a class="more-info-link" href="#">more info</a>
         <label class="show-code-label"><input type="checkbox" checked="true"> Show code on hover</label>
     </div>
     <div class="alert alert-info">
-        <ul>
-            <li><strong>Move cell: </strong>Click and drag <span class="fa fa-arrows"></span> to move a cell. Hold <strong>Shift</strong> to drag from anywhere on a cell.</li>
-            <li><strong>Resize cell: </strong>Click and drag cell edges or corners to resize.</li>
+        <ul class="help-details-list">
             <li><strong>Hide cell: </strong>Click <span class="fa fa-close"></span> to hide a cell from the dashboard view.</li>
             <li><strong>Show cell: </strong>Click <span class="fa fa-plus"></span> to return a hidden cell to the dashboard view.</li>
             <li><strong>Hide/Show all: </strong>Select the options under <strong>Cell > Dashboard</strong> to hide or show all cells.</li>

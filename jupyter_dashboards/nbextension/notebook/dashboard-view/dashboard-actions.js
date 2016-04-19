@@ -2,131 +2,139 @@
  * Copyright (c) Jupyter Development Team.
  * Distributed under the terms of the Modified BSD License.
  */
-/* global console, requirejs */
-
 /**
- * This module handles dashboard-view menu and toolbar creation and actions.
+ * This module handles dashboard view menu and toolbar creation and actions.
  */
 define([
-    'require',
     'jquery',
     'base/js/namespace',
-    'text!./sub-menu.html',
-    'text!./view-menu.html'
+    './dashboard-metadata',
+    'template!./view-toolbar-buttons.html',
+    'template!./sub-menu.html',
+    'template!./view-menu.html'
 ], function(
-    require,
     $,
     IPython,
-    subMenuTemplate,
-    viewMenuTemplate
+    Metadata,
+    $viewToolbarBtnsTemplate,
+    $subMenuTemplate,
+    $viewMenuTemplate
 ) {
     'use strict';
 
-    var STATE_NOTEBOOK = 'nb';
-    var STATE_DASHBOARD_AUTH = 'auth';
-    var STATE_DASHBOARD_VIEW = 'view';
-    var dashboardState = STATE_NOTEBOOK;
+    // These states are used in html templates as data-dashboard-state
+    // DASHBOARD_AUTH_* states are saved in notebook metadata as layout
+    var STATE = Object.freeze({
+        NOTEBOOK: 'notebook',
+        DASHBOARD_AUTH_GRID: 'grid',
+        DASHBOARD_AUTH_REPORT: 'report',
+        DASHBOARD_PREVIEW: 'preview'
+    });
+    var currentState = STATE.NOTEBOOK;
+    var toolbarBtnsSelector = '#urth-dashboard-view-toolbar-buttons';
+    var isHeaderVisible = true, isToolbarVisible = true;
+    var opts, scrollToBottom;
 
-    var VIEW_BTN_IDX = {};
-    VIEW_BTN_IDX[STATE_NOTEBOOK] = 1;
-    VIEW_BTN_IDX[STATE_DASHBOARD_AUTH] = 2;
-    VIEW_BTN_IDX[STATE_DASHBOARD_VIEW] = 3;
-
-    var enterDbModeCallback;
-    var exitDbModeCallback;
-    var showAllCallback;
-    var showAllStackedCallback;
-    var hideAllCallback;
-    var scrollToBottom;
-
-    function queryState() {
-        var idx = window.location.search.slice(1).split(/[&=]/).indexOf('dashboard');
-        if (idx !== -1) {
-            // view-only mode
-            toggleDashboardMode(STATE_DASHBOARD_VIEW);
-        }
-    }
-
-    function toggleDashboardMode(newState) {
-        if (dashboardState === newState) {
-            // nothing to do; ignore
-            return;
-        }
-        if (newState === STATE_NOTEBOOK) {
-            exitDashboardMode();
-        } else {
-            enterDashboardMode(newState, dashboardState /* prev state */);
-        }
-        setViewButtonEnabled(newState);
-        dashboardState = newState;
-    }
-
-    function exitDashboardMode() {
-        // Revert changes done in enterDashboardMode()
-        $('body').removeClass('view-only');
-        $('#urth-notebook-view').addClass('selected');
-        $('#urth-dashboard-auth, #urth-dashboard-view').removeClass('selected');
-        $('#urth-dashboard-show-all, #urth-dashboard-show-all-stacked, #urth-dashboard-hide-all').addClass('disabled');
-        exitDbModeCallback();
-        updateUrlState(false);
-        toggleHeaders(true); // enable header and toolbar
-        enableCodeMirror(true);
-
-        // restore scrolling behavior
-        IPython.Notebook.prototype.scroll_to_bottom = scrollToBottom;
-        scrollToBottom = null;
-    }
-
-    function enterDashboardMode(newState, prevState) {
-        // Add a class to the document body so our styles can take effect
-        $('body').toggleClass('view-only', newState === STATE_DASHBOARD_VIEW);
-
-        // style menus accordingly
-        $('#urth-notebook-view').removeClass('selected');
-        $('#urth-dashboard-auth').toggleClass('selected', newState === STATE_DASHBOARD_AUTH);
-        $('#urth-dashboard-view').toggleClass('selected', newState === STATE_DASHBOARD_VIEW);
-        $('#urth-dashboard-show-all, #urth-dashboard-show-all-stacked, #urth-dashboard-hide-all').toggleClass('disabled', newState === STATE_DASHBOARD_VIEW);
-
-        // disable header and toolbar as necessary
-        toggleHeaders(newState === STATE_DASHBOARD_AUTH);
-
-        enableCodeMirror(false);
-
-        enterDbModeCallback(newState === STATE_DASHBOARD_AUTH /* doEnableGrid */);
-        updateUrlState(newState === STATE_DASHBOARD_VIEW);
-
+    function enterDashboardMode(newState) {
+        opts.enterDbModeCallback(newState);
         // disable scroll to bottom of notebook
         scrollToBottom = IPython.Notebook.prototype.scroll_to_bottom;
         IPython.Notebook.prototype.scroll_to_bottom = function() {};
     }
 
-    function setViewButtonEnabled(state) {
-        var idx = VIEW_BTN_IDX[state];
-        $('#urth-dashboard-view-toolbar-buttons > button:nth-of-type(' + idx + ')')
-            .addClass('active')
-            .siblings().removeClass('active');
+    function exitDashboardMode() {
+        opts.exitDbModeCallback();
+        // restore scrolling behavior
+        IPython.Notebook.prototype.scroll_to_bottom = scrollToBottom;
+        scrollToBottom = null;
     }
 
-    var isHeaderVisible = true;
-    var isToolbarVisible = true;
+    function getFaIconClass(el) {
+        return $(el).attr('class').split(' ').filter(function(value) {
+            return /^fa-/.test(value);
+        })[0];
+    }
 
-    function toggleHeaders(doShow) {
+    function updateAuthoringBtn(state) {
+        if (state &&
+            state !== STATE.NOTEBOOK &&
+            state !== STATE.DASHBOARD_PREVIEW) {
+            var $btns = $(toolbarBtnsSelector);
+            var icon = getFaIconClass($btns.find(
+                '.dashboard-layout-menu-item[data-dashboard-state="' + state + '"] i'));
+            $btns.find('.dashboard-authoring-btn')
+                .attr('data-dashboard-state', state)
+                .find('.dashboard-authoring-icon')
+                    .removeClass(function() {
+                        return getFaIconClass(this);
+                    })
+                    .addClass(icon);
+        }
+    }
+
+    function setDashboardState(newState) {
+        if (newState !== currentState) {
+            if (newState === STATE.NOTEBOOK) {
+                exitDashboardMode();
+            } else {
+                enterDashboardMode(newState);
+            }
+            updateUIState(newState);
+            currentState = newState;
+        }
+    }
+
+    function setHeaderVisibility(doShow) {
         // if hiding, save current state
         if (!doShow) {
             isHeaderVisible = $('#header-container').is(':visible');
             isToolbarVisible = $('div#maintoolbar').is(':visible');
         }
-        // hide or revert back to previous saved state
-        $('#header-container').toggle(doShow && isHeaderVisible);
-        $('.header-bar').toggle(doShow && isHeaderVisible);
+        // hide or revert back to previous state
+        $('#header-container, .header-bar').toggle(doShow && isHeaderVisible);
         $('div#maintoolbar').toggle(doShow && isToolbarVisible);
-        // make sure notebook resizes properly
         IPython.notebook.events.trigger('resize-header.Page');
     }
 
+    function setStateFromQueryString() {
+        // set 'Dashboard View' state if 'dashboard' query parameter is set
+        var idx = window.location.search.slice(1).split(/[&=]/).indexOf('dashboard');
+        if (idx !== -1) {
+            setDashboardState(STATE.DASHBOARD_PREVIEW);
+        }
+    }
+
+    function updateUIState(state) {
+        var isDashboardPreview = state === STATE.DASHBOARD_PREVIEW;
+        updateUrlState(isDashboardPreview);
+        setHeaderVisibility(isDashboardPreview);
+        updateAuthoringBtn(state);
+
+        // set view-only class if previewing the dashboard
+        $('body').toggleClass('view-only', state === STATE.DASHBOARD_PREVIEW);
+
+        // enable the correct button group and menu state items
+        var activeBtn = $(toolbarBtnsSelector + ' button:not(.dropdown-toggle)[data-dashboard-state="' + state + '"]');
+        if (activeBtn.is('.dashboard-authoring-btn')) {
+            activeBtn = activeBtn.parent();
+        }
+        activeBtn.addClass('active').siblings().removeClass('active');
+        $('#view_menu [data-dashboard-state]').each(function() {
+            $(this).toggleClass('selected', state === $(this).attr('data-dashboard-state'));
+        });
+
+        // disable show/hide menu items when in preview state
+        $('.dashboard-submenu-item').toggleClass('disabled', state === STATE.NOTEBOOK || state === STATE.DASHBOARD_PREVIEW);
+        $('#urth-dashboard-show-all').toggleClass('disabled', state === STATE.NOTEBOOK || state === STATE.DASHBOARD_PREVIEW || state === STATE.DASHBOARD_AUTH_REPORT);
+
+        // disable code editing when in a dashboard view
+        $('.CodeMirror').each(function() {
+            this.CodeMirror.setOption('readOnly', state === STATE.NOTEBOOK ? false : 'nocursor');
+        });
+    }
+
     function updateUrlState(inDashboardViewMode) {
-        var l = window.location;
-        var s = l.search.slice(1);
+        var l = window.location, s = l.search.slice(1);
         if (inDashboardViewMode) {
             if (s.split(/[&=]/).indexOf('dashboard') === -1) {
                 s += (s.length ? '&' : '') + 'dashboard';
@@ -143,82 +151,65 @@ define([
         window.history.replaceState(null, null, url);
     }
 
-    // disable editting/focussing of CodeMirror content when in dashboard mode
-    function enableCodeMirror(doEnable) {
-        $('.CodeMirror').each(function() {
-            this.CodeMirror.setOption('readOnly', doEnable ? false : 'nocursor');
-        });
-    }
-
     /*************************************/
     var DashboardActions = function(args) {
-        enterDbModeCallback = args.enterDashboardMode;
-        exitDbModeCallback = args.exitDashboardMode;
-        showAllCallback = args.showAll;
-        showAllStackedCallback = args.showAllStacked;
-        hideAllCallback = args.hideAll;
-
-        queryState();
+        opts = {
+            enterDbModeCallback: args.enterDashboardMode,
+            exitDbModeCallback: args.exitDashboardMode,
+            showAllCallback: args.showAll,
+            showAllStackedCallback: args.showAllStacked,
+            hideAllCallback: args.hideAll
+        };
+        setStateFromQueryString();
     };
 
+    Object.defineProperty(DashboardActions, 'STATE', {
+        value: STATE,
+        writable: false
+    });
+
     DashboardActions.prototype.addMenuItems = function() {
-        // View menu items
-        $('#view_menu').append('<li class="divider"/>', viewMenuTemplate);
-        $('#urth-notebook-view').click(toggleDashboardMode.bind(null, STATE_NOTEBOOK));
-        $('#urth-dashboard-auth').click(toggleDashboardMode.bind(null, STATE_DASHBOARD_AUTH));
-        $('#urth-dashboard-view').click(toggleDashboardMode.bind(null, STATE_DASHBOARD_VIEW));
+        // Add view menu items and hook up click handlers to set state
+        $('#view_menu').append('<li class="divider"/>', $viewMenuTemplate.clone())
+            .find('[data-dashboard-state]')
+                .click(function() {
+                    var $el = $(this);
+                    var state = $el.attr('data-dashboard-state');
+                    if ($el.parents('#urth-dashboard-layout-menu').length) {
+                        Metadata.dashboardLayout = state;
+                    }
+                    setDashboardState(state);
+                })
+                .filter(function() {
+                    return $(this).attr('data-dashboard-state') === currentState;
+                }).addClass('selected'); // initial selected view menu item
 
-        // initial selected menu item
-        if (dashboardState === STATE_NOTEBOOK) {
-            $('#urth-notebook-view').addClass('selected');
-        } else if (dashboardState === STATE_DASHBOARD_VIEW) {
-            $('#urth-dashboard-view').addClass('selected');
-        }
-
-        // Cell menu items
-        $('#cell_menu').append('<li class="divider"/>', subMenuTemplate);
-        $('#urth-dashboard-show-all').click(showAllCallback);
-        $('#urth-dashboard-show-all-stacked').click(showAllStackedCallback);
-        $('#urth-dashboard-hide-all').click(hideAllCallback);
+        // Cell menu items to show/hide cells
+        $('#cell_menu').append('<li class="divider"/>', $subMenuTemplate.clone());
+        $('#urth-dashboard-show-all').click(opts.showAllCallback);
+        $('#urth-dashboard-show-all-stacked').click(opts.showAllStackedCallback);
+        $('#urth-dashboard-hide-all').click(opts.hideAllCallback);
     };
 
     DashboardActions.prototype.addToolbarItems = function() {
-        // switch view group
-        var notebookView = {
-            help: 'Notebook view. Edit the code.',
-            icon: 'fa-code',
-            help_index: '',
-            handler: function() { toggleDashboardMode(STATE_NOTEBOOK); }
-        };
-        var layoutView = {
-            help: 'Dashboard Layout. Size and position dashboard cells.',
-            icon: 'fa-th-large',
-            help_index: '',
-            handler: function() { toggleDashboardMode(STATE_DASHBOARD_AUTH); }
-        };
-        var dashboardView = {
-            help: 'Dashboard Preview. Preview the dashboard.',
-            icon: 'fa-dashboard',
-            help_index: '',
-            handler: function() { toggleDashboardMode(STATE_DASHBOARD_VIEW); }
-        };
+        // add toolbar buttons from template and add click handlers
+        $(IPython.toolbar.selector).append($viewToolbarBtnsTemplate.clone());
+        $(toolbarBtnsSelector + ' [data-dashboard-state]').click(function() {
+            var el = $(this);
+            var state = el.attr('data-dashboard-state');
+            if (el.is('.dashboard-layout-menu-item')) {
+                Metadata.dashboardLayout = state;
+            }
+            setDashboardState(state);
+        });
 
-        var a = IPython.keyboard_manager.actions.register(notebookView, 'notebook-view', 'urth');
-        var b = IPython.keyboard_manager.actions.register(layoutView, 'layout-view', 'urth');
-        var c = IPython.keyboard_manager.actions.register(dashboardView, 'dashboard-view', 'urth');
-
-        IPython.toolbar.add_buttons_group([a,b,c],
-                'urth-dashboard-view-toolbar-buttons');
-        $('#urth-dashboard-view-toolbar-buttons')
-            .addClass('urth-dashboard-toolbar-buttons')
-            .prepend('<span class="navbar-text">View:</span>');
-
-        // activate the button corresponding to the current view
-        setViewButtonEnabled(dashboardState);
+        // update the UI based on initial state
+        updateAuthoringBtn(Metadata.dashboardLayout);
+        updateUIState(currentState);
     };
 
     DashboardActions.prototype.switchToNotebook = function() {
-        toggleDashboardMode(STATE_NOTEBOOK);
+        setDashboardState(STATE.NOTEBOOK);
     };
 
     return DashboardActions;
