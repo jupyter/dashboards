@@ -31,6 +31,10 @@ define([
             ];
         }
 
+        Metadata.initialize({
+            dashboardLayout: Metadata.DASHBOARD_LAYOUT.REPORT
+        });
+
         // setup cells for report layout
         var self = this;
         this.$container.find('.cell').each(function() {
@@ -48,10 +52,6 @@ define([
             self._addCellControls($cell);
 
             self._updateCollapseBtns();
-        });
-
-        Metadata.initialize({
-            dashboardLayout: Metadata.DASHBOARD_LAYOUT.REPORT
         });
     }
 
@@ -122,7 +122,7 @@ define([
     /* PUBLIC API */
 
     ReportLayout.prototype.destroy = function() {
-        this.$container.find('.cell').removeClass('dashboard-hidden');
+        this.$container.find('.cell').removeClass('dashboard-hidden dashboard-collapsed');
         this.$container.find('.cell-control-container').remove();
         this.$container.find('.dashboard-report-collapse-btn').remove();
     };

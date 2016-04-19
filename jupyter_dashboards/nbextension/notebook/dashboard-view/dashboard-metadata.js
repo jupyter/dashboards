@@ -42,11 +42,18 @@ define([
             $elem = $elem.parents('.cell').first();
         }
         if ($elem.length > 0) {
-            return $elem.data('cell').metadata;
+            var metadata = $elem.data('cell').metadata;
+            return metadata &&
+                   metadata.urth &&
+                   metadata.urth.dashboard;
         }
     }
 
-    function _createEmptyUrthMetadata(metadata, preserveExistingMetadata) {
+    function _createEmptyUrthMetadata(cell, preserveExistingMetadata) {
+        var metadata = IPython.notebook.metadata;
+        if (cell) {
+            metadata = $(cell).data('cell').metadata;
+        }
         if (preserveExistingMetadata) {
             metadata.urth = metadata.urth || {};
             metadata.urth.dashboard = metadata.urth.dashboard || {};
@@ -93,14 +100,14 @@ define([
     function _initMetadata(opts) {
         // create empty notebook metadata (will wipe out any existing metadata)
         var preserveExistingMetadata = _getDashboardLayout() === opts.dashboardLayout;
-        _createEmptyUrthMetadata(IPython.notebook.metadata, preserveExistingMetadata);
+        _createEmptyUrthMetadata(null, preserveExistingMetadata);
 
         // add default notebook metadata values
         _setDefaultValues(opts);
 
         // create empty cell metadata if it doesn't exist
         $('.cell').each(function() {
-            _createEmptyUrthMetadata(_getCellMetadata($(this)), preserveExistingMetadata);
+            _createEmptyUrthMetadata(this, preserveExistingMetadata);
         });
     }
 
@@ -137,7 +144,7 @@ define([
 
     function _showCell(cells) {
         $(cells).each(function() {
-            var metadata = _getCellMetadata($(this)).urth.dashboard;
+            var metadata = _getCellMetadata($(this));
             metadata.layout = {};
             delete metadata.hidden;
         });
@@ -152,7 +159,7 @@ define([
         }
 
         $cells.each(function(i, cell) {
-            var metadata = _getCellMetadata($(cell)).urth.dashboard;
+            var metadata = _getCellMetadata($(cell));
 
             // only update the layout if not hidden
             if (layout && !metadata.hidden) {
@@ -194,13 +201,13 @@ define([
                 var preserveExistingMetadata = currentLayout === dbLayout ||
                                                currentLayout === null;
 
-                _createEmptyUrthMetadata(IPython.notebook.metadata, preserveExistingMetadata)
+                _createEmptyUrthMetadata(null, preserveExistingMetadata)
                     .urth.dashboard.layout = dbLayout;
 
                 if (!preserveExistingMetadata) {
                     // clear out cell metadata
                     $('.cell').each(function() {
-                        _createEmptyUrthMetadata(_getCellMetadata($(this)));
+                        _createEmptyUrthMetadata(this);
                     });
                 }
             } else {
@@ -213,7 +220,8 @@ define([
          * @return {Object} layout positioning for the specified cell
          */
         getCellLayout: function($cell) {
-            return _getCellMetadata($cell).urth.dashboard.layout;
+            var metadata = _getCellMetadata($cell);
+            return metadata && metadata.layout;
         },
         /**
          * Update a cell's metadata so it does not appear in the dashboard.
@@ -231,7 +239,8 @@ define([
          * @return {boolean} true if the cell is visible, else false
          */
         isCellVisible: function($cell) {
-            return !_getCellMetadata($cell).urth.dashboard.hidden;
+            var metadata = _getCellMetadata($cell);
+            return metadata && !metadata.hidden;
         },
         /**
          * Copies layout data from the dashboard to the notebook metadata
