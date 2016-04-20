@@ -45,9 +45,10 @@ define([
                     }
 
                     // set hidden state
-                    $cell.toggleClass('dashboard-hidden dashboard-collapsed', !Metadata.isCellVisible($cell));
+                    $cell.toggleClass('dashboard-hidden dashboard-collapsed',
+                        !Metadata.isCellVisible($cell));
 
-                    // add controle for hide, add, edit
+                    // add controls for hide, add, edit
                     self._addCellControls($cell);
 
                     self._updateCollapseBtns();
@@ -88,15 +89,21 @@ define([
         // insert collapse button between adjacent visible and hidden cells
         this.$container.find('.cell:not(.dashboard-hidden) + .cell.dashboard-hidden, .cell.dashboard-hidden:first-child')
             .each(function() {
-                var $collapseBtn = $collapseButtonTemplate.clone().click(function() {
-                    var $btn = $(this);
-                    $btn.toggleClass('dashboard-collapsed');
-                    $btn.nextUntil('.dashboard-report-collapse-btn', '.cell.dashboard-hidden')
-                        .toggleClass('dashboard-collapsed', $btn.is('.dashboard-collapsed'));
-                });
+                var $collapseBtn = $collapseButtonTemplate.clone()
+                    .filter('.dashboard-report-collapse-btn')
+                    .click(function() {
+                        var $btn = $(this);
+                        $btn.toggleClass('dashboard-collapsed');
+                        $btn.nextUntil('.dashboard-report-collapse-btn', '.cell.dashboard-hidden')
+                            .toggleClass('dashboard-collapsed', $btn.is('.dashboard-collapsed'));
+                    });
                 $(this).before($collapseBtn);
+
+                // Set to collapsed if either of the next two cells is collapsed
+                // This helps merge collapse groups
                 $collapseBtn.toggleClass('dashboard-collapsed',
-                    $collapseBtn.next('.dashboard-hidden').is('.dashboard-collapsed'));
+                    $collapseBtn.next().is('.dashboard-collapsed') ||
+                    $collapseBtn.next().next().is('.dashboard-collapsed'));
             });
 
         // remove out of place collapse buttons
