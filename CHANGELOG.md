@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0 (2016-04-26)
+
+* Add report layout for simple top-to-bottom, full-width dashboards
+* Add buttons to move a cell to the top, bottom, or notebook order in layout mode
+* Make compatible with Jupyter Notebook 4.0.x to 4.2.x
+* Fix bokeh example race condition
+* Fix browser scrolling when dragging cells in layout view
+
 ## 0.4.2 (2016-02-18)
 
 * Fix code cell overflow in layout mode
