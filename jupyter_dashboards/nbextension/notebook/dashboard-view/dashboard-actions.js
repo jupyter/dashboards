@@ -54,8 +54,8 @@ define([
             return /^fa-/.test(value);
         })[0];
     }
-
-    function updateAuthoringOptions(state) {
+    
+    function updateAuthoringButtonState(state) {
         if (state &&
             state !== STATE.NOTEBOOK &&
             state !== STATE.DASHBOARD_PREVIEW) {
@@ -70,6 +70,11 @@ define([
                     })
                     .addClass(icon);
         }
+    }
+
+    function updateAuthoringOptions(state) {
+        // update the layout button to reflect the current notebook layout mode
+        updateAuthoringButtonState(state);
 
         // enable the correct button group and menu state items
         var activeBtn = $(toolbarBtnsSelector + ' button:not(.dropdown-toggle)[data-dashboard-state="' + state + '"]');
@@ -199,6 +204,9 @@ define([
         });
         // update the authoring element based on current state
         updateAuthoringOptions(currentState);
+        // also set the initial layout button default to whatever layout the
+        // notebook currently has
+        updateAuthoringButtonState(Metadata.dashboardLayout);
     };
 
     DashboardActions.prototype.switchToNotebook = function() {
