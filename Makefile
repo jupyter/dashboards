@@ -16,11 +16,12 @@ endef
 
 help:
 	@echo 'Host commands:'
-	@echo '             build - builds a dev image with node/npm/bower for dev'
+	@echo '             build - builds an image with node/npm/bower for dev'
 	@echo '             clean - clean built files'
 	@echo '               dev - start notebook server in a container with source mounted'
 	@echo '  dev-with-widgets - like dev, but with stable declarativewidgets installed'
 	@echo '           install - install latest sdist into a container'
+	@echo '                js - build/install required modules into the source'
 	@echo '             sdist - build a source distribution into dist/'
 	@echo ' system-test-local - run system tests locally'
 	@echo 'system-test-remote - run system tests remotely on sauce labs, you must export SAUCE_USERNAME and SAUCE_ACCESS_KEY as environment variables'
