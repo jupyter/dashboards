@@ -42,6 +42,9 @@ define([
                     // hide cell if empty
                     if ($cell.height() === 0 && !Metadata.getCellLayout($cell)) {
                         Metadata.hideCell($cell);
+                    } else {
+                        // explicitly call show if we're not hiding when we initialize
+                        Metadata.showCell($cell);
                     }
 
                     // set hidden state

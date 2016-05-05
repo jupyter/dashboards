@@ -148,6 +148,9 @@ define([
     function _showCell(cells) {
         $(cells).each(function() {
             var metadata = _getCellMetadata($(this));
+            // add a layout object to indicate that this cell has explicitly 
+            // been added to the layout either by some initialization routine
+            // that calculated the layout or the user
             metadata.layout = {};
             delete metadata.hidden;
         });
