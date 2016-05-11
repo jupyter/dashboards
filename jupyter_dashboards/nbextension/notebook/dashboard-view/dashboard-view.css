@@ -112,7 +112,7 @@
     border: 1px solid black;
 }
 
-/* static view */
+/* Dashboard preview */
 .urth-dashboard.view-only #dashboard-hidden-header {
     display: none;
 }
@@ -132,4 +132,9 @@
 @keyframes shadow-fade {
     0%   { box-shadow: 0 0 10px 2px #5bc0de; }
     100% { box-shadow: 0 0 10px 2px transparent; }
+}
+
+/* Declarative widgets specific styles */
+.urth-dashboard .cell .urth-widget-error {
+    display: none;
 }
