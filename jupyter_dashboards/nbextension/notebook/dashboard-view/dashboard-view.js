@@ -71,10 +71,10 @@ define([
     PolymerSupport.init();
     
     // register delegate handlers that persist across dashboard mode changes  
-    $('body').on('change', '.show-code-label input', function() {
+    $('#notebook_panel').on('change', '.show-code-label input', function() {
         $('#notebook-container').toggleClass('hide-code', !this.checked);
     });
-    $('body').on('click', '.more-info-link', function() {
+    $('#notebook_panel').on('click', '.more-info-link', function() {
         $(this).parents('.help-area').toggleClass('show-more', 200);
     });
 
@@ -123,7 +123,7 @@ define([
                         // reset code hiding to false since we reset everything else
                         $('#notebook-container').removeClass('hide-code');
                     }
-                    $helpArea = $helpTemplate.clone().prependTo($('#notebook_panel'));                    
+                    $helpArea = $helpTemplate.clone().prependTo($('#notebook_panel'));
                     var layoutHelpText = layout.module.helpText;
                     if (layoutHelpText) {
                         // insert layout-specific help text
