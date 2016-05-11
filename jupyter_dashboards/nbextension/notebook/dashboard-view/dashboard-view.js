@@ -111,6 +111,8 @@ define([
                     // create help area
                     if ($helpArea) {
                         // remove if it exists since layout-specific help text will be inserted
+                        // note: we assume this cleans up all descendant event handlers (according to
+                        // the jquery source and various online doc)
                         $helpArea.remove();
                     }
                     $helpArea = $helpTemplate.clone().prependTo($('#notebook_panel'));

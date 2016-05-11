@@ -51,9 +51,15 @@
 </div>
 <script>
     (function() {
+        // always show code by default
+        $('#notebook-container').removeClass('hide-code');
+        
+        // show or hide code on cell hover
         $('.show-code-label input').change(function() {
             $('#notebook-container').toggleClass('hide-code', !this.checked);
         });
+        
+        // show or hide more info on link click
         $('.more-info-link').click(function() {
             $(this).parents('.help-area').toggleClass('show-more', 200);
         });
