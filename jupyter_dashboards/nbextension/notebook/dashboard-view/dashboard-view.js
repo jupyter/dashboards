@@ -69,6 +69,14 @@ define([
     }
 
     PolymerSupport.init();
+    
+    // register delegate handlers that persist across dashboard mode changes  
+    $('#notebook_panel').on('change', '.show-code-label input', function() {
+        $('#notebook-container').toggleClass('hide-code', !this.checked);
+    });
+    $('#notebook_panel').on('click', '.more-info-link', function() {
+        $(this).parents('.help-area').toggleClass('show-more', 200);
+    });
 
     // dashboard-actions depends on requirejs text plugin
     require([
@@ -112,6 +120,8 @@ define([
                     if ($helpArea) {
                         // remove if it exists since layout-specific help text will be inserted
                         $helpArea.remove();
+                        // reset code hiding to false since we reset everything else
+                        $('#notebook-container').removeClass('hide-code');
                     }
                     $helpArea = $helpTemplate.clone().prependTo($('#notebook_panel'));
                     var layoutHelpText = layout.module.helpText;
@@ -160,6 +170,7 @@ define([
                 dashboard.hideAllCells();
             }
         });
+        // initialize initial toolbar and menu item state
         dbActions.addMenuItems();
         dbActions.addToolbarItems();
     });
