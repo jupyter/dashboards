@@ -39,12 +39,19 @@ define([
                 .each(function() {
                     var $cell = $(this);
 
-                    // hide cell if empty
-                    if ($cell.height() === 0 && !Metadata.getCellLayout($cell)) {
-                        Metadata.hideCell($cell);
-                    } else {
-                        // explicitly call show if we're not hiding when we initialize
-                        Metadata.showCell($cell);
+                    // if there's no layout object in the cell metadata, assume
+                    // this cell has never been seen by the layout before and
+                    // compute a default visibility based on its height
+                    if(!Metadata.getCellLayout($cell)) {
+                        // hide cell if empty
+                        if ($cell.height() === 0) {
+                            Metadata.hideCell($cell);
+                        } else {
+                            // otherwise, explicitly show the cell so that
+                            // it gains layout metadata and its visibility is
+                            // not automatically computed again in the future
+                            Metadata.showCell($cell);
+                        }
                     }
 
                     // set hidden state
