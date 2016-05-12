@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.1 (2016-05-11)
+
+* Hide errors from declarative widgets in dashboard layout and preview
+* Fix the state of the show code checkbox in layout view when switching layout types
+* Fix history window slider widgetin the community outreach demo
+* Fix missing imports in the declarative widgets scotch demo
+* Fix copy/pasted cells receive the same layout metadata
+* Fix lost cells in report layout after clear and refresh
+* Fix layout toolbar button default state
+
 ## 0.5.0 (2016-04-26)
 
 * Add report layout for simple top-to-bottom, full-width dashboards
