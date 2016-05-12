@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2 (2016-05-11)
+
+* Fix report layout reset when switching between dashboard layout and preview
+
 ## 0.5.1 (2016-05-11)
 
 * Hide errors from declarative widgets in dashboard layout and preview
