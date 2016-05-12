@@ -176,7 +176,10 @@ define([
                     }
                 });
             } else {
-                delete metadata.layout;
+                // reset the layout object, but don't remove it completely
+                // since it serves as the indicator that this cell has been
+                // purposefully added to the layout in the past
+                metadata.layout = {};
                 metadata.hidden = true;
             }
         });
