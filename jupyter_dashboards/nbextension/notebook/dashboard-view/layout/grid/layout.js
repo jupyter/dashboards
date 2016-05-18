@@ -467,6 +467,9 @@ define([
             });
         });
         this.gridstack.remove_widget($cell, false /* don't detach node */);
+        
+        // update all cell metadata as remove may have displaced some cells
+        Metadata.save();
     };
 
     // computes metadata for a cell that doesn't have grid layout metadata
