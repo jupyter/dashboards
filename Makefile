@@ -5,13 +5,13 @@
 
 PYTHON?=python3
 
-REPO:=jupyter/pyspark-notebook:0017b56d93c9
-BOWER_REPO:=jupyter/pyspark-notebook-bower:0017b56d93c9
+REPO:=jupyter/pyspark-notebook:dc6ae8bd8209
+BOWER_REPO:=jupyter/pyspark-notebook-bower:dc6ae8bd8209
 PYTHON2_SETUP:=source activate python2
 
 define EXT_DEV_SETUP
-	jupyter dashboards install --user --symlink && \
-	jupyter dashboards activate
+	jupyter nbextension install --py jupyter_dashboards --sys-prefix --symlink && \
+	jupyter nbextension enable --py jupyter_dashboards --sys-prefix
 endef
 
 help:
@@ -59,7 +59,7 @@ dev-python2: EXTENSION_DIR:=/opt/conda/envs/python2/lib/python2.7/site-packages/
 dev-python2: _dev
 
 dev-python3: LANG_SETUP_CMD:=python --version
-dev-python3: EXTENSION_DIR:=/opt/conda/lib/python3.4/site-packages/jupyter_dashboards
+dev-python3: EXTENSION_DIR:=/opt/conda/lib/python3.5/site-packages/jupyter_dashboards
 dev-python3: _dev
 
 _dev: OPTIONS?=--rm -it
@@ -80,7 +80,7 @@ dev-with-widgets-python2: EXTENSION_DIR:=/opt/conda/envs/python2/lib/python2.7/s
 dev-with-widgets-python2: _dev-with-widgets
 
 dev-with-widgets-python3: LANG_SETUP_CMD?=python --version
-dev-with-widgets-python3: EXTENSION_DIR:=/opt/conda/lib/python3.4/site-packages/jupyter_dashboards
+dev-with-widgets-python3: EXTENSION_DIR:=/opt/conda/lib/python3.5/site-packages/jupyter_dashboards
 dev-with-widgets-python3: _dev-with-widgets
 
 _dev-with-widgets: CMD?=start-notebook.sh
@@ -93,9 +93,8 @@ _dev-with-widgets:
 		-v `pwd`/../declarativewidgets:/declarativewidgets \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
 		$(BOWER_REPO) bash -c '$(LANG_SETUP_CMD) && $(EXT_DEV_SETUP) && \
-			pip install --no-binary :all: $$(ls -1 /declarativewidgets/dist/*.tar.gz | tail -n 1) && \
-			jupyter declarativewidgets install --user && \
-			jupyter declarativewidgets activate && \
+			pip install jupyter_declarativewidgets && \
+			jupyter declarativewidgets quick-setup --sys-prefix && \
 			$(CMD)'
 
 install: install-$(PYTHON)
