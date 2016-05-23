@@ -111,8 +111,7 @@ _install:
 		-v `pwd`:/src \
 		$(REPO) bash -c '$(SETUP_CMD) && cd /src/dist && \
 			pip install --no-binary :all: $$(ls -1 *.tar.gz | tail -n 1) && \
-			jupyter dashboards install --user && \
-			jupyter dashboards activate && \
+			jupyter dashboards quick-setup --sys-prefix && \
 			$(CMD)'
 
 sdist: js
