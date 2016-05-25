@@ -31,7 +31,7 @@ define([
         DASHBOARD_PREVIEW: 'preview'
     });
     var currentState = STATE.NOTEBOOK;
-    var toolbarBtnsSelector = '#urth-dashboard-view-toolbar-buttons';
+    var toolbarBtnsSelector = '#jupyter-dashboard-view-toolbar-buttons';
     var isHeaderVisible = true, isToolbarVisible = true;
     var opts, scrollToBottom;
 
@@ -54,7 +54,7 @@ define([
             return /^fa-/.test(value);
         })[0];
     }
-    
+
     function updateAuthoringButtonState(state) {
         if (state &&
             state !== STATE.NOTEBOOK &&
@@ -88,7 +88,7 @@ define([
 
         // disable show/hide menu items when in preview state
         $('.dashboard-submenu-item').toggleClass('disabled', state === STATE.NOTEBOOK || state === STATE.DASHBOARD_PREVIEW);
-        $('#urth-dashboard-show-all').toggleClass('disabled', state === STATE.NOTEBOOK || state === STATE.DASHBOARD_PREVIEW || state === STATE.DASHBOARD_AUTH_REPORT);
+        $('#jupyter-dashboard-show-all').toggleClass('disabled', state === STATE.NOTEBOOK || state === STATE.DASHBOARD_PREVIEW || state === STATE.DASHBOARD_AUTH_REPORT);
     }
 
     function setDashboardState(newState) {
@@ -180,7 +180,7 @@ define([
                 .click(function() {
                     var $el = $(this);
                     var state = $el.attr('data-dashboard-state');
-                    if ($el.parents('#urth-dashboard-layout-menu').length) {
+                    if ($el.parents('#jupyter-dashboard-layout-menu').length) {
                         Metadata.dashboardLayout = state;
                     }
                     setDashboardState(state);
@@ -191,9 +191,9 @@ define([
 
         // Cell menu items to show/hide cells
         $('#cell_menu').append('<li class="divider"/>', $subMenuTemplate.clone());
-        $('#urth-dashboard-show-all').click(opts.showAllCallback);
-        $('#urth-dashboard-show-all-stacked').click(opts.showAllStackedCallback);
-        $('#urth-dashboard-hide-all').click(opts.hideAllCallback);
+        $('#jupyter-dashboard-show-all').click(opts.showAllCallback);
+        $('#jupyter-dashboard-show-all-stacked').click(opts.showAllStackedCallback);
+        $('#jupyter-dashboard-hide-all').click(opts.hideAllCallback);
     };
 
     DashboardActions.prototype.addToolbarItems = function() {

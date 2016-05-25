@@ -7,12 +7,12 @@ define([
     'jquery',
     'lodash',
     'base/js/namespace',
-    'urth-common/error-log',
+    'dashboard-common/error-log',
     '../../../link-css',
     '../../dashboard-metadata',
     '../../notebook-util',
     'template!./cell-controls.html',
-    'urth-common/gridstack-custom' // jquery plugin: return value not used
+    'dashboard-common/gridstack-custom' // jquery plugin: return value not used
 ], function(
     $,
     _,
@@ -467,7 +467,7 @@ define([
             });
         });
         this.gridstack.remove_widget($cell, false /* don't detach node */);
-        
+
         // update all cell metadata as remove may have displaced some cells
         Metadata.save();
     };

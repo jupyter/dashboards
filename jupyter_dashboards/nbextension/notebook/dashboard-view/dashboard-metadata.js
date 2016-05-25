@@ -4,21 +4,10 @@
  */
 /**
  * This module provides an API to manage notebook dashboard layout cell metadata.
+ *
+ * Dashboard metadata structure:
+ *    https://github.com/jupyter-incubator/dashboards/wiki/Dashboard-Metadata-and-Rendering
  */
-/*************
-    Dashboard metadata structure:
-        "metadata": {
-            "urth": {
-                "dashboard": {
-                    "layout": {
-                        "col":
-                        ...
-                    },
-                    "hidden": false
-                }
-            }
-        }
-**************/
 define([
     'jquery',
     'base/js/namespace'
@@ -148,7 +137,7 @@ define([
     function _showCell(cells) {
         $(cells).each(function() {
             var metadata = _getCellMetadata($(this));
-            // add a layout object to indicate that this cell has explicitly 
+            // add a layout object to indicate that this cell has explicitly
             // been added to the layout either by some initialization routine
             // that calculated the layout or the user
             metadata.layout = {};
