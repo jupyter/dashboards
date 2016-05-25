@@ -23,7 +23,7 @@ define([
     // use global require.js to setup the paths for our dependencies
     requirejs.config({
         packages: [
-            { name: 'urth-common', location: require.toUrl('../dashboard-common').split('?')[0] }
+            { name: 'dashboard-common', location: require.toUrl('../dashboard-common').split('?')[0] }
         ],
         paths: {
             Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.min').split('?')[0],
@@ -78,9 +78,10 @@ define([
         DashboardActions,
         Metadata
     ) {
+        var dashboardClass = 'jupyter-dashboard';
         var dbActions = new DashboardActions({
             enterDashboardMode: function(actionState) {
-                $('body').addClass('urth-dashboard');
+                $('body').addClass(dashboardClass);
                 require([
                     './layout/grid/layout',
                     './layout/report/layout',
@@ -144,7 +145,7 @@ define([
                 });
             },
             exitDashboardMode: function() {
-                $('body').removeClass('urth-dashboard')
+                $('body').removeClass(dashboardClass)
                          .attr('data-dashboard-layout', '');
                 dashboard.destroy();
                 dashboard = null;

@@ -11,18 +11,19 @@ var Dashboard = function(wd, browser) {
   this.wd = wd;
   this.lastCommand = browser;
 };
+
 //  Represents different UI elements in the notebook/dashboard UI
 var DashboardElements = {
-  "notebookViewButton": "#urth-dashboard-view-toolbar-buttons > button:nth-of-type(1)",
-  "layoutViewButton": "#urth-dashboard-view-toolbar-buttons > .dashboard-authoring-btn-container > button:nth-of-type(1)",
-  "dashboardViewButton": "#urth-dashboard-view-toolbar-buttons > button:nth-of-type(2)",
+  "notebookViewButton": "#jupyter-dashboard-view-toolbar-buttons > button:nth-of-type(1)",
+  "layoutViewButton": "#jupyter-dashboard-view-toolbar-buttons > .dashboard-authoring-btn-container > button:nth-of-type(1)",
+  "dashboardViewButton": "#jupyter-dashboard-view-toolbar-buttons > button:nth-of-type(2)",
   "layoutViewHelpArea" : "#notebook_panel > .help-area",
   "jupyterHeaderContainer": "#header-container",
   "viewMenuButton" : "ul.nav > li:nth-child(3)",
   "notebookViewMenuButton" : "#urth-notebook-view",
-  "layoutViewMenuButton" : "#urth-dashboard-layout-menu",
-  "layoutViewGridMenuButton" : "#urth-dashboard-auth-grid",
-  "dashboardViewMenuButton" : "#urth-dashboard-view"
+  "layoutViewMenuButton" : "#jupyter-dashboard-layout-menu",
+  "layoutViewGridMenuButton" : "#jupyter-dashboard-auth-grid",
+  "dashboardViewMenuButton" : "#jupyter-dashboard-view"
 };
 //  Represents expressions run in the browser for verification
 var DashboardExpressions = {

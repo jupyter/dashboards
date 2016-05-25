@@ -4,14 +4,14 @@
  */
 
 /* Gridstack container */
-.urth-dashboard .grid-stack#notebook-container {
+.jupyter-dashboard .grid-stack#notebook-container {
     padding-left: 0;
     padding-right: 0;
     transition: background-color 0.75s,
                 box-shadow 0.75s,
                 height 0.3s;
 }
-.urth-dashboard:not(.view-only) .grid-stack#notebook-container:hover {
+.jupyter-dashboard:not(.view-only) .grid-stack#notebook-container:hover {
     background-color: transparent;
     box-shadow: none;
 }
@@ -65,8 +65,8 @@
 .grid-stack .cell:not(.grid-stack-item) {
     box-shadow: 0 1px 5px 1px rgba(87,87,87,0.2);
 }
-.urth-dashboard .grid-stack .ui-draggable-dragging.cell,
-.urth-dashboard .grid-stack .ui-resizable-resizing.cell {
+.jupyter-dashboard .grid-stack .ui-draggable-dragging.cell,
+.jupyter-dashboard .grid-stack .ui-resizable-resizing.cell {
     opacity: 0.75;
 }
 .grid-stack .cell > :not(.dashboard-item-background):not(.dashboard-item-border):not(.ui-resizable-handle) {
@@ -79,20 +79,20 @@
 }
 
 /* Dashboard cell controls: drag */
-.urth-dashboard .grid-stack .cell .drag-handle:hover {
+.jupyter-dashboard .grid-stack .cell .drag-handle:hover {
     color: #306c9e;
     cursor: move; /* for old IE */
     cursor: -webkit-grab;
     cursor: grab;
 }
 body.dragging,
-body.dragging.urth-dashboard .grid-stack .ui-draggable-dragging.cell:hover .drag-handle:hover {
+body.dragging.jupyter-dashboard .grid-stack .ui-draggable-dragging.cell:hover .drag-handle:hover {
     cursor: -webkit-grabbing !important;
     cursor: grabbing !important;
 }
 
 /* drag/drop cell overlay*/
-.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .dashboard-item-border {
+.jupyter-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .dashboard-item-border {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
@@ -107,21 +107,21 @@ body.dragging.urth-dashboard .grid-stack .ui-draggable-dragging.cell:hover .drag
     font-size: 50px;
     pointer-events: auto;
 }
-.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .dashboard-item-border:hover {
+.jupyter-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .dashboard-item-border:hover {
     cursor: -webkit-grab;
     cursor: grab;
 }
-.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .cell-control-container,
-.urth-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .ui-resizable-handle {
+.jupyter-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .cell-control-container,
+.jupyter-dashboard.all_cell_drag:not(.view-only) .grid-stack .grid-stack-item .ui-resizable-handle {
     display: none !important; /* important needed to override inline style set by gridstack */
 }
-.urth-dashboard:not(.all_cell_drag):not(.view-only) .grid-stack .dashboard-item-border i,
-.urth-dashboard .grid-stack > .cell:not(.grid-stack-item) .dashboard-item-border i {
+.jupyter-dashboard:not(.all_cell_drag):not(.view-only) .grid-stack .dashboard-item-border i,
+.jupyter-dashboard .grid-stack > .cell:not(.grid-stack-item) .dashboard-item-border i {
     display: none;
 }
 
 /* Cell controls: add buttons */
-.urth-dashboard .grid-stack .cell .cell-control.add-btn {
+.jupyter-dashboard .grid-stack .cell .cell-control.add-btn {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
@@ -130,53 +130,53 @@ body.dragging.urth-dashboard .grid-stack .ui-draggable-dragging.cell:hover .drag
     min-width: 25px;
     width: auto;
 }
-.urth-dashboard .grid-stack .cell .cell-control.add-btn > .bar-container {
+.jupyter-dashboard .grid-stack .cell .cell-control.add-btn > .bar-container {
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
     flex-direction: column;
 }
-.urth-dashboard .grid-stack .cell .cell-control.add-btn > .bar-container > .bar {
+.jupyter-dashboard .grid-stack .cell .cell-control.add-btn > .bar-container > .bar {
     width: 1em;
     height: 3px;
     background-color: #b2b2b2;
     display: inline-block;
     margin-bottom: 2px;
 }
-.urth-dashboard .grid-stack .cell .cell-control.add-btn > .bar-container > .bar.bar-lighter {
+.jupyter-dashboard .grid-stack .cell .cell-control.add-btn > .bar-container > .bar.bar-lighter {
     background-color: #dadada;
 }
-.urth-dashboard .grid-stack .cell .cell-control.add-btn:hover > .bar-container > .bar {
+.jupyter-dashboard .grid-stack .cell .cell-control.add-btn:hover > .bar-container > .bar {
     background-color: #306c9e;
 }
-.urth-dashboard .grid-stack .cell .cell-control.add-btn:hover > .bar-container > .bar.bar-lighter {
+.jupyter-dashboard .grid-stack .cell .cell-control.add-btn:hover > .bar-container > .bar.bar-lighter {
     background-color: #A6D3F9;
 }
-.urth-dashboard .grid-stack .cell .cell-control.add-btn > .fa-plus {
+.jupyter-dashboard .grid-stack .cell .cell-control.add-btn > .fa-plus {
     margin-left: 2px;
     margin-top: 4px;
     font-size: 0.8em;
 }
 
 /* Hide specific grid controls based on hidden state */
-.urth-dashboard .grid-stack .cell.grid-stack-item .cell-control.add-btn-relative,
-.urth-dashboard .grid-stack .cell.grid-stack-item .cell-control .fa-plus,
-.urth-dashboard .grid-stack .cell:not(.grid-stack-item) .cell-control.drag-handle,
-.urth-dashboard .grid-stack .cell:not(.grid-stack-item) .cell-control.hide-btn,
-.urth-dashboard .grid-stack .cell:not(.grid-stack-item) .gs-resize-handle {
+.jupyter-dashboard .grid-stack .cell.grid-stack-item .cell-control.add-btn-relative,
+.jupyter-dashboard .grid-stack .cell.grid-stack-item .cell-control .fa-plus,
+.jupyter-dashboard .grid-stack .cell:not(.grid-stack-item) .cell-control.drag-handle,
+.jupyter-dashboard .grid-stack .cell:not(.grid-stack-item) .cell-control.hide-btn,
+.jupyter-dashboard .grid-stack .cell:not(.grid-stack-item) .gs-resize-handle {
     display: none;
 }
 
 /* static view */
-.urth-dashboard.view-only .grid-stack-static .cell.ui-state-disabled {
+.jupyter-dashboard.view-only .grid-stack-static .cell.ui-state-disabled {
     /* override disabled state set by jquery-ui */
     opacity: 1;
     -webkit-filter: none;
     filter: none;
 }
-.urth-dashboard.view-only .grid-stack .cell:not(.grid-stack-item),
-.urth-dashboard.view-only .grid-stack .dashboard-item-background,
-.urth-dashboard.view-only .grid-stack .dashboard-item-border {
+.jupyter-dashboard.view-only .grid-stack .cell:not(.grid-stack-item),
+.jupyter-dashboard.view-only .grid-stack .dashboard-item-background,
+.jupyter-dashboard.view-only .grid-stack .dashboard-item-border {
     display: none;
 }
 
