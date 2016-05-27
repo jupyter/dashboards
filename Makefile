@@ -5,8 +5,8 @@
 
 PYTHON?=python3
 
-REPO:=jupyter/pyspark-notebook:f3028232e94a
-BOWER_REPO:=jupyter/pyspark-notebook-bower:f3028232e94a
+REPO:=jupyter/pyspark-notebook:8015c88c4b11
+BOWER_REPO:=jupyter/pyspark-notebook-bower:8015c88c4b11
 PYTHON2_SETUP:=source activate python2
 
 define EXT_DEV_SETUP
@@ -117,7 +117,7 @@ sdist: js ## Build a source distribution in dist/
 			cp -r dist /src'
 
 release: POST_SDIST=register upload
-release: sdist
+release: sdist ## Package and release to PyPI
 
 _system-test-local-setup:
 # Check if deps are installed when running locally
