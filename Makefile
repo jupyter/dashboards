@@ -15,18 +15,10 @@ define EXT_DEV_SETUP
 endef
 
 help:
-	@echo 'Host commands:'
-	@echo '             build - builds an image with node/npm/bower for dev'
-	@echo '             clean - clean built files'
-	@echo '               dev - start notebook server in a container with source mounted'
-	@echo '  dev-with-widgets - like dev, but with stable declarativewidgets installed'
-	@echo '           install - install latest sdist into a container'
-	@echo '                js - build/install required modules into the source'
-	@echo '             sdist - build a source distribution into dist/'
-	@echo ' system-test-local - run system tests locally'
-	@echo 'system-test-remote - run system tests remotely on sauce labs, you must export SAUCE_USERNAME and SAUCE_ACCESS_KEY as environment variables'
+# http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-build:
+build: ## Build the dev Docker image
 	@-docker rm -f bower-build
 	@docker run -it --user root --name bower-build \
 		$(REPO) bash -c 'apt-get update && \
@@ -37,7 +29,7 @@ build:
 	@docker commit bower-build $(BOWER_REPO)
 	@-docker rm -f bower-build
 
-clean:
+clean: ## Clean source tree
 	@-rm -rf dist
 	@-rm -rf *.egg-info
 	@-rm -rf etc/notebooks/local_dashboards
@@ -45,14 +37,14 @@ clean:
 	@-rm -rf jupyter_dashboards/nbextension/notebook/bower_components
 	@-find . -name __pycache__ -exec rm -fr {} \;
 
-js:
+js: ## Build Javascript components
 # Run as root to appease travis
 	@docker run -it --rm \
 		--user root \
 		-v `pwd`:/src \
 		$(BOWER_REPO) bash -c 'cd /src && npm install && npm run bower'
 
-dev: dev-$(PYTHON)
+dev: dev-$(PYTHON) ## Start notebook server in a container with source mounted
 
 dev-python2: LANG_SETUP_CMD:=$(PYTHON2_SETUP) && python --version
 dev-python2: EXTENSION_DIR:=/opt/conda/envs/python2/lib/python2.7/site-packages/jupyter_dashboards
@@ -73,7 +65,7 @@ _dev:
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
 		$(REPO) bash -c '$(LANG_SETUP_CMD) && $(EXT_DEV_SETUP) && $(CMD)'
 
-dev-with-widgets: dev-with-widgets-$(PYTHON)
+dev-with-widgets: dev-with-widgets-$(PYTHON) ## Same as dev but w/ declarative widgets enabled
 
 dev-with-widgets-python2: LANG_SETUP_CMD?=$(PYTHON2_SETUP) && python --version
 dev-with-widgets-python2: EXTENSION_DIR:=/opt/conda/envs/python2/lib/python2.7/site-packages/jupyter_dashboards
@@ -97,7 +89,7 @@ _dev-with-widgets:
 			jupyter declarativewidgets quick-setup --sys-prefix && \
 			$(CMD)'
 
-install: install-$(PYTHON)
+install: install-$(PYTHON) ## Install and activate the sdist package in the container
 
 install-python2: SETUP_CMD=$(PYTHON2_SETUP) && python --version
 install-python2: _install
@@ -114,7 +106,7 @@ _install:
 			jupyter dashboards quick-setup --sys-prefix && \
 			$(CMD)'
 
-sdist: js
+sdist: js ## Build a source distribution in dist/
 # Run as root to appease travis
 	@docker run -it --rm \
 		--user root \
@@ -139,12 +131,12 @@ _system-test-local-teardown:
 system-test-local: TEST_SERVER?=192.168.99.1:4444
 system-test-local: BASEURL?=http://192.168.99.100:9500
 system-test-local: TEST_TYPE?=local
-system-test-local: _system-test-local-setup _system-test _system-test-local-teardown
+system-test-local: _system-test-local-setup _system-test _system-test-local-teardown ## Run selenium tests locally
 
 system-test-remote: TEST_TYPE?=remote
 system-test-remote: BASEURL?=http://127.0.0.1:9500
 system-test-remote: TEST_SERVER?=ondemand.saucelabs.com
-system-test-remote: _system-test
+system-test-remote: _system-test ## Run selenium tests on Sauce Labs using SAUCE_USERNAME and SAUCE_ACCESS_KEY
 
 _system-test: SERVER_NAME?=jupyter_dashboards_integration_test_server
 _system-test: CMD?=bash -c 'cd /src; npm run system-test -- --baseurl $(BASEURL) --server $(TEST_SERVER) --test-type $(TEST_TYPE)'
