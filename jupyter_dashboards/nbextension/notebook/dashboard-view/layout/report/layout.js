@@ -29,7 +29,7 @@ define([
             cssLoaded = linkCSS('./dashboard-view/layout/report/layout.css');
         }
 
-        Metadata.dashboardLayout = Metadata.DASHBOARD_LAYOUT.REPORT;
+        Metadata.activeView = Metadata.DASHBOARD_VIEW.REPORT;
 
         $.when(cssLoaded).then(function() {
             // setup cells for report layout
@@ -39,22 +39,17 @@ define([
                 .each(function() {
                     var $cell = $(this);
 
-                    // if there's no layout object in the cell metadata, assume
-                    // this cell has never been seen by the layout before and
-                    // compute a default visibility based on its height
-                    if(!Metadata.getCellLayout($cell)) {
-                        // hide cell if empty
+                    // mark new & empty cells hidden
+                    if (!Metadata.hasCellBeenRendered($cell)) {
+                        // mark the cell as rendered by hiding or showing
                         if ($cell.height() === 0) {
                             Metadata.hideCell($cell);
                         } else {
-                            // otherwise, explicitly show the cell so that
-                            // it gains layout metadata and its visibility is
-                            // not automatically computed again in the future
                             Metadata.showCell($cell);
                         }
                     }
 
-                    // set hidden state
+                    // set hidden state in UI
                     $cell.toggleClass('dashboard-hidden dashboard-collapsed',
                         !Metadata.isCellVisible($cell));
 

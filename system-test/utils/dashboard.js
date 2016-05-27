@@ -20,7 +20,7 @@ var DashboardElements = {
   "layoutViewHelpArea" : "#notebook_panel > .help-area",
   "jupyterHeaderContainer": "#header-container",
   "viewMenuButton" : "ul.nav > li:nth-child(3)",
-  "notebookViewMenuButton" : "#urth-notebook-view",
+  "notebookViewMenuButton" : "#jupyter-dashboard-notebook-view",
   "layoutViewMenuButton" : "#jupyter-dashboard-layout-menu",
   "layoutViewGridMenuButton" : "#jupyter-dashboard-auth-grid",
   "dashboardViewMenuButton" : "#jupyter-dashboard-view"

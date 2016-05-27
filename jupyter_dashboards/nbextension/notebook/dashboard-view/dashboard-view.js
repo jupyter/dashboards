@@ -92,21 +92,21 @@ define([
                     $helpTemplate
                 ) {
                     var LAYOUT = {};
-                    LAYOUT[Metadata.DASHBOARD_LAYOUT.GRID] = getLayout(dbActions, GridLayout, {
+                    LAYOUT[Metadata.DASHBOARD_VIEW.GRID] = getLayout(dbActions, GridLayout, {
                         onResize: PolymerSupport.onResize
                     });
-                    LAYOUT[Metadata.DASHBOARD_LAYOUT.REPORT] = getLayout(dbActions, ReportLayout);
+                    LAYOUT[Metadata.DASHBOARD_VIEW.REPORT] = getLayout(dbActions, ReportLayout);
 
                     if (actionState !== DashboardActions.STATE.NOTEBOOK &&
-                        !Metadata.dashboardLayout) {
+                        !Metadata.activeView) {
                         // set to grid by default if layout not set
-                        Metadata.dashboardLayout = Metadata.DASHBOARD_LAYOUT.GRID;
+                        Metadata.activeView = Metadata.DASHBOARD_VIEW.GRID;
                     }
-                    LAYOUT[DashboardActions.STATE.DASHBOARD_PREVIEW] = LAYOUT[Metadata.dashboardLayout];
+                    LAYOUT[DashboardActions.STATE.DASHBOARD_PREVIEW] = LAYOUT[Metadata.activeView];
                     var layout = LAYOUT[actionState];
 
                     if (dashboard) {
-                        // when switching between two layouts, destroy the old one
+                        // destroy the previous view
                         dashboard.destroy();
                     }
                     // create help area
@@ -140,8 +140,8 @@ define([
                             PolymerSupport.notifyResizeAll();
                         }
                     });
-                    // Metadata.dashboardLayout gets set by the layout module
-                    $('body').attr('data-dashboard-layout', Metadata.dashboardLayout);
+                    // Metadata.activeView gets set by the layout module
+                    $('body').attr('data-dashboard-layout', Metadata.activeView);
                 });
             },
             exitDashboardMode: function() {

@@ -181,7 +181,7 @@ define([
                     var $el = $(this);
                     var state = $el.attr('data-dashboard-state');
                     if ($el.parents('#jupyter-dashboard-layout-menu').length) {
-                        Metadata.dashboardLayout = state;
+                        Metadata.activeView = state;
                     }
                     setDashboardState(state);
                 })
@@ -206,7 +206,7 @@ define([
         updateAuthoringOptions(currentState);
         // also set the initial layout button default to whatever layout the
         // notebook currently has
-        updateAuthoringButtonState(Metadata.dashboardLayout);
+        updateAuthoringButtonState(Metadata.activeView);
     };
 
     DashboardActions.prototype.switchToNotebook = function() {
