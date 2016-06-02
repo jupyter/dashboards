@@ -74,8 +74,14 @@ define([
                     Object.keys(cellDashboard.views).forEach(function(view) {
                         cellDashboard.views[view].hidden = false;
                     });
-                    cellDashboard.views[jupyter_dashboards.activeView].hidden =
-                        !!cellMetadata.urth.dashboard.hidden;
+                    if (jupyter_dashboards.activeView === GRID_DEFAULT &&
+                        Object.keys(cellMetadata.urth.dashboard).length === 0) {
+                        // special case: empty grid cells were implicitly hidden
+                        cellDashboard.views[jupyter_dashboards.activeView].hidden = true;
+                    } else {
+                        cellDashboard.views[jupyter_dashboards.activeView].hidden =
+                            !!cellMetadata.urth.dashboard.hidden;
+                    }
 
                     // copy layout properties
                     if (cellMetadata.urth.dashboard.layout) {
