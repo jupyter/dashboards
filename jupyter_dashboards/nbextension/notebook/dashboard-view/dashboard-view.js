@@ -72,13 +72,22 @@ define([
 
     // dashboard-actions depends on requirejs text plugin
     require([
+        'base/js/namespace',
         './dashboard-actions',
-        './dashboard-metadata'
+        './dashboard-metadata',
+        './dashboard-metadata-compatibility'
     ], function(
+        Jupyter,
         DashboardActions,
-        Metadata
+        Metadata,
+        Compatibility
     ) {
         var dashboardClass = 'jupyter-dashboard';
+        if (Jupyter.notebook.metadata.hasOwnProperty('urth')) {
+            // convert old metadata spec to new version
+            Metadata.initialize();
+            Compatibility.convert();
+        }
         var dbActions = new DashboardActions({
             enterDashboardMode: function(actionState) {
                 $('body').addClass(dashboardClass);
