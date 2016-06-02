@@ -3,174 +3,163 @@
  * Distributed under the terms of the Modified BSD License.
  */
 /**
- * This module provides an API to manage notebook dashboard layout cell metadata.
+ * This module provides an API to manage Jupyter Dashboards extension metadata.
  *
- * Dashboard metadata structure:
+ * Jupyter Dashboard metadata structure:
  *    https://github.com/jupyter-incubator/dashboards/wiki/Dashboard-Metadata-and-Rendering
  */
 define([
     'jquery',
-    'base/js/namespace'
+    'base/js/namespace',
+    './dashboard-metadata-compatibility',
+    './object-util'
 ], function(
     $,
-    IPython
+    IPython,
+    Compatibility,
+    ObjectUtil
 ) {
     'use strict';
 
-    var CELL_PROPERTIES = ['col','row','width','height'];
+    var SPEC_VERSION = 1;
+    var GRID_DEFAULT = 'grid_default';
+    var REPORT_DEFAULT = 'report_default';
 
-    // must match `dashboard-actions` auth states
-    var DASHBOARD_LAYOUT = Object.freeze({
+    // must match `dashboard-actions.js` auth states
+    var DASHBOARD_VIEW = Object.freeze({
         GRID: 'grid',
         REPORT: 'report'
     });
 
-    // pull cell metadata from element data
-    function _getCellMetadata($elem) {
+    // Mapping of view type to view id
+    // This will change when multiple views of the same type are supported.
+    var VIEW_TO_ID = {
+        grid: GRID_DEFAULT,
+        report: REPORT_DEFAULT
+    };
+
+    function _getActiveView() {
+        var metadata = _getDashboardMetadata();
+        if (metadata) {
+            return metadata.activeView;
+        }
+    }
+
+    /**
+     * Returns view metadata from cell element data.
+     * @param  {jQuery} $elem - notebook cell or child element of a notebook cell
+     * @param  {string} [viewId] - View to get metadata for.
+     *                             Defaults to the active view if viewId isn't specified.
+     * @return {Object} view metadata
+     */
+    function _getCellViewMetadata($elem, viewId) {
+        // use active view if not specified
+        viewId = viewId || _getActiveView();
         if (!$elem.is('.cell')) {
             $elem = $elem.parents('.cell').first();
         }
         if ($elem.length > 0) {
             var metadata = $elem.data('cell').metadata;
-            return metadata &&
-                   metadata.urth &&
-                   metadata.urth.dashboard;
+            return metadata.extensions.jupyter_dashboards.views[viewId];
         }
     }
 
-    function _createEmptyUrthMetadata(cell, preserveExistingMetadata) {
+    function _createDashboardMetadata(cell) {
         var metadata = IPython.notebook.metadata;
         if (cell) {
             metadata = $(cell).data('cell').metadata;
         }
-        if (preserveExistingMetadata) {
-            metadata.urth = metadata.urth || {};
-            metadata.urth.dashboard = metadata.urth.dashboard || {};
-        } else {
-            metadata.urth = {
-                dashboard: {}
-            };
-        }
-        return metadata;
-    }
 
-    function _getDashboardLayout() {
-        var metadata = _getDashboardMetadata();
-        var layout = null;
-        if (metadata && metadata.layout) {
-            layout = metadata.layout;
+        // common metadata
+        ObjectUtil.ensure(metadata, 'extensions.jupyter_dashboards.views');
+        metadata.extensions.jupyter_dashboards.version = SPEC_VERSION;
+
+        var views = metadata.extensions.jupyter_dashboards.views;
+        ObjectUtil.ensure(views, GRID_DEFAULT);
+        ObjectUtil.ensure(views, REPORT_DEFAULT);
+
+        // notebook-level only metadata
+        if (!cell) {
+            views[GRID_DEFAULT].type = DASHBOARD_VIEW.GRID;
+            views[REPORT_DEFAULT].type = DASHBOARD_VIEW.REPORT;
+
+            // default names
+            views[GRID_DEFAULT].name = DASHBOARD_VIEW.GRID;
+            views[REPORT_DEFAULT].name = DASHBOARD_VIEW.REPORT;
         }
-        return layout;
+
+        return metadata;
     }
 
     function _getDashboardMetadata() {
         var metadata = IPython.notebook.metadata;
-        if (metadata.hasOwnProperty('urth') &&
-            metadata.urth.hasOwnProperty('dashboard')) {
-            return metadata.urth.dashboard;
+        if (ObjectUtil.has(metadata, 'extensions.jupyter_dashboards')) {
+            return metadata.extensions.jupyter_dashboards;
         }
     }
 
-    /**
-     * Sets default values in the metadata if not set.
-     * @param  {Object} values - values to set
-     */
-    function _setDefaultValues(values) {
-        values = values || {};
-        if (typeof values === 'object') {
-            var metadata = _getDashboardMetadata();
-            Object.keys(values).forEach(function(key) {
+    function _setDefaultGridProperties(props) {
+        props = props || {};
+        if (typeof props === 'object') {
+            var metadata = _getDashboardMetadata().views[GRID_DEFAULT];
+            Object.keys(props).forEach(function(key) {
                 // only copy values that are not already set in metadata
                 if (!metadata.hasOwnProperty(key)) {
-                    metadata[key] = values[key];
+                    metadata[key] = props[key];
                 }
             });
         } else {
-            throw new Error('Metadata values must be an object:', values);
+            throw new Error('Metadata properties must be an object:', props);
         }
     }
 
     // Ensures dashboard metadata exists and sets default notebook-level values.
-    // Will clear out existing metadata if preserveExistingMetadata == true.
-    function _initMetadata(opts, preserveExistingMetadata) {
-        if (arguments.length < 2) {
-            preserveExistingMetadata = true;
-        }
-        _createEmptyUrthMetadata(null, preserveExistingMetadata);
-        _setDefaultValues(opts);
+    function _initMetadata() {
+        _createDashboardMetadata();
         $('.cell').each(function() {
-            _createEmptyUrthMetadata(this, preserveExistingMetadata);
+            _createDashboardMetadata(this);
         });
+        Compatibility.convert();
     }
 
-    function _removePosition() {
+    function _removeGridPositioning() {
         IPython.notebook.get_cells().forEach(function(cell, i) {
-            var layout = cell.metadata.urth.dashboard.layout;
-            if (layout) {
-                delete layout.col;
-                delete layout.row;
+            var view = cell.metadata.extensions.jupyter_dashboards.views[GRID_DEFAULT];
+            if (view) {
+                delete view.col;
+                delete view.row;
             }
         });
     }
 
-    // copy dashboard layout information into each cell's metadata
+    // copy grid layout information into each cell's view metadata
     function _saveGrid() {
         $('.grid-stack .cell').each(function (i) {
             var el = $(this);
             if (el.is('.grid-stack-item')) {
-                // add gridstack layout data to cell metadata
+                // add gridstack layout data to cell metadata and show cell
                 var node = el.data('_gridstack_node');
-                _updateCellMetadata(el, {
+                _updateCellMetadata({
                     col: node.x,
                     row: node.y,
                     width: node.width,
                     height: node.height
-                });
+                }, el, GRID_DEFAULT);
             } else {
                 // add hidden metadata to cell
-                _updateCellMetadata(el, null);
+                _updateCellMetadata({ hidden: true }, el, GRID_DEFAULT);
             }
         });
         IPython.notebook.set_dirty(true);
     }
 
-    function _showCell(cells) {
-        $(cells).each(function() {
-            var metadata = _getCellMetadata($(this));
-            // add a layout object to indicate that this cell has explicitly
-            // been added to the layout either by some initialization routine
-            // that calculated the layout or the user
-            metadata.layout = {};
-            delete metadata.hidden;
-        });
-    }
-
-    function _updateCellMetadata($cells, layout) {
-        if (arguments.length === 1) {
-            layout = $cells; // first argument is optional
-            $cells = $('.cell');
-        } else {
-            $cells = $($cells); // force to jquery
-        }
+    function _updateCellMetadata(viewProps, $cells, viewId) {
+        // force cells to jquery & use all cells if not specified
+        $cells = $cells ? $($cells) : $('.cell');
+        viewId = viewId || _getActiveView();
 
         $cells.each(function(i, cell) {
-            var metadata = _getCellMetadata($(cell));
-
-            // only update the layout if not hidden
-            if (layout && !metadata.hidden) {
-                metadata.layout = metadata.layout || {};
-                CELL_PROPERTIES.forEach(function(prop) {
-                    if (layout.hasOwnProperty(prop)) {
-                        metadata.layout[prop] = layout[prop];
-                    }
-                });
-            } else {
-                // reset the layout object, but don't remove it completely
-                // since it serves as the indicator that this cell has been
-                // purposefully added to the layout in the past
-                metadata.layout = {};
-                metadata.hidden = true;
-            }
+            $.extend(_getCellViewMetadata($(cell), viewId), viewProps);
         });
         IPython.notebook.set_dirty(true);
     }
@@ -182,26 +171,27 @@ define([
     }
 
     return {
-        get DASHBOARD_LAYOUT() { return DASHBOARD_LAYOUT; },
+        get DASHBOARD_VIEW() { return DASHBOARD_VIEW; },
 
         /**
-         * @return {string} dashboard layout type (defaults to grid layout if not set)
+         * @return {string} dashboard view type
          *//**
-         * Sets the specified dashboard layout in the notebook metadata
-         * @param {string} layout - desired dashboard layout
+         * Sets the specified view in the notebook metadata
+         * @param {string} view - desired dashboard view
          */
-        get dashboardLayout() {
-            return _getDashboardLayout();
+        get activeView() {
+            // map default view id to view type
+            var activeView = _getActiveView();
+            return Object.keys(VIEW_TO_ID).filter(function(key) {
+                return VIEW_TO_ID[key] === activeView;
+            })[0];
         },
-        set dashboardLayout(dbLayout) {
-            if (_validValue(DASHBOARD_LAYOUT, dbLayout)) {
-                var currentLayout = _getDashboardLayout();
-                var preserveExistingMetadata = currentLayout === dbLayout ||
-                                               currentLayout === null;
-                _initMetadata({}, preserveExistingMetadata);
-                _getDashboardMetadata().layout = dbLayout;
+        set activeView(dbView) {
+            if (_validValue(DASHBOARD_VIEW, dbView)) {
+                _initMetadata();
+                _getDashboardMetadata().activeView = VIEW_TO_ID[dbView];
             } else {
-                throw new Error('Invalid dashboard layout:', dbLayout);
+                throw new Error('Invalid dashboard view:', dbView);
             }
         },
 
@@ -213,19 +203,31 @@ define([
         },
 
         /**
+         * @return {Object} active view properties
+         */
+        get viewProperties() {
+            return _getDashboardMetadata().views[_getActiveView()];
+        },
+
+        /**
          * @param  {jQuery} $cell - notebook cell or element inside a notebook cell
-         * @return {Object} layout positioning for the specified cell
+         * @return {Object} view positioning for the specified cell
          */
         getCellLayout: function($cell) {
-            var metadata = _getCellMetadata($cell);
-            return metadata && metadata.layout;
+            return _getCellViewMetadata($cell);
         },
         /**
-         * Update a cell's metadata so it does not appear in the dashboard.
-         * @param {(DOM Element|DOM Element[]|jQuery)} $cell - one or more notebook cells to hide
+         * @return {boolean} true if cell has been rendered in the active dashboard view
          */
-        hideCell: function($cell) {
-            _updateCellMetadata($cell, null);
+        hasCellBeenRendered: function($cell) {
+            return _getCellViewMetadata($cell).hasOwnProperty('hidden');
+        },
+        /**
+         * Hide's a cell in the active view.
+         * @param {(DOM Element|DOM Element[]|jQuery)} $cells - one or more notebook cells to hide
+         */
+        hideCell: function($cells) {
+            _updateCellMetadata({ hidden: true }, $cells);
         },
         /**
          * Populates the notebook metadata with empty dashboard metadata
@@ -236,27 +238,36 @@ define([
          * @return {boolean} true if the cell is visible, else false
          */
         isCellVisible: function($cell) {
-            var metadata = _getCellMetadata($cell);
-            return metadata && !metadata.hidden;
+            return !_getCellViewMetadata($cell).hidden;
         },
         /**
          * Copies layout data from the dashboard to the notebook metadata
          */
         save: _saveGrid,
         /**
-         * Shows the specified cells. Adds an empty layout object.
-         * The layout can be subsequently populated by calling `updateCellLayout`.
+         * Mark a cell as being rendered. Some layouts may use this information
+         * for performing operations on new cells, e.g. auto-hide.
+         * @param  {jQuery} $cell - cell to mark rendered
+         */
+        setCellRendered: function($cell) {
+            var view = _getCellViewMetadata($cell);
+            view.hidden = !!view.hidden;
+        },
+        /**
+         * Sets the specified grid view properties if they are not set
+         * @type {Object} props - grid view properties and values
+         */
+        setDefaultGridProperties: _setDefaultGridProperties,
+        /**
+         * Shows the specified cells in the active view.
          * @type {(DOM Element|DOM Element[]|jQuery)} cells - one or more cells to show
          */
-        showCell: _showCell,
+        showCell: function($cells) {
+            _updateCellMetadata({ hidden: false }, $cells);
+        },
         /**
          * Stacks the cells in notebook order. Keeps hidden cells hidden.
          */
-        stackCells: _removePosition,
-        /**
-         * Update the specified cell's layout metadata
-         * @param {(DOM Element|DOM Element[]|jQuery)} $cell - one or more notebook cells to update
-         */
-        updateCellLayout: _updateCellMetadata
+        stackCells: _removeGridPositioning
     };
 });

@@ -48,15 +48,16 @@ define([
         this._loaded = $.Deferred();
         ErrorLog.enable(IPython);
 
-        Metadata.dashboardLayout = Metadata.DASHBOARD_LAYOUT.GRID;
+        Metadata.activeView = Metadata.DASHBOARD_VIEW.GRID;
 
         // read configurable values from dashboard metadata
-        var dm = Metadata.dashboardMetadata;
-        this.gridMargin = dm.cellMargin >= 0 ? dm.cellMargin : 10;
-        this.numCols = dm.maxColumns >= 0 ? dm.maxColumns : 12;
-        this.rowHeight = dm.defaultCellHeight >= 0 ? dm.defaultCellHeight : 20;
+        var viewProps = Metadata.viewProperties;
+        this.gridMargin = viewProps.cellMargin >= 0 ? viewProps.cellMargin : 10;
+        this.numCols = viewProps.maxColumns >= 0 ? viewProps.maxColumns : 12;
+        this.rowHeight = viewProps.defaultCellHeight >= 0 ? viewProps.defaultCellHeight : 20;
 
-        Metadata.initialize({
+        Metadata.initialize();
+        Metadata.setDefaultGridProperties({
             cellMargin: this.gridMargin,
             maxColumns: this.numCols,
             defaultCellHeight: this.rowHeight
@@ -111,23 +112,23 @@ define([
         this.$container.addClass('grid-stack');
         var self = this;
         this.$container.find('.cell').each(function(idx) {
-            // Gridstack expects horizontal margins to be handled within the cell. To accomplish
-            // that, we need to wrap the cell contents in an element.
-            // Also, we add a separate div to show the border, since we want to show that above
+            // Wrap the cell contents in an element because Gridstack expects
+            // horizontal margins to be handled within the cell.
+            // Add a separate div to show the border since we want to show it above
             // the cell contents. This is necessary since cell contents may overflow the cell
             // bounds, but we still want to show the user those boundaries.
-            var el = $(this);
-            if (el.find('> .dashboard-item-background').length === 0) {
-                el.prepend('<div class="dashboard-item-background"/><div class="dashboard-item-border"><i class="fa fa-arrows"/></div>');
+            var $cell = $(this);
+            if ($cell.find('> .dashboard-item-background').length === 0) {
+                $cell.prepend('<div class="dashboard-item-background"/><div class="dashboard-item-border"><i class="fa fa-arrows"/></div>');
             }
 
-            var layout = Metadata.getCellLayout(el);
-            if (Metadata.isCellVisible(el)) {
-                if (layout) {
-                    self._initVisibleCell(el, layout);
-                } else {
-                    nolayout.push($(this)); // cell doesn't have layout info; save for later
+            if (Metadata.hasCellBeenRendered($cell)) {
+                if (Metadata.isCellVisible($cell)) {
+                    self._initVisibleCell($cell, Metadata.getCellLayout($cell));
                 }
+            } else {
+                // cell hasn't been laid out before so save for later
+                nolayout.push($(this));
             }
         });
         return nolayout;
