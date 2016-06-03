@@ -11,12 +11,10 @@
 define([
     'jquery',
     'base/js/namespace',
-    './dashboard-metadata-compatibility',
     './object-util'
 ], function(
     $,
     IPython,
-    Compatibility,
     ObjectUtil
 ) {
     'use strict';
@@ -119,7 +117,6 @@ define([
         $('.cell').each(function() {
             _createDashboardMetadata(this);
         });
-        Compatibility.convert();
     }
 
     function _removeGridPositioning() {
