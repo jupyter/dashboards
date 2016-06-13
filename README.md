@@ -8,7 +8,7 @@ Extension for Jupyter Notebook that enables the layout and presentation of grid-
 
 This repository is a portion of the `jupyter-incubator/dashboards` effort which covers:
 
-* [Arranging](https://github.com/jupyter-incubator/dashboards) notebook outputs in a grid-layout (**this repo**)
+* [Arranging](https://github.com/jupyter-incubator/dashboards) notebook outputs in a grid- or report-like (**this repo**)
 * [Bundling](https://github.com/jupyter-incubator/dashboards_bundlers) notebooks and associated assets for deployment as dashboards
 * [Serving](https://github.com/jupyter-incubator/dashboards_server) notebook-defined dashboards as standalone web apps
 
@@ -16,9 +16,9 @@ It is also has close ties to [jupyter-incubator/declarativewidgets](https://gith
 
 ## What It Gives You
 
-* Dashboard layout mode for arranging notebook cell outputs in a grid-like fashion
+* Dashboard layout mode for arranging notebook cell outputs in a grid- or report-like fashion
 * Dashboard view mode for interacting with an assembled dashboard within the Jupyter Notebook
-* Ability to share notebooks that have dashboard layout metadata in them with other Jupyter Notebook users for layout and viewing
+* Ability to share notebooks that have [dashboard layout metadata](https://github.com/jupyter-incubator/dashboards/wiki/Dashboard-Metadata-and-Rendering) in them with other Jupyter Notebook users for layout and viewing
 * Ability to deploy dashboards as standalone web applications when used in conjunction with the [dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) and [dashboards_server](https://github.com/jupyter-incubator/dashboards_server) projects
 
 ## Try It
@@ -27,16 +27,12 @@ If you want to try the dashboard extension and demos without installing it yours
 
 Note that both of these deployments tend to lag the latest stable release.
 
-## Install It
-
-### Prerequisites
+## Prerequisites
 
 * Jupyter Notebook 4.2.x, 4.1.x, or 4.0.x running on Python 3.x or Python 2.7.x
 * Edge, Chrome, Firefox, or Safari
 
-Note: If you're running IPython Notebook 3.2.x, you can install the older 0.1.x version of the extension.
-
-### Dashboard Layout and Preview
+## Install It
 
 In Jupyter Notebook 4.2, you install and activate the dashboard layout and preview features in two commands like so:
 
@@ -64,19 +60,6 @@ jupyter dashboards install --user --symlink --overwrite
 # Enable the JS and server extensions in your ~/.jupyter
 jupyter dashboards activate
 ```
-
-If you also want to download or deploy your dashboards as web applications, read the next section about *Deploying Dashboards*.
-
-### Dashboard Deployment
-
-It's within the scope of the dashboard incubator projects to allow users to both:
-
-1. Create dashboard layouts within notebooks, persist the layout metadata within the notebook JSON, and share those dashboard-notebooks with other Jupyter users (this project).
-2. Convert and deploy dashboard-notebooks as standalone web applications (the [jupyter-incubator/dashboard_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) and [jupyter-incubator/dashboards_server](https://github.com/jupyter-incubator/dashboards_server) projects).
-
-We consider the code which addresses the first use case stable for the time being. On the other hand, we are actively maturing support for the latter use case by following our [dashboard deployment roadmap](https://github.com/jupyter-incubator/dashboards/wiki/Deployment-Roadmap) which largely seeks to address the [threats identified](https://github.com/jupyter-incubator/dashboards/wiki/Deployed-Dashboard-Threat-Analysis) in our initial proof-of-concept deployment mechanisms.
-
-If you'd like to try the **experimental** support for deploying dashboards as standalone web apps today, see the [jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) README for details.
 
 ## Uninstall It
 
