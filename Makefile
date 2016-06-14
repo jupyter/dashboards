@@ -82,7 +82,6 @@ _dev-with-widgets:
 		--user jovyan \
 		-v `pwd`/jupyter_dashboards:$(EXTENSION_DIR) \
 		-v `pwd`/scripts/jupyter-dashboards:/usr/local/bin/jupyter-dashboards \
-		-v `pwd`/../declarativewidgets:/declarativewidgets \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
 		$(BOWER_REPO) bash -c '$(LANG_SETUP_CMD) && $(EXT_DEV_SETUP) && \
 			pip install jupyter_declarativewidgets && \
