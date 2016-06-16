@@ -1,0 +1,22 @@
+{
+  "name": "dynamic-list",
+  "version": "0.0.1",
+  "description": "A dynamic list",
+  "authors": [
+    "IBM"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies" : {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-icons": "PolymerElements/iron-list#^1.0.0",
+    "paper-radio-button": "PolymerElements/paper-material#^1.0.0",
+    "paper-radio-group": "PolymerElements/paper-toggle-button#^1.0.0"
+  },
+  "main" : "dynamic-list.html",
+  "private" : true
+}
