@@ -6,34 +6,41 @@
                 color: white;
                 padding: 10px;
             }
-                
+
             :host .controls {
                 display: flex;
                 justify-content: space-between;
             }
-                
+
             :host iron-list {
                 height: 850px;
             }
-                
+
             :host .count {
                 font-size: smaller;
                 text-transform: uppercase;
-            }                
+            }
             :host .count .new-items {
                 margin-left: 1em;
                 color: white;
             }
-                
-            :host paper-toggle-button {
-                --paper-toggle-button-unchecked-button-color: darkgray;
-                --default-primary-color: white;
+
+            :host .toggle-btn-container {
+                display: flex;
+                justify-content: flex-end;
             }
-                
+            :host paper-toggle-button {
+                --default-primary-color: white;
+                --paper-toggle-button-unchecked-button-color: darkgray;
+                --paper-toggle-button-checked-bar-color:  var(--paper-light-blue-300);
+                --paper-toggle-button-checked-button-color:  var(--paper-light-blue-300);
+                --paper-toggle-button-checked-ink-color: var(--paper-light-blue-300);
+            }
+
             :host paper-toggle-button:hover {
                 cursor: pointer;
             }
-            
+
             .member-card {
                 display: flex;
                 height: 60px;
@@ -86,12 +93,12 @@
             .member-card:not(:hover) .contact-button {
                 display: none;
             }
-                
+
             :host .member-card[data-converted] {
                 background-color: rgba(130, 209, 245, 0.2);
             }
         </style>
-        
+
         <paper-material class="header">
             <h2>[[heading]]</h2>
             <div class="controls">

@@ -1,0 +1,22 @@
+{
+  "name": "upcoming-meetups",
+  "version": "0.0.1",
+  "description": "A list of future meetups",
+  "authors": [
+    "IBM"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies" : {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-icons": "PolymerElements/iron-list#^1.0.0",
+    "iron-icons": "PolymerElements/iron-resizable-behavior#^1.0.0",
+    "paper-radio-button": "PolymerElements/paper-material#^1.0.0"
+  },
+  "main" : "upcoming-meetups.html",
+  "private" : true
+}
