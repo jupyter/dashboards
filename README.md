@@ -6,11 +6,13 @@ Extension for Jupyter Notebook that enables the layout and presentation of dashb
 
 ![Dashboard layout screenshot](etc/dashboards_intro.png)
 
-This repository is a portion of the `jupyter-incubator/dashboards` effort which covers:
+The Jupyter Incubator Dashboards effort covers:
 
-* [Arranging](https://github.com/jupyter-incubator/dashboards) notebook outputs in a grid- or report-like (**this repo**)
-* [Bundling](https://github.com/jupyter-incubator/dashboards_bundlers) notebooks and associated assets for deployment as dashboards
-* [Serving](https://github.com/jupyter-incubator/dashboards_server) notebook-defined dashboards as standalone web apps
+1. Arranging notebook outputs in a grid- or report-like layout 
+2. Bundling notebooks and associated assets for deployment as dashboards 
+3. Serving notebook-defined dashboards as standalone web apps
+
+This repository focuses on (1) above, while [jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers) handles (2) and [jupyter-incubator/dashboards_server](https://github.com/jupyter-incubator/dashboards_server) implements (3).
 
 See https://github.com/jupyter-incubator/dashboards/wiki for an overview of the entire dashboards effort.
 
