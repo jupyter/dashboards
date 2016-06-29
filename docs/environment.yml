@@ -1,0 +1,5 @@
+name: dashboard_docs
+dependencies:
+- python=3.5
+- sphinx_rtd_theme
+- sphinx
