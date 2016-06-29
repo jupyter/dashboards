@@ -1,10 +1,8 @@
-[![PyPI version](https://badge.fury.io/py/jupyter_dashboards.svg)](https://badge.fury.io/py/jupyter_dashboards) [![Build Status](https://travis-ci.org/jupyter-incubator/dashboards.svg?branch=master)](https://travis-ci.org/jupyter-incubator/dashboards) [![Google Group](https://img.shields.io/badge/-Google%20Group-lightgrey.svg)](https://groups.google.com/forum/#!forum/jupyter)
-
 # Jupyter Dashboards Layout
 
 Extension for Jupyter Notebook that enables the layout and presentation of dashboards from notebooks.
 
-![Dashboard layout screenshot](etc/dashboards_intro.png)
+![Dashboard layout screenshot](_static/dashboards_intro.png)
 
 The Jupyter Incubator Dashboards effort covers:
 
