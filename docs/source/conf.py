@@ -57,7 +57,7 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = 'Dashboards'
+project = 'Jupyter Dashboards - Layout'
 copyright = '2016, Project Jupyter'
 author = 'Project Jupyter'
 
@@ -215,6 +215,10 @@ html_static_path = ['_static']
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Dashboardsdoc'
+
+html_context = {
+    'css_files': ['_static/custom.css'],
+}
 
 # -- Options for LaTeX output ---------------------------------------------
 
