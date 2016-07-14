@@ -15,5 +15,5 @@ RUN apt-get update && \
 USER jovyan
 
 # Setup a sphinx environment for doc building
-COPY docs/environment.yml /tmp
+COPY docs/environment.yml /tmp/environment.yml
 RUN conda env create -f /tmp/environment.yml
