@@ -13,7 +13,7 @@ addons:
     no_ssl_bump_domains: all
 
 script:
-- make build
+- make image
 - make sdist
 - make install-python2
 - make install-python3
