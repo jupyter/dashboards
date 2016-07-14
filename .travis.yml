@@ -17,7 +17,6 @@ script:
 - make sdist
 - make install-python2
 - make install-python3
-- make docs
 - if [[ -n "$SAUCE_USERNAME" ]]; then make system-test-remote; fi
 
 notifications:
