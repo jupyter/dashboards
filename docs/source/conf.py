@@ -216,10 +216,6 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Dashboardsdoc'
 
-html_context = {
-    'css_files': ['_static/custom.css'],
-}
-
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
