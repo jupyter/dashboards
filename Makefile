@@ -1,12 +1,11 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-.PHONY: build clean dev dev-with-widgets help install js sdist system-test-local system-test-remote test
+.PHONY: build clean dev dev-with-widgets docs help install js sdist system-test-local system-test-remote test
 
 PYTHON?=python3
 
-REPO:=jupyter/pyspark-notebook:8015c88c4b11
-BOWER_REPO:=jupyter/pyspark-notebook-bower:8015c88c4b11
+IMAGE:=jupyter/dashboards-dev
 PYTHON2_SETUP:=source activate python2
 
 define EXT_DEV_SETUP
@@ -18,16 +17,9 @@ help:
 # http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-build: ## Build the dev Docker image
-	@-docker rm -f bower-build
-	@docker run -it --user root --name bower-build \
-		$(REPO) bash -c 'apt-get update && \
-		apt-get install -y curl && \
-		curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
-		apt-get install --yes nodejs && \
-		npm install -g bower'
-	@docker commit bower-build $(BOWER_REPO)
-	@-docker rm -f bower-build
+build: image
+image: ## Build the dev Docker image
+	@docker build --rm -f Dockerfile.dev -t $(IMAGE) .
 
 clean: ## Clean source tree
 	@-rm -rf dist
@@ -42,7 +34,13 @@ js: ## Build Javascript components
 	@docker run -it --rm \
 		--user root \
 		-v `pwd`:/src \
-		$(BOWER_REPO) bash -c 'cd /src && npm install && npm run bower'
+		$(IMAGE) bash -c 'cd /src && npm install && npm run bower'
+
+docs: ## Build the sphinx documentation in a container
+	@docker run --rm -it \
+		-v `pwd`/docs:/docs \
+		$(IMAGE) \
+		bash -c "source activate dashboard_docs && make -C /docs html"
 
 dev: dev-$(PYTHON) ## Start notebook server in a container with source mounted
 
@@ -63,7 +61,7 @@ _dev:
 		-v `pwd`/jupyter_dashboards:$(EXTENSION_DIR) \
 		-v `pwd`/scripts/jupyter-dashboards:/usr/local/bin/jupyter-dashboards \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
-		$(REPO) bash -c '$(LANG_SETUP_CMD) && $(EXT_DEV_SETUP) && $(CMD)'
+		$(IMAGE) bash -c '$(LANG_SETUP_CMD) && $(EXT_DEV_SETUP) && $(CMD)'
 
 dev-with-widgets: dev-with-widgets-$(PYTHON) ## Same as dev but w/ declarative widgets enabled
 
@@ -83,12 +81,12 @@ _dev-with-widgets:
 		-v `pwd`/jupyter_dashboards:$(EXTENSION_DIR) \
 		-v `pwd`/scripts/jupyter-dashboards:/usr/local/bin/jupyter-dashboards \
 		-v `pwd`/etc/notebooks:/home/jovyan/work \
-		$(BOWER_REPO) bash -c '$(LANG_SETUP_CMD) && $(EXT_DEV_SETUP) && \
+		$(IMAGE) bash -c '$(LANG_SETUP_CMD) && $(EXT_DEV_SETUP) && \
 			pip install jupyter_declarativewidgets && \
 			jupyter declarativewidgets quick-setup --sys-prefix && \
 			$(CMD)'
 
-install: install-$(PYTHON) ## Install and activate the sdist package in the container
+install: install-$(PYTHON) ## Install and activate the sdist package in a container
 
 install-python2: SETUP_CMD=$(PYTHON2_SETUP) && python --version
 install-python2: _install
@@ -100,7 +98,7 @@ _install: CMD?=exit
 _install:
 	@docker run -it --rm \
 		-v `pwd`:/src \
-		$(REPO) bash -c '$(SETUP_CMD) && cd /src/dist && \
+		$(IMAGE) bash -c '$(SETUP_CMD) && cd /src/dist && \
 			pip install --no-binary :all: $$(ls -1 *.tar.gz | tail -n 1) && \
 			jupyter dashboards quick-setup --sys-prefix && \
 			$(CMD)'
@@ -110,7 +108,7 @@ sdist: js ## Build a source distribution in dist/
 	@docker run -it --rm \
 		--user root \
 		-v `pwd`:/src \
-		$(REPO) bash -c 'cp -r /src /tmp/src && \
+		$(IMAGE) bash -c 'cp -r /src /tmp/src && \
 			cd /tmp/src && \
 			python setup.py sdist $(POST_SDIST) && \
 			cp -r dist /src'
@@ -152,5 +150,5 @@ _system-test:
 		-e SAUCE_ACCESS_KEY=$(SAUCE_ACCESS_KEY) \
 		-e TRAVIS_JOB_NUMBER=$(TRAVIS_JOB_NUMBER) \
 		-v `pwd`:/src \
-		$(BOWER_REPO) $(CMD)
+		$(IMAGE) $(CMD)
 	-@docker rm -f $(SERVER_NAME)

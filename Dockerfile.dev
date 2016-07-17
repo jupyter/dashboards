@@ -1,0 +1,19 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+FROM jupyter/pyspark-notebook:8015c88c4b11
+
+USER root
+
+# Install dependencies for development with declarative widgets
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl --silent --location https://deb.nodesource.com/setup_0.12 | sudo bash - && \
+    apt-get install --yes nodejs && \
+    npm install -g bower
+
+USER jovyan
+
+# Setup a sphinx environment for doc building
+COPY docs/environment.yml /tmp/environment.yml
+RUN conda env create -f /tmp/environment.yml
