@@ -6,7 +6,7 @@
 
 The dashboards layout extension is an add-on for Jupyter Notebook. It lets you arrange your notebook outputs (text, plots, widgets, ...) in grid- or report-like layouts. It saves information about your layouts in your notebook document. Other people with the extension can open your notebook and view your layouts.
 
-![Dashboard layout screenshot](docs/_static/dashboards_intro.png)
+![Dashboard layout screenshot](docs/source/_static/dashboards_intro.png)
 
 The extension is part of the larger Jupyter Dashboards effort which covers:
 
