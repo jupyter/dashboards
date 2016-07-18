@@ -30,6 +30,7 @@ For a sample of what's possible with the dashboard layout extension, have a look
   
    development
    maintenance
+   metadata
 
 .. toctree::
    :maxdepth: 2
