@@ -64,4 +64,13 @@ jupyter dashboards deactivate
 pip uninstall jupyter_dashboards
 ```
 
+### For dashboards 0.4 and earlier
+
+In addition to the steps listed for Jupyter Notebook 4.0, 4.1, you may need to remove this line from your `jupyter_notebook_config.py` file:
+
+```python
+# [YOUR_JUPYTER_CONFIG_PATH]/jupyter_notebook_config.py
+c.NotebookApp.server_extensions.append('urth.dashboard.nbexts')
+```
+
 Note that there is no command to remove extension assets from the user profile in this version of Jupyter Notebook.
