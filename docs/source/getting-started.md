@@ -64,7 +64,7 @@ jupyter dashboards deactivate
 pip uninstall jupyter_dashboards
 ```
 
-### On Jupyter Notebook < 4.0
+### For dashboards 0.4 and earlier
 
 In addition to the steps listed for Jupyter Notebook 4.0, 4.1, you may need to remove this line from your `jupyter_notebook_config.py` file:
 
