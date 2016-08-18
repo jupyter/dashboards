@@ -1,1 +1,2 @@
 recursive-include jupyter_dashboards *
+include LICENSE.md
