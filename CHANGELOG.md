@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1 (2016-08-18)
+
+* Include LICENSE.md in source package
+
 ## 0.6.0 (2016-06-17)
 
 * Switch to the [v1 dashboard layout specification](https://github.com/jupyter-incubator/dashboards/wiki/Dashboard-Metadata-and-Rendering)
