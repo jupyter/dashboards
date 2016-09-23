@@ -2,7 +2,7 @@
 
 This page provides a brief walkthrough of using the dashboard extension. The extension provides additional, built-in help about all of the dashboard features. The steps below include instructions on how to access the help.
 
-Create a new Jupyter notebook document in an language of your choose. Insert markdown and code into the notebook. Run the cells to generate text, plots, widgets, etc.
+Create a new Jupyter notebook document in a language of your choice. Insert markdown and code into the notebook. Run the cells to generate text, plots, widgets, etc.
 
 ![Screenshot of a notebook](_static/notebook.png)
 
