@@ -48,7 +48,7 @@ jupyter dashboards quick-remove --sys-prefix
 pip uninstall jupyter_dashboards
 ```
 
-Note that the second command is a shortcut for the following:
+Note that the first command is a shortcut for the following:
 
 ```bash
 jupyter nbextension disable --py jupyter_dashboards --sys-prefix
