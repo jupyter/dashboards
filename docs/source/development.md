@@ -12,7 +12,7 @@ mkdir -p ~/projects
 cd !$
 
 # clone this repo
-git clone https://github.com/jupyter-incubator/dashboards.git
+git clone https://github.com/jupyter/dashboards.git
 ```
 
 Pull a base Docker image and build a subimage from it that includes `bower`, `nodejs`, and `npm` both as a dashboard dev dependency and as a prereq for example notebooks that use declarative widgets.

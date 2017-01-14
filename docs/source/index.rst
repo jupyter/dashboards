@@ -14,7 +14,7 @@ The extension is part of the larger Jupyter Dashboards effort which covers:
 
 The layout extension focuses on (1) above, while `jupyter-incubator/dashboards_bundlers <https://github.com/jupyter-incubator/dashboards_bundlers>`_ handles (2) and `jupyter-incubator/dashboards_server <https://github.com/jupyter-incubator/dashboards_server>`_ implements (3).
 
-For a sample of what's possible with the dashboard layout extension, have a look at the `demo dashboard-notebooks in the project repository <https://github.com/jupyter-incubator/dashboards/tree/master/etc/notebooks>`__.
+For a sample of what's possible with the dashboard layout extension, have a look at the `demo dashboard-notebooks in the project repository <https://github.com/jupyter/dashboards/tree/master/etc/notebooks>`__.
 
 .. toctree::
    :maxdepth: 2

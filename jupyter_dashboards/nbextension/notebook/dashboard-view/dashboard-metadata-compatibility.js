@@ -7,7 +7,7 @@
  * Jupyter Dashboards extension metadata.
  *
  * Jupyter Dashboard metadata structure:
- *    https://github.com/jupyter-incubator/dashboards/wiki/Dashboard-Metadata-and-Rendering
+ *    https://github.com/jupyter/dashboards/wiki/Dashboard-Metadata-and-Rendering
  */
 define([
     'jquery',

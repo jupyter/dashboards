@@ -25,10 +25,10 @@ setup_args = dict(
 * Dashboard view mode for interacting with an assembled dashboard within the Jupyter Notebook
 * Ability to share notebooks with dashboard layout metadata in them with other Jupyter Notebook users
 
-See `the project README <https://github.com/jupyter-incubator/dashboards>`_
+See `the project README <https://github.com/jupyter/dashboards>`_
 for more information.
 ''',
-    url='https://github.com/jupyter-incubator/dashboards',
+    url='https://github.com/jupyter/dashboards',
     version=VERSION_NS['__version__'],
     license='BSD',
     platforms=['Jupyter Notebook 4.0.x', 'Jupyter Notebook 4.1.x', 'Jupyter Notebook 4.2.x'],

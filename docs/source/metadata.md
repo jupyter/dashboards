@@ -2,14 +2,14 @@
 
 This page documents:
 
-1. The fields written to notebook documents (`.ipynb` files) by the `jupyter-incubator/dashboards` extension
-2. The interpretation of these fields in `jupyter-incubator/dashboards` and `jupyter-incubator/dashboards_server` to render a notebook in a dashboard layout.
+1. The fields written to notebook documents (`.ipynb` files) by the `jupyter/dashboards` extension
+2. The interpretation of these fields in `jupyter/dashboards` and `jupyter-incubator/dashboards_server` to render a notebook in a dashboard layout.
 
 ## Versioning
 
 The dashboard metadata specification is versioned independently of the packages that use it. The current version of the specification is v1. 
 
-Prior to the v1 specification, the dashboard incubator projects read and wrote a legacy v0 metadata format. The details of this [older spec appear on the dashboards wiki](https://github.com/jupyter-incubator/dashboards/wiki/Dashboard-Metadata-and-Rendering#spec-v0) for historical purposes.
+Prior to the v1 specification, the dashboard incubator projects read and wrote a legacy v0 metadata format. The details of this [older spec appear on the dashboards wiki](https://github.com/jupyter/dashboards/wiki/Dashboard-Metadata-and-Rendering#spec-v0) for historical purposes.
 
 ## Notebook Fields
 
