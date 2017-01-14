@@ -6,7 +6,7 @@
 
 ## 0.6.0 (2016-06-17)
 
-* Switch to the [v1 dashboard layout specification](https://github.com/jupyter-incubator/dashboards/wiki/Dashboard-Metadata-and-Rendering)
+* Switch to the [v1 dashboard layout specification](https://github.com/jupyter/dashboards/wiki/Dashboard-Metadata-and-Rendering)
 * Automatically upgrade existing notebook metadata to the v1 spec
 * Update example notebooks for compatibility with `jupyter_declarativewidgets` 0.6.0
 * Remove `urth` moniker in favor of `jupyter_dashboards` for CSS classes, notebook metadata, etc.
