@@ -6,6 +6,9 @@ addons:
   sauce_connect:
     no_ssl_bump_domains: all
 
+env:
+  - TEST_SERVER=ondemand.saucelabs.com TEST_TYPE=remote
+
 before_install:
   - git clone https://github.com/ericdill/ci ~/scripts
   - . ~/scripts/install-miniconda.sh
@@ -14,7 +17,7 @@ install:
   - make env
 
 script:
-  - make test-saucelabs
+  - ./system-test/bin/run-system-test.sh
 
 notifications:
   email:

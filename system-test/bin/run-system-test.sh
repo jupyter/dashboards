@@ -5,8 +5,8 @@
 TEST_SERVER=${TEST_SERVER:-127.0.0.1:4444}
 TEST_TYPE=${TEST_TYPE:-local}
 
-kill -9 $(cat /tmp/selenium.pid)
-kill -9 $(cat /tmp/notebook.pid)
+kill $(cat /tmp/selenium.pid)
+kill $(cat /tmp/notebook.pid)
 
 # Start selenium if local
 if [[ "$TEST_TYPE" == "local" ]]; then
@@ -27,12 +27,11 @@ jupyter notebook --ip 127.0.0.1 \
     --NotebookApp.token='' &
 echo $! > /tmp/notebook.pid
 
-pwd
 # Run the tests
 npm run system-test -- \
     --baseurl "http://127.0.0.1:8888" \
     --server "$TEST_SERVER" \
     --test-type "$TEST_TYPE"
 
-kill -9 $(cat /tmp/selenium.pid)
-kill -9 $(cat /tmp/notebook.pid)
+kill $(cat /tmp/selenium.pid)
+kill $(cat /tmp/notebook.pid)

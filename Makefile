@@ -53,8 +53,7 @@ release: sdist ## Make a release on PyPI
 sdist: js ## Make a dist/*.tar.gz source distribution
 	$(SA) $(ENV) && python setup.py sdist
 
-test: test-local
-test-local: ## Make a local test run
+test: ## Make a local test run
 	@./system-test/bin/run-system-test.sh
 
 test-saucelabs:
