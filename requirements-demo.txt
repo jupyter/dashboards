@@ -1,0 +1,6 @@
+bokeh==0.12.4
+ipywidgets
+matplotlib
+pandas
+seaborn
+widgetsnbextension

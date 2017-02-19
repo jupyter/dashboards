@@ -1,29 +1,25 @@
-sudo: required
-
 language: python
-
 python:
-- 3.4
-
-services:
-- docker
+  - 3.5
 
 addons:
   sauce_connect:
     no_ssl_bump_domains: all
 
+before_install:
+  - git clone https://github.com/ericdill/ci ~/scripts
+  - . ~/scripts/install-miniconda.sh
+
+install:
+  - make env
+
 script:
-- make image
-- make sdist
-- make install-python2
-- make install-python3
-- if [[ -n "$SAUCE_USERNAME" ]]; then make system-test-remote; fi
+  - make test-saucelabs
 
 notifications:
   email:
     on_success: change
     on_failure: always
-  slack: cloudet:rMfRKhvsbZuCIRZpTct3kBI4
 
 branches:
   only:

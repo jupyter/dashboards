@@ -1,6 +1,6 @@
 {
-  "name": "dashboard-nbexts",
-  "description": "Extensions for Jupyter / IPython Notebook to enable the authoring and deployment of dashboards from notebooks.",
+  "name": "jupyter-dashboards",
+  "description": "Frontend dependencies for the Jupyter Notebook dashboards extension",
   "directories": {
     "test": "test"
   },
