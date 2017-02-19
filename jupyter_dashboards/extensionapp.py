@@ -5,16 +5,21 @@ import sys
 
 from ._version import __version__
 
-from notebook.nbextensions import (InstallNBExtensionApp, EnableNBExtensionApp, 
-    DisableNBExtensionApp, flags, aliases)
-    
+from notebook.nbextensions import (InstallNBExtensionApp, EnableNBExtensionApp,
+                                   DisableNBExtensionApp, flags, aliases)
+
 try:
-    from notebook.nbextensions import BaseNBExtensionApp
+    from notebook.extensions import BaseExtensionApp
     _new_extensions = True
 except ImportError:
-    BaseNBExtensionApp = object
-    _new_extensions = False
-    
+    try:
+        from notebook.nbextensions import BaseNBExtensionApp
+        BaseExtensionApp = BaseNBExtensionApp
+        _new_extensions = True
+    except ImportError:
+        BaseExtensionApp = object
+        _new_extensions = False
+
 from traitlets import Unicode
 from traitlets.config.application import catch_config_error
 from traitlets.config.application import Application
@@ -26,6 +31,7 @@ INSTALL_FLAGS.update(flags)
 INSTALL_ALIASES = {}
 INSTALL_ALIASES.update(aliases)
 del INSTALL_ALIASES['destination']
+
 
 class ExtensionInstallApp(InstallNBExtensionApp):
     '''Subclass that installs this particular extension.'''
@@ -78,6 +84,7 @@ class ExtensionActivateApp(EnableNBExtensionApp):
         self.enable_nbextension("jupyter_dashboards/notebook/main")
         self.log.info("Done.")
 
+
 class ExtensionDeactivateApp(DisableNBExtensionApp):
     '''Subclass that deactivates this particular extension.'''
     name = u'jupyter-dashboards-extension-deactivate'
@@ -99,7 +106,8 @@ class ExtensionDeactivateApp(DisableNBExtensionApp):
         self.disable_nbextension("jupyter_dashboards/notebook/main")
         self.log.info("Done.")
 
-class ExtensionQuickSetupApp(BaseNBExtensionApp):
+
+class ExtensionQuickSetupApp(BaseExtensionApp):
     """Installs and enables all parts of this extension"""
     name = "jupyter dashboards quick-setup"
     version = __version__
@@ -107,7 +115,7 @@ class ExtensionQuickSetupApp(BaseNBExtensionApp):
 
     def start(self):
         self.argv.extend(['--py', 'jupyter_dashboards'])
-        
+
         from notebook import nbextensions
         install = nbextensions.InstallNBExtensionApp()
         install.initialize(self.argv)
@@ -116,7 +124,8 @@ class ExtensionQuickSetupApp(BaseNBExtensionApp):
         enable.initialize(self.argv)
         enable.start()
 
-class ExtensionQuickRemovalApp(BaseNBExtensionApp):
+
+class ExtensionQuickRemovalApp(BaseExtensionApp):
     """Disables and uninstalls all parts of this extension"""
     name = "jupyter dashboards quick-remove"
     version = __version__
@@ -132,6 +141,7 @@ class ExtensionQuickRemovalApp(BaseNBExtensionApp):
         install = nbextensions.UninstallNBExtensionApp()
         install.initialize(self.argv)
         install.start()
+
 
 class ExtensionApp(Application):
     '''CLI for extension management.'''
@@ -187,6 +197,7 @@ class ExtensionApp(Application):
 
         # This starts subapps
         super(ExtensionApp, self).start()
+
 
 def main():
     ExtensionApp.launch_instance()
