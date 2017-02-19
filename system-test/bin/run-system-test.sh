@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
@@ -18,7 +19,7 @@ if [[ "$TEST_TYPE" == "local" ]]; then
 fi
 
 # Start the notebook server
-eval $(make activate)
+source activate dashboards
 jupyter notebook --ip 127.0.0.1 \
     --port 8888 \
     --notebook-dir=./etc/notebooks \
@@ -26,6 +27,7 @@ jupyter notebook --ip 127.0.0.1 \
     --NotebookApp.token='' &
 echo $! > /tmp/notebook.pid
 
+pwd
 # Run the tests
 npm run system-test -- \
     --baseurl "http://127.0.0.1:8888" \
