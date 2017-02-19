@@ -22,7 +22,7 @@ clean: ## Make a clean source tree
 	@-rm -rf ./jupyter_dashboards/nbextension/notebook/bower_components
 
 docs: ## Make HTML documentation
-	make -C docs
+	make -C docs html
 
 build: env
 env: ## Make a dev environment
@@ -36,6 +36,10 @@ env: ## Make a dev environment
 		pip install -e . && \
 		jupyter dashboards quick-setup --sys-prefix --symlink
 
+js: ## Make JavaScript assets
+	npm install
+	npm run bower
+
 notebook: ## Make a notebook server
 	$(SA) $(ENV) && jupyter notebook --notebook-dir=./etc/notebooks
 
@@ -45,7 +49,7 @@ nuke: clean ## Make clean + remove conda env
 release: sdist ## Make a release on PyPI
 	$(SA) $(ENV) && python setup.py sdist register upload
 
-sdist: ## Make a dist/*.tar.gz source distribution
+sdist: js ## Make a dist/*.tar.gz source distribution
 	$(SA) $(ENV) && python setup.py sdist
 
 test: test-local
