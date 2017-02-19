@@ -5,6 +5,7 @@
 
 SA:=source activate
 ENV:=dashboards
+SHELL:=/bin/bash
 
 help:
 # http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
