@@ -26,6 +26,13 @@ jupyter nbextension install --py jupyter_dashboards --sys-prefix
 jupyter nbextension enable --py jupyter_dashboards --sys-prefix
 ```
 
+Alternatively, the following command both installs and enables package using
+`conda`.
+
+```bash
+conda install jupyter_dashboards -c conda-forge
+```
+
 ## Disabling and Uninstalling
 
 The following steps deactivate the extension in the active Python environment
@@ -41,6 +48,13 @@ Note that the first command is a shortcut for the following:
 ```bash
 jupyter nbextension disable --py jupyter_dashboards --sys-prefix
 jupyter nbextension uninstall --py jupyter_dashboards --sys-prefix
+```
+
+The following command deactivates and uninstalls the package if it was 
+installed using `conda`.
+
+```bash
+conda remove jupyter_dashboards
 ```
 
 ## Legacy Notes
