@@ -23,7 +23,7 @@ clean: ## Make a clean source tree
 	@-rm -rf ./jupyter_dashboards/nbextension/notebook/bower_components
 
 docs: ## Make HTML documentation
-	make -C docs html
+	$(SA) $(ENV) && make -C docs html
 
 build: env
 env: ## Make a dev environment
@@ -47,7 +47,7 @@ notebook: ## Make a notebook server
 nuke: clean ## Make clean + remove conda env
 	-conda env remove -n $(ENV) -y
 
-release: sdist ## Make a release on PyPI
+release: js ## Make a release on PyPI
 	$(SA) $(ENV) && python setup.py sdist register upload
 
 sdist: js ## Make a dist/*.tar.gz source distribution
