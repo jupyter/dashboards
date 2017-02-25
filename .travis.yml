@@ -17,7 +17,8 @@ install:
   - make env
 
 script:
-  - ./system-test/bin/run-system-test.sh
+  # SauceLab creds are only available on merge
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then ./system-test/bin/run-system-test.sh; fi;'
 
 notifications:
   email:
