@@ -26,8 +26,8 @@ jupyter nbextension install --py jupyter_dashboards --sys-prefix
 jupyter nbextension enable --py jupyter_dashboards --sys-prefix
 ```
 
-Alternatively, the following command both installs and enables package using
-`conda`.
+Alternatively, the following command both installs and enables the package
+using `conda`.
 
 ```bash
 conda install jupyter_dashboards -c conda-forge
