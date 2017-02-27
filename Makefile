@@ -28,6 +28,7 @@ docs: ## Make HTML documentation
 build: env
 env: ## Make a dev environment
 	conda create -y -n $(ENV) -c conda-forge python=3 \
+		--file requirements.txt \
 		--file requirements-test.txt \
 		--file requirements-demo.txt
 	$(SA) $(ENV) && \

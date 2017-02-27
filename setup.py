@@ -36,6 +36,9 @@ for more information.
         'jupyter_dashboards'
     ],
     include_package_data=True,
+    install_requires=[
+        'notebook>=4.0',
+    ],
     scripts=[
         'scripts/jupyter-dashboards'
     ],
