@@ -36,7 +36,8 @@ env: ## Make a dev environment
 		npm install && \
 		npm run bower && \
 		pip install -e . && \
-		jupyter dashboards quick-setup --sys-prefix
+		jupyter dashboards quick-setup --sys-prefix &&
+		jupyter nbextension enable --py widgetsnbextension --sys-prefix
 
 js: ## Make JavaScript assets
 	npm install
