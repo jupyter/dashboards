@@ -42,6 +42,9 @@ env: ## Make a dev environment
 js: ## Make JavaScript assets
 	npm install
 	npm run bower
+	$(SA) $(ENV) && \
+		pip install -e . && \
+		jupyter dashboards quick-setup --sys-prefix
 
 notebook: ## Make a notebook server
 	$(SA) $(ENV) && jupyter notebook --notebook-dir=./etc/notebooks

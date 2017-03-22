@@ -9,7 +9,7 @@
 
 .jupyter-dashboard .container div.output_subarea {
     max-width: 100%; /* override Notebook CSS so it takes up full width */
-    overflow: visible; /* ensure contents overflow, needed for widgets such as dropdown menus */
+    overflow: hidden; /* hide overflowing contents */
 }
 
 /* disable display of paragraph anchor text*/
