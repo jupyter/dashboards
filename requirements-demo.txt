@@ -1,0 +1,7 @@
+bokeh==0.12.4
+jupyter_declarativewidgets
+ipywidgets
+matplotlib
+pandas
+seaborn
+widgetsnbextension

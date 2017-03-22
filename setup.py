@@ -17,7 +17,7 @@ setup_args = dict(
     name='jupyter_dashboards',
     author='Jupyter Development Team',
     author_email='jupyter@googlegroups.com',
-    description='Extension for Jupyter Notebook 4.0.x for laying out, viewing, and deploying notebooks as dynamic dashboards',
+    description='Extension for Jupyter Notebook for laying out, viewing, and deploying notebooks as dynamic dashboards',
     long_description = '''
     This package adds the following features to Jupyter Notebook:
 
@@ -31,11 +31,14 @@ for more information.
     url='https://github.com/jupyter/dashboards',
     version=VERSION_NS['__version__'],
     license='BSD',
-    platforms=['Jupyter Notebook 4.0.x', 'Jupyter Notebook 4.1.x', 'Jupyter Notebook 4.2.x'],
+    platforms=['Jupyter Notebook 4.x', 'Jupyter Notebook 5.x'],
     packages=[
         'jupyter_dashboards'
     ],
     include_package_data=True,
+    install_requires=[
+        'notebook>=4.0',
+    ],
     scripts=[
         'scripts/jupyter-dashboards'
     ],

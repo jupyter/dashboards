@@ -6,15 +6,13 @@ The dashboards layout extension is an add-on for Jupyter Notebook. It lets you a
 .. image:: _static/dashboards_intro.png
    :alt: Dashboard layout screenshot
 
-The extension is part of the larger Jupyter Dashboards effort which covers:
-
-1. Arranging notebook outputs in a grid- or report-like layout 
-2. Bundling notebooks and associated assets for deployment as dashboards 
-3. Serving notebook-defined dashboards as standalone web apps
-
-The layout extension focuses on (1) above, while `jupyter-incubator/dashboards_bundlers <https://github.com/jupyter-incubator/dashboards_bundlers>`_ handles (2) and `jupyter-incubator/dashboards_server <https://github.com/jupyter-incubator/dashboards_server>`_ implements (3).
-
 For a sample of what's possible with the dashboard layout extension, have a look at the `demo dashboard-notebooks in the project repository <https://github.com/jupyter/dashboards/tree/master/etc/notebooks>`__.
+
+The extension can be used in combination with the incubating
+[jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers)
+and
+[jupyter-incubator/dashboards_server](https://github.com/jupyter-incubator/dashboards_server)
+projects.
 
 .. toctree::
    :maxdepth: 2
@@ -27,7 +25,7 @@ For a sample of what's possible with the dashboard layout extension, have a look
 .. toctree::
    :maxdepth: 2
    :caption: Contributor Documentation
-  
+
    development
    maintenance
    metadata

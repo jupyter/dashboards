@@ -21,6 +21,9 @@
     border: none;
     padding: 0;
 }
+.jupyter-dashboard .cell.selected:before {
+    background: transparent;
+}
 
 /* Show cell code in the background of each cell */
 .jupyter-dashboard:not(.view-only) .cell > .input {

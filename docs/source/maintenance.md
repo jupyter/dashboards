@@ -10,12 +10,6 @@ To build a source tarball in `dist/`, run the following:
 make sdist
 ```
 
-To test the installation and activation of the built package in a Docker container, do the following next:
-
-```bash
-make install
-```
-
 ## Make a release
 
 To start a new major/minor branch for its first release (e.g., 0.3.0):
@@ -43,7 +37,7 @@ To make a patch release on a major/minor branch (e.g., 0.3.0):
 git checkout master
 git checkout -b tmp-backport-0.3.x
 git rebase -i 0.3.x
-# delete any version bumps or other commits you don't want 
+# delete any version bumps or other commits you don't want
 # in the stable release branch from master
 git checkout 0.3.x
 git merge tmp-backport-0.3.x
