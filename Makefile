@@ -29,15 +29,15 @@ build: env
 env: ## Make a dev environment
 	conda create -y -n $(ENV) -c conda-forge python=3 \
 		--file requirements.txt \
-		--file requirements-test.txt \
-		--file requirements-demo.txt
+		--file requirements-test.txt
 	$(SA) $(ENV) && \
-		pip install -r requirements-doc.txt && \
+		pip install -r requirements-doc.txt -r requirements-demo.txt && \
 		npm install && \
 		npm run bower && \
 		pip install -e . && \
 		jupyter dashboards quick-setup --sys-prefix && \
-		jupyter nbextension enable --py widgetsnbextension --sys-prefix
+		jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
+		jupyter declarativewidgets quick-setup --sys-prefix
 
 js: ## Make JavaScript assets
 	npm install
