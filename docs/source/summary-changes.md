@@ -2,6 +2,13 @@
 
 See `git log` for a more detailed summary of changes.
 
+## 0.7
+
+### 0.7.0 (2017-04-04)
+
+* Updated to support notebook 5.0
+* Fixed clipping at cell boundaries
+
 ## 0.6
 
 ### 0.6.0 (2016-06-17)

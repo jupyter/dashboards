@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0 (2017-04-04)
+
+* Updated to support notebook 5.0
+* Fixed clipping at cell boundaries
+
 ## 0.6.1 (2016-08-18)
 
 * Include LICENSE.md in source package
