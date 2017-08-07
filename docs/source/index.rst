@@ -8,8 +8,6 @@ The dashboards layout extension is an add-on for Jupyter Notebook. It lets you a
 
 For a sample of what's possible with the dashboard layout extension, have a look at the `demo dashboard-notebooks in the project repository <https://github.com/jupyter/dashboards/tree/master/etc/notebooks>`__.
 
-The extension can be used in combination with the incubating `jupyter-incubator/dashboards_bundlers <https://github.com/jupyter-incubator/dashboards_bundlers>`__ and `jupyter-incubator/dashboards_server <https://github.com/jupyter-incubator/dashboards_server>`__ projects.
-
 .. toctree::
    :maxdepth: 2
    :caption: User Documentation
