@@ -29,5 +29,4 @@ The following demos are kept up-to-date as issues with dependencies are found an
 
 1. [Got Scotch?](got_scotch_demo/scotch_dashboard.ipynb) - show similarities
    between scotch varieties
-2. [Bokeh demo](bokeh_demo/bokeh_demo.ipynb) - shows some Bokeh widgets in a
-   dashboard layout
+2. [Plotting demo](plotting_demo.ipynb) - shows how matplotlib, bokeh, and plotly work in a dashboard layout
