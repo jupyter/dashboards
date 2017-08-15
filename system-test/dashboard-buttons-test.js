@@ -7,7 +7,7 @@ var boilerplate = new Boilerplate();
   * Tests clicking through the dashboard buttons in the notebook toolbar.
   */
 describe('Dashboard View Buttons', function() {
-  boilerplate.setup(this.title, '/notebooks/system-test/Basic.ipynb');
+  boilerplate.setup(this.title, '/notebooks/test/system-test/Basic.ipynb');
   var dashboard = boilerplate.dashboard;
 
   it('clicking layout view should switch to layout view', function(done) {

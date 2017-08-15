@@ -14,14 +14,6 @@ layouts.
 
 For a sample of what's possible with the dashboard layout extension, have a look at the [demo dashboard-notebooks](etc/notebooks) in this repository.
 
-The extension can be used in combination with the incubating
-[jupyter-incubator/dashboards_bundlers](https://github.com/jupyter-incubator/dashboards_bundlers)
-and
-[jupyter-incubator/dashboards_server](https://github.com/jupyter-incubator/dashboards_server)
-projects. See the [Understanding the use
-case](http://jupyter-dashboards-layout.readthedocs.io/en/latest/use-cases.html)
-documentation page for more background information.
-
 ## Installation
 
 Detailed installation instructions appear in the [Getting started
