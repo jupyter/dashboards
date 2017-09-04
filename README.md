@@ -12,7 +12,15 @@ layouts.
 
 ![Dashboard layout screenshot](docs/source/_static/dashboards_intro.png)
 
-For a sample of what's possible with the dashboard layout extension, have a look at the [demo dashboard-notebooks](etc/notebooks) in this repository.
+## Try It
+
+You can try some of the demos in `etc/notebooks` online.
+
+1. Request a [Jupyter Notebook server on beta.mybinder.org](https://beta.mybinder.org/v2/gh/jupyter/dashboards/master).
+2. Wait for the demo server to build and launch.
+3. Click through the folders to `etc/notebooks/got_scotch_demo/scotch_dashboard.ipynb` or `etc/notebooks/plotting_demo.ipynb`.
+4. Run the notebook top to bottom.
+5. Use the [dashboard toolbar to switch to viewing or layout mode](http://jupyter-dashboards-layout.readthedocs.io/en/latest/using.html).
 
 ## Installation
 
