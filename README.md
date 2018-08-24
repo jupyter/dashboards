@@ -1,6 +1,6 @@
 # Jupyter Dashboards - Layout Extension
 
-[![PyPI version](https://badge.fury.io/py/jupyter_dashboards.svg)](https://badge.fury.io/py/jupyter_dashboards) [![Build Status](https://travis-ci.org/jupyter/dashboards.svg?branch=master)](https://travis-ci.org/jupyter/dashboards) [![Google Group](https://img.shields.io/badge/-Google%20Group-lightgrey.svg)](https://groups.google.com/forum/#!forum/jupyter)
+[![PyPI version](https://badge.fury.io/py/jupyter_dashboards.svg)](https://badge.fury.io/py/jupyter_dashboards) [![Build Status](https://travis-ci.org/jupyter/dashboards.svg?branch=master)](https://travis-ci.org/jupyter/dashboards) [![Google Group](https://img.shields.io/badge/-Google%20Group-lightgrey.svg)](https://groups.google.com/forum/#!forum/jupyter) [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/jupyter/dashboards/master)
 
 ## Overview
 
@@ -12,7 +12,11 @@ layouts.
 
 ![Dashboard layout screenshot](docs/source/_static/dashboards_intro.png)
 
+### Demos
+
 For a sample of what's possible with the dashboard layout extension, have a look at the [demo dashboard-notebooks](etc/notebooks) in this repository.
+
+- [![Interactive Plotting Demo](https://img.shields.io/badge/launch-Binder_Plotting_Demo-red.svg)](https://mybinder.org/v2/gh/kmader/dashboards/patch-1?filepath=etc%2Fnotebooks%2Fplotting_demo.ipynb)
 
 ## Installation
 
