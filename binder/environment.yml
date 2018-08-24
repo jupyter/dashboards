@@ -1,0 +1,12 @@
+name: jupyter-dashboards
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - matplotlib
+  - pandas
+  - bokeh
+  - jupyter_dashboards
+  - pip:
+    - plotly
