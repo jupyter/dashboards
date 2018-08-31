@@ -37,7 +37,6 @@ env: ## Make a dev environment
 		pip install -e . && \
 		jupyter dashboards quick-setup --sys-prefix && \
 		jupyter nbextension enable --py widgetsnbextension --sys-prefix
-		#jupyter declarativewidgets quick-setup --sys-prefix
 
 js: ## Make JavaScript assets
 	npm install
