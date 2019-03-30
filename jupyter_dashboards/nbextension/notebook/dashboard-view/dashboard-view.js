@@ -26,7 +26,7 @@ define([
             { name: 'dashboard-common', location: require.toUrl('../dashboard-common').split('?')[0] }
         ],
         paths: {
-            Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.min').split('?')[0],
+            Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.all').split('?')[0],
             lodash: require.toUrl('../bower_components/lodash/lodash').split('?')[0],
             text: require.toUrl('../bower_components/requirejs-text/text').split('?')[0],
             template: require.toUrl('./template-loader').split('?')[0]

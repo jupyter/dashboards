@@ -137,11 +137,11 @@ define([
     GridLayout.prototype._enableGridstack = function() {
         var handles = 'e, se, s, sw, w';
         this.gridstack = this.$container.gridstack({
-                vertical_margin: this.gridMargin,
-                cell_height: this.rowHeight,
+                verticalMargin: this.gridMargin,
+                cellHeight: this.rowHeight,
                 width: this.numCols,
                 // disables single-column mode (which reorders DOM nodes)
-                min_width: 0,
+                minWidth: 0,
                 // Disable animation when first creating Gridstack so it doesn't do a resize
                 // transition on cells when first created. We enable animation later (in
                 // `setInteractive`).
@@ -599,8 +599,8 @@ define([
      */
     GridLayout.prototype.setInteractive = function(args) {
         this._loaded.then(function() {
-            this.gridstack.set_static(!args.enable);
-            this.gridstack.set_animation(args.enable);
+            this.gridstack.setStatic(!args.enable);
+            this.gridstack.setAnimation(args.enable);
             this.interactive = !!args.enable;
 
             if (args.enable) {

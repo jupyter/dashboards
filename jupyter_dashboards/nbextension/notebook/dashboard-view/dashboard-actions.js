@@ -38,14 +38,14 @@ define([
     function enterDashboardMode(newState) {
         opts.enterDbModeCallback(newState);
         // disable scroll to bottom of notebook
-        scrollToBottom = IPython.Notebook.prototype.scroll_to_bottom;
-        IPython.Notebook.prototype.scroll_to_bottom = function() {};
+        scrollToBottom = requirejs("notebook/js/notebook").Notebook.prototype.scroll_to_bottom;
+        requirejs("notebook/js/notebook").Notebook.prototype.scroll_to_bottom = function() {};
     }
 
     function exitDashboardMode() {
         opts.exitDbModeCallback();
         // restore scrolling behavior
-        IPython.Notebook.prototype.scroll_to_bottom = scrollToBottom;
+        requirejs("notebook/js/notebook").Notebook.prototype.scroll_to_bottom = scrollToBottom;
         scrollToBottom = null;
     }
 
