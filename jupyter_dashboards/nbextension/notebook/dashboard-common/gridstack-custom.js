@@ -6,8 +6,7 @@
 /**
  * Overrides some Gridstack functions
  */
-define(['jquery', 'Gridstack'], function($, Gridstack) {
-
+define(['jquery', 'gridstack', 'gridstack.jqueryui'], function($, Gridstack, GridstackjQueryUI) {
     var GridstackCustom = function() {
         Gridstack.apply(this, arguments);
     };

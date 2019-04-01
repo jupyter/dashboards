@@ -26,10 +26,11 @@ define([
             { name: 'dashboard-common', location: require.toUrl('../dashboard-common').split('?')[0] }
         ],
         paths: {
-            Gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack.all').split('?')[0],
             lodash: require.toUrl('../bower_components/lodash/lodash').split('?')[0],
             text: require.toUrl('../bower_components/requirejs-text/text').split('?')[0],
-            template: require.toUrl('./template-loader').split('?')[0]
+            template: require.toUrl('./template-loader').split('?')[0],
+            gridstack: require.toUrl('../bower_components/gridstack/dist/gridstack').split('?')[0],
+            'gridstack.jqueryui': require.toUrl('../bower_components/gridstack/dist/gridstack.jQueryUI').split('?')[0]
             // jquery-ui is already loaded by Notebook, as 'jqueryui' in 4.0.x and 'jquery-ui' in 4.1.x
         },
         map: {
@@ -39,12 +40,31 @@ define([
             // because requirejs does not recursively apply maps and instead chooses the most
             // specific rule. Here, that would be whatever we set for Gridstack vs whatever notebook
             // set for '*'.
-            Gridstack: {
+            '*': {
                 'jquery-ui/core': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
                 'jquery-ui/mouse': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
                 'jquery-ui/widget': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
                 'jquery-ui/resizable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
-                'jquery-ui/draggable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui'
+                'jquery-ui/draggable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/data': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/disable-selection': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/focusable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/form': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/ie': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/labels': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/jquery-1-7': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/plugin': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/keycode': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/safe-active-element': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/safe-blur': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/scroll-parent': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/tabbable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/unique-id': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/version': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/widgets/mouse': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/widgets/draggable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/widgets/droppable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui',
+                'jquery-ui/widgets/resizable': require.specified('jquery-ui') ? 'jquery-ui' : 'jqueryui'
             }
         }
     });
