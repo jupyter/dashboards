@@ -446,8 +446,8 @@ define([
     GridLayout.prototype._hideCell = function($cell) {
         var self = this;
         this.$container.one('change', function() {
-            $cell.resizable('destroy');
-            $cell.draggable('destroy');
+            $cell.resizable(false);
+            $cell.draggable(false);
             Metadata.hideCell($cell);
             // Temporarily set 'top' *before* removing 'grid-stack-item' class. This makes it so
             // cell animates when moving from dashboard to hidden cells area.
@@ -665,7 +665,7 @@ define([
         });
 
         $('.grid-stack-item')
-                .resizable('destroy').draggable('destroy')
+                .resizable(false).draggable(false)
                 .removeClass('ui-resizable-autohide'); // jquery bug, cannot remove class using API
 
         $('.dashboard-item-background').remove();

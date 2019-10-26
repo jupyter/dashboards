@@ -1,15 +1,15 @@
 {
   "name": "jupyter-dashboards",
   "description": "Frontend dependencies for the Jupyter Notebook dashboards extension",
- "dependencies": {},
+  "dependencies": {},
   "devDependencies": {
-    "bower": "^1.4.1",
-    "mocha" :"^2.0.0",
-    "wd": "latest",
+    "bower": "^1.8.4",
     "chai": "latest",
     "chai-as-promised": "latest",
     "colors": "latest",
-    "minimist": "latest"
+    "minimist": "latest",
+    "mocha": "^5.2.0",
+    "wd": "^1.10.3"
   },
   "scripts": {
     "bower": "bower --allow-root install",
