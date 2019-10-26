@@ -1,4 +1,8 @@
-# Jupyter Dashboards - Layout Extension
+# [RETIRED] Jupyter Dashboards - Layout Extension
+
+This project has been retired and replaced by incorporating the [Voilà ecosystem of dashboarding tools into Project Jupyter](https://github.com/voila-dashboards). See the [Jupyter blog](https://blog.jupyter.org/and-voil%C3%A0-f6a2c08a4a93) [posts](https://blog.jupyter.org/a-gallery-of-voil%C3%A0-examples-a2ce7ef99130?source=collection_home---6------10-----------------------) about Voilà and the [proposal to make Voilà part of Jupyter](https://github.com/jupyter/enhancement-proposals/blob/master/voila-incorporation/voila-incorporation.md) for more details. [voila-gridstack](https://github.com/voila-dashboards/voila-gridstack) is an on-going project to support layouts created by this deprecated extension using Voilà.
+
+---
 
 [![Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.](https://www.repostatus.org/badges/latest/inactive.svg)](https://www.repostatus.org/#inactive)
 [![PyPI version](https://badge.fury.io/py/jupyter_dashboards.svg)](https://badge.fury.io/py/jupyter_dashboards) [![Build Status](https://travis-ci.org/jupyter/dashboards.svg?branch=master)](https://travis-ci.org/jupyter/dashboards) [![Google Group](https://img.shields.io/badge/-Google%20Group-lightgrey.svg)](https://groups.google.com/forum/#!forum/jupyter)
