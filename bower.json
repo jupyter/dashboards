@@ -15,7 +15,7 @@
     "tests"
   ],
   "dependencies": {
-    "gridstack": "0.2.4",
+    "gridstack": "0.4.0",
     "requirejs": "~2.1.20",
     "requirejs-text": "~2.0.14"
   }

@@ -6,8 +6,7 @@
 /**
  * Overrides some Gridstack functions
  */
-define(['jquery', 'Gridstack'], function($, Gridstack) {
-
+define(['jquery', 'gridstack', 'gridstack.jqueryui'], function($, Gridstack, GridstackjQueryUI) {
     var GridstackCustom = function() {
         Gridstack.apply(this, arguments);
     };
@@ -15,29 +14,29 @@ define(['jquery', 'Gridstack'], function($, Gridstack) {
     GridstackCustom.prototype = Object.create(Gridstack.prototype);
     GridstackCustom.prototype.constructor = GridstackCustom;
 
-    GridstackCustom.prototype.__destroy = Gridstack.prototype.destroy;
-    GridstackCustom.prototype.destroy = function(detach_node) {
-        detach_node = typeof detach_node === 'undefined' ? true : detach_node;
+    // GridstackCustom.prototype.__destroy = Gridstack.prototype.destroy;
+    // GridstackCustom.prototype.destroy = function(detach_node) {
+    //     detach_node = typeof detach_node === 'undefined' ? true : detach_node;
 
-        if (!detach_node) {
-            // Gridstack.destroy() removes the container from the DOM. Hack around it to make it
-            // a no-op if `detach_node` is false.
-            var $container = this.container;
-            var oldRemove = $.fn.remove;
-            $.fn.remove = function() {
-                if (!this.is($container)) {
-                    return oldRemove.apply(this, arguments);
-                }
-                return this;
-            };
-        }
+    //     if (!detach_node) {
+    //         // Gridstack.destroy() removes the container from the DOM. Hack around it to make it
+    //         // a no-op if `detach_node` is false.
+    //         var $container = this.container;
+    //         var oldRemove = $.fn.remove;
+    //         $.fn.remove = function() {
+    //             if (!this.is($container)) {
+    //                 return oldRemove.apply(this, arguments);
+    //             }
+    //             return this;
+    //         };
+    //     }
 
-        this.__destroy();
+    //     this.__destroy();
 
-        if (!detach_node) {
-            $.fn.remove = oldRemove;
-        }
-    };
+    //     if (!detach_node) {
+    //         $.fn.remove = oldRemove;
+    //     }
+    // };
 
     /**
      * Generates cell styles which depend on margin (which is a layout option).
